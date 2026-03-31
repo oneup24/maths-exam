@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">math-exam</string>
+    <string name="title_activity_main">math-exam</string>
+    <string name="package_name">com.mathexam.app</string>
+    <string name="custom_url_scheme">com.mathexam.app</string>
+</resources>

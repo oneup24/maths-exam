@@ -1,7 +1,13 @@
 import React,{useState,useEffect,useCallback,useRef} from 'react';
+import confetti from 'canvas-confetti';
+import {playCorrect,playWrong,playTick,playFanfare,playSubmit} from './lib/sounds';
+import Onboarding from './Onboarding';
+import PrivacyPolicy from './PrivacyPolicy';
+import Profile from './Profile';
 import {motion,AnimatePresence} from 'framer-motion';
 import {ArrowLeft,RotateCcw,Eye,Printer,ChevronDown,ChevronUp,X,Check,Play,Pause,BookOpen,Send,Trophy,AlertTriangle,Home,Clock,History,Trash2} from 'lucide-react';
 import {TOPICS,GRADE_INFO,DIFF_INFO,buildExam,printExam,chkAns,saveHistory,loadHistory,clearHistory} from './lib/engine';
+import {t} from './lib/i18n';
 
 const fmt=t=>{var m=Math.floor(t/60),s=t%60;return m+':'+(s<10?'0':'')+s};
 
@@ -20,7 +26,7 @@ export default function App(){
   const[running,setRunning]=useState(false);
   const[showPrint,setShowPrint]=useState(false);
   const[printAns,setPrintAns]=useState(false);
-  const[studentName,setStudentName]=useState('');
+  const[studentName,setStudentName]=useState(()=>localStorage.getItem('student_name')||'');
   const[answers,setAnswers]=useState({});
   const[mcSel,setMcSel]=useState({});
   const[isMarked,setIsMarked]=useState(false);
@@ -30,10 +36,24 @@ export default function App(){
   const[wrongOnly,setWrongOnly]=useState(false);
   const[history,setHistory]=useState([]);
   const timerRef=useRef(null);
+  const[onboarded,setOnboarded]=useState(()=>!!localStorage.getItem('onboarding_done'));
+  const[streak,setStreak]=useState(()=>+(localStorage.getItem('streak_count')||0));
+  const[soundOn,setSoundOn]=useState(()=>localStorage.getItem('sound_on')!=='0');
+  const[showPrivacy,setShowPrivacy]=useState(false);
+  const[lang,setLang]=useState(()=>localStorage.getItem('lang')||'zh');
+  const L=(key,...args)=>t(lang,key,...args);
+  const[gradeBest,setGradeBest]=useState(()=>{var b={};[1,2,3,4,5,6].forEach(g=>{var v=localStorage.getItem('grade_best_'+g);if(v)b[g]=+v});return b;});
+  var isBirthday=(()=>{var bd=localStorage.getItem('student_birthday');if(!bd)return false;var b=new Date(bd),n=new Date();return b.getMonth()===n.getMonth()&&b.getDate()===n.getDate();})();
 
   useEffect(()=>{var ts=TOPICS[grade];if(ts)setSelTopics(new Set(ts.map(t=>t.id)))},[grade]);
   useEffect(()=>{setHistory(loadHistory())},[]);
-  useEffect(()=>{if(running&&timeLeft>0){timerRef.current=setInterval(()=>{setTimeLeft(t=>{if(t<=1){setRunning(false);return 0}return t-1})},1000);return()=>clearInterval(timerRef.current)}if(running&&timeLeft<=0)setRunning(false)},[running,timeLeft]);
+  useEffect(()=>{if(running&&timeLeft>0){timerRef.current=setInterval(()=>{setTimeLeft(t=>{if(t<=1){setRunning(false);return 0}if(t<=60&&soundOn)playTick();return t-1})},1000);return()=>clearInterval(timerRef.current)}if(running&&timeLeft<=0)setRunning(false)},[running,timeLeft,soundOn]);
+
+  var completeOnboarding=n=>{
+    if(n){setStudentName(n);localStorage.setItem('student_name',n);}
+    localStorage.setItem('onboarding_done','1');
+    setOnboarded(true);
+  };
 
   var generate=useCallback(()=>{
     var exam=buildExam(grade,Array.from(selTopics),examType,difficulty);
@@ -57,14 +77,53 @@ export default function App(){
       var pts=ok?(q.sc||2):0;sc+=pts;res[k]={ok,pts,max:q.sc||2};
     }));
     setMarkRes(res);setTotScore(sc);setIsMarked(true);setRunning(false);setShowSubmit(false);
+    /* sounds */
+    if(soundOn){var sp0=grandTotal>0?Math.round(sc/grandTotal*100):0;setTimeout(()=>{if(sp0>=80)playFanfare();else if(sp0>=50)playCorrect();else playWrong();},400);}
+    /* confetti */
+    var sp=grandTotal>0?Math.round(sc/grandTotal*100):0;
+    var cols=['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#c77dff'];
+    if(sp>=90){
+      setTimeout(()=>{
+        confetti({particleCount:80,angle:60,spread:55,origin:{x:0,y:0.65},colors:cols});
+        confetti({particleCount:80,angle:120,spread:55,origin:{x:1,y:0.65},colors:cols});
+      },300);
+      setTimeout(()=>{
+        confetti({particleCount:60,angle:60,spread:55,origin:{x:0,y:0.65},colors:cols});
+        confetti({particleCount:60,angle:120,spread:55,origin:{x:1,y:0.65},colors:cols});
+        confetti({particleCount:30,spread:70,origin:{y:0.5},shapes:['star'],colors:['#FFD700','#FFA500']});
+      },800);
+    }else if(sp>=80){
+      setTimeout(()=>confetti({particleCount:120,spread:80,origin:{y:0.6},colors:cols}),300);
+    }else if(sp>=50){
+      setTimeout(()=>confetti({particleCount:50,spread:55,origin:{y:0.6},colors:['#ffd93d','#6bcb77','#4d96ff']}),300);
+    }
+    /* streak */
+    var today=new Date().toISOString().slice(0,10);
+    var last=localStorage.getItem('streak_last_date');
+    var yesterday=new Date(Date.now()-864e5).toISOString().slice(0,10);
+    var newStreak=last===today?+(localStorage.getItem('streak_count')||1):last===yesterday?+(localStorage.getItem('streak_count')||0)+1:1;
+    localStorage.setItem('streak_count',newStreak);
+    localStorage.setItem('streak_last_date',today);
+    setStreak(newStreak);
+    /* grade best */
+    var prevBest=+(localStorage.getItem('grade_best_'+grade)||0);
+    if(sp>prevBest){localStorage.setItem('grade_best_'+grade,sp);setGradeBest(p=>({...p,[grade]:sp}));}
     /* save to history */
     saveHistory({grade,difficulty,examType,score:sc,total:grandTotal,pct:grandTotal>0?Math.round(sc/grandTotal*100):0,qCount:totalQs,date:new Date().toLocaleDateString('zh-HK')});
     setHistory(loadHistory());
     setTimeout(()=>window.scrollTo({top:0,behavior:'smooth'}),100);
   };
   var resetMarking=()=>{setAnswers({});setMcSel({});setIsMarked(false);setMarkRes({});setTotScore(0);setWrongOnly(false);setRevealed({});setStepsShown({})};
+  var retryWrong=()=>{
+    var ws=sections.map((sec,si)=>{
+      var wqs=sec.qs.filter((_,qi)=>{var mr=markRes[si+'-'+qi];return mr&&!mr.ok;});
+      return{...sec,qs:wqs,total:wqs.reduce((s,q)=>s+(q.sc||2),0)};
+    }).filter(s=>s.qs.length>0);
+    setSections(ws);setAnswers({});setMcSel({});setIsMarked(false);setMarkRes({});setTotScore(0);setWrongOnly(false);setRevealed({});setStepsShown({});
+    setTimeout(()=>window.scrollTo({top:0,behavior:'smooth'}),100);
+  };
   var pct=grandTotal>0?Math.round(totScore/grandTotal*100):0;
-  var fb=pct>=90?{e:'🌟',m:'太棒了！成績優異！',c:'text-yellow-500'}:pct>=70?{e:'😊',m:'做得好！繼續保持！',c:'text-emerald-500'}:pct>=50?{e:'💪',m:'尚可，繼續加油！',c:'text-blue-500'}:{e:'📚',m:'多加練習，你可以的！',c:'text-orange-500'};
+  var fb=L('fb',pct);
   var secScores=si=>{var sec=sections[si];if(!sec)return 0;var total=0;sec.qs.forEach((q,qi)=>{var mr=markRes[si+'-'+qi];if(mr)total+=mr.pts});return total};
 
   var GC={rose:'from-rose-500 to-rose-600',orange:'from-orange-500 to-orange-600',amber:'from-amber-500 to-amber-600',emerald:'from-emerald-500 to-emerald-600',sky:'from-sky-500 to-sky-600',violet:'from-violet-500 to-violet-600'};
@@ -72,35 +131,71 @@ export default function App(){
   var co=GRADE_INFO[grade]?GRADE_INFO[grade].co:'indigo';
   var catColors={'數':'bg-blue-100 text-blue-700','代數':'bg-purple-100 text-purple-700','度量':'bg-green-100 text-green-700','圖形與空間':'bg-orange-100 text-orange-700','數據處理':'bg-pink-100 text-pink-700'};
 
+  /* ════════ ONBOARDING ════════ */
+  if(!onboarded)return <Onboarding onComplete={completeOnboarding} lang={lang}/>;
+
+  /* ════════ PROFILE ════════ */
+  if(view==='profile')return <Profile onBack={()=>setView('home')} lang={lang} studentName={studentName} setStudentName={setStudentName} streak={streak}/>;
+
   /* ════════ HOME ════════ */
   if(view==='home')return(
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 p-4 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-stone-50 to-orange-50 p-4 pb-20">
       <div className="max-w-lg mx-auto">
+        <div className="flex justify-between items-center mb-1">
+          <button onClick={()=>{const v=lang==='zh'?'en':'zh';setLang(v);localStorage.setItem('lang',v);}}
+            className="text-xs font-black px-3 py-1.5 rounded-full bg-white/60 active:bg-white border border-stone-200 shadow-sm text-gray-600">
+            {lang==='zh'?'EN':'中'}
+          </button>
+          <button onClick={()=>setView('profile')}
+            className="text-xl p-2 rounded-full bg-white/60 active:bg-white border border-stone-200 shadow-sm">
+            ⚙️
+          </button>
+          <button onClick={()=>{const v=!soundOn;setSoundOn(v);localStorage.setItem('sound_on',v?'1':'0');}}
+            className="text-xl p-2 rounded-full bg-white/60 active:bg-white border border-stone-200 shadow-sm">
+            {soundOn?'🔊':'🔇'}
+          </button>
+        </div>
         <motion.div initial={{opacity:0,y:15}} animate={{opacity:1,y:0}} className="text-center mb-4 pt-4">
-          <div className="text-5xl mb-2">📐</div>
-          <h1 className="text-2xl font-black text-gray-800">小學數學模擬試卷</h1>
-          <p className="text-xs text-gray-400 mt-1">依據教育局《小學數學科學習內容》(2017)</p>
+          <img src={isBirthday?'/mascot-happy.png':'/mascot.png'} alt="mascot" className="w-48 h-48 object-cover rounded-3xl mx-auto mb-3 shadow-lg"/>
+          {isBirthday&&<motion.div initial={{scale:0}} animate={{scale:1}} transition={{type:'spring',stiffness:200}} className="inline-flex items-center gap-1.5 bg-pink-100 border border-pink-200 text-pink-600 font-bold text-sm px-3 py-1.5 rounded-full mb-2">🎂 {lang==='zh'?'生日快樂！':'Happy Birthday!'}</motion.div>}
+          <div className="flex items-center justify-center gap-3 mb-1">
+            {studentName?<p className="text-base font-bold text-indigo-600">{L('greeting',studentName)}</p>:null}
+            {streak>0&&<div className="flex items-center gap-1 bg-orange-100 border border-orange-200 px-2.5 py-1 rounded-full">
+              <span className="text-lg">🔥</span>
+              <span className="text-sm font-black text-orange-500">{streak}</span>
+              <span className="text-xs text-orange-400 font-bold">{lang==='zh'?'日':'d'}</span>
+            </div>}
+          </div>
+          <h1 className="text-3xl font-black text-gray-800">{L('appTitle')}</h1>
+          <p className="text-xs text-gray-400 mt-1">{L('appSubtitle')}</p>
           <div className="flex items-center justify-center gap-2 mt-1 flex-wrap">
-            <span className="text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full">Band 1 級</span>
-            <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full flex items-center gap-0.5"><AlertTriangle size={10}/> 含干擾項</span>
+            <span className="text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full">{L('band1')}</span>
+            <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full flex items-center gap-0.5"><AlertTriangle size={10}/> {L('hasTrap')}</span>
           </div>
         </motion.div>
         <div className="grid grid-cols-2 gap-3 mb-4">
-          {[1,2,3,4,5,6].map(g=>(
-            <motion.button key={g} whileTap={{scale:.96}} onClick={()=>{setGrade(g);setView('settings')}}
-              className={"p-4 rounded-2xl bg-gradient-to-br "+GC[GRADE_INFO[g].co]+" text-white shadow-lg active:shadow-md transition-shadow"}>
-              <div className="text-3xl font-black">P{g}</div>
-              <div className="text-sm font-bold opacity-90">{GRADE_INFO[g].nm}</div>
-              <div className="text-xs opacity-70 mt-1">{TOPICS[g].length}個課題</div>
-            </motion.button>
-          ))}
+          {[1,2,3,4,5,6].map(g=>{
+            var best=gradeBest[g]||0;
+            var stars=best>=80?3:best>=60?2:best>=40?1:0;
+            return(
+              <motion.button key={g} whileTap={{scale:.96}} onClick={()=>{setGrade(g);setView('settings')}}
+                className={"relative p-5 rounded-3xl bg-gradient-to-br "+GC[GRADE_INFO[g].co]+" text-white shadow-lg active:shadow-md transition-shadow"}>
+                {stars>0&&<div className="absolute top-2 right-2 flex gap-0.5">
+                  {[1,2,3].map(s=><span key={s} className={"text-base "+(s<=stars?'opacity-100':'opacity-25')}>⭐</span>)}
+                </div>}
+                <div className="text-4xl font-black">P{g}</div>
+                <div className="text-base font-bold opacity-90">{GRADE_INFO[g].nm}</div>
+                <div className="text-xs opacity-70 mt-1">{best>0?L('bestScore',best):L('topicsCount',TOPICS[g].length)}</div>
+              </motion.button>
+            );
+          })}
         </div>
         {/* History Section */}
         {history.length>0&&(
           <div className="bg-white rounded-2xl p-4 shadow-sm border mb-3">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-bold text-gray-700 flex items-center gap-1.5"><History size={16}/>歷史記錄</h3>
-              <button onClick={()=>{clearHistory();setHistory([])}} className="text-xs text-red-400 flex items-center gap-0.5"><Trash2 size={12}/>清除</button>
+              <h3 className="font-bold text-gray-700 flex items-center gap-1.5"><History size={16}/>{L('historyTitle')}</h3>
+              <button onClick={()=>{clearHistory();setHistory([])}} className="text-xs text-red-400 flex items-center gap-0.5"><Trash2 size={12}/>{L('clearHistory')}</button>
             </div>
             <div className="space-y-1.5 max-h-48 overflow-y-auto">
               {history.slice(0,8).map((h,i)=>(
@@ -123,18 +218,24 @@ export default function App(){
           <div className="flex items-start gap-2">
             <AlertTriangle size={16} className="text-amber-600 mt-0.5 shrink-0"/>
             <div>
-              <p className="text-xs font-bold text-amber-700">干擾項訓練</p>
-              <p className="text-xs text-amber-600 mt-0.5">應用題包含與解題無關的數據，訓練學生篩選有用資訊的能力。批改後會標示哪些是干擾資訊。</p>
+              <p className="text-xs font-bold text-amber-700">{L('trapBoxTitle')}</p>
+              <p className="text-xs text-amber-600 mt-0.5">{L('trapBoxDesc')}</p>
             </div>
           </div>
         </div>
+
+        <p className="text-center text-xs text-gray-300 mt-6">
+          <button onClick={()=>setShowPrivacy(true)} className="underline hover:text-gray-400">{L('privacy')}</button>
+        </p>
       </div>
+
+      <AnimatePresence>{showPrivacy&&<PrivacyPolicy onClose={()=>setShowPrivacy(false)}/>}</AnimatePresence>
     </div>
   );
 
   /* ════════ SETTINGS ════════ */
   if(view==='settings')return(
-    <div className="min-h-screen bg-gray-50 p-3 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-stone-50 to-orange-50 p-3 pb-20">
       <div className="max-w-lg mx-auto">
         <div className="flex items-center gap-3 mb-4">
           <button onClick={()=>setView('home')} className="p-2 rounded-xl bg-white border active:bg-gray-100"><ArrowLeft size={18}/></button>
@@ -143,7 +244,7 @@ export default function App(){
 
         {/* Difficulty — NEW */}
         <div className="bg-white rounded-2xl p-4 shadow-sm border mb-3">
-          <h3 className="font-bold text-gray-700 mb-2">⭐ 難度</h3>
+          <h3 className="font-bold text-gray-700 mb-2">{L('diffTitle')}</h3>
           <div className="grid grid-cols-3 gap-2">
             {[1,2,3].map(d=>{var di=DIFF_INFO[d];var dcol={1:'border-emerald-500 bg-emerald-50 text-emerald-700',2:'border-amber-500 bg-amber-50 text-amber-700',3:'border-rose-500 bg-rose-50 text-rose-700'};return(
               <button key={d} onClick={()=>setDifficulty(d)}
@@ -159,8 +260,8 @@ export default function App(){
         {/* Topics */}
         <div className="bg-white rounded-2xl p-4 shadow-sm border mb-3">
           <div className="flex justify-between items-center mb-3">
-            <h3 className="font-bold text-gray-700 flex items-center gap-1"><BookOpen size={16}/>課題(請選擇需要的課題)</h3>
-            <button onClick={toggleAll} className="text-xs px-3 py-1 rounded-lg bg-indigo-100 text-indigo-600 font-bold">{selTopics.size===TOPICS[grade].length?'取消全選':'全選'}</button>
+            <h3 className="font-bold text-gray-700 flex items-center gap-1"><BookOpen size={16}/>{L('topicsTitle')}</h3>
+            <button onClick={toggleAll} className="text-xs px-3 py-1 rounded-lg bg-indigo-100 text-indigo-600 font-bold">{selTopics.size===TOPICS[grade].length?L('deselectAll'):L('selectAll')}</button>
           </div>
           <div className="space-y-1.5">
             {TOPICS[grade].map(t=>(
@@ -179,12 +280,12 @@ export default function App(){
 
         {/* Exam Type */}
         <div className="bg-white rounded-2xl p-4 shadow-sm border mb-3">
-          <h3 className="font-bold text-gray-700 mb-2">📋 類型</h3>
+          <h3 className="font-bold text-gray-700 mb-2">{L('typeTitle')}</h3>
           <div className="flex gap-2">
-            {[{v:'practice',l:'練習',d:'~12題'},{v:'test',l:'測驗',d:'~15題'},{v:'exam',l:'考試',d:'~24題'}].map(e=>(
+            {[{v:'practice',lk:'practice',dk:'practiceQ'},{v:'test',lk:'test',dk:'testQ'},{v:'exam',lk:'exam',dk:'examQ'}].map(e=>(
               <button key={e.v} onClick={()=>{setExamType(e.v);setTimerMins(e.v==='test'?30:e.v==='exam'?55:30);setUseTimer(e.v!=='practice')}}
                 className={"flex-1 py-2.5 rounded-xl border-2 transition-all "+(examType===e.v?'border-indigo-500 bg-indigo-50 text-indigo-700':'border-gray-200 text-gray-400')}>
-                <div className="text-sm font-bold">{e.l}</div><div className="text-xs opacity-70">{e.d}</div>
+                <div className="text-sm font-bold">{L(e.lk)}</div><div className="text-xs opacity-70">{L(e.dk)}</div>
               </button>
             ))}
           </div>
@@ -193,17 +294,17 @@ export default function App(){
         {/* Timer */}
         <div className="bg-white rounded-2xl p-4 shadow-sm border mb-3">
           <div className="flex items-center justify-between">
-            <h3 className="font-bold text-gray-700">⏱️ 計時</h3>
+            <h3 className="font-bold text-gray-700">{L('timerTitle')}</h3>
             <button onClick={()=>setUseTimer(!useTimer)} className={"w-12 h-6 rounded-full transition-all "+(useTimer?'bg-indigo-500':'bg-gray-300')}>
               <div className={"w-5 h-5 bg-white rounded-full shadow transition-transform "+(useTimer?'translate-x-6':'translate-x-0.5')}/>
             </button>
           </div>
-          {useTimer&&<div className="flex items-center gap-3 mt-2"><input type="range" min={10} max={90} value={timerMins} onChange={e=>setTimerMins(+e.target.value)} className="flex-1 accent-indigo-500"/><span className="text-sm font-bold text-indigo-600 w-16 text-right">{timerMins}分鐘</span></div>}
+          {useTimer&&<div className="flex items-center gap-3 mt-2"><input type="range" min={10} max={90} value={timerMins} onChange={e=>setTimerMins(+e.target.value)} className="flex-1 accent-indigo-500"/><span className="text-sm font-bold text-indigo-600 w-16 text-right">{L('minutes',timerMins)}</span></div>}
         </div>
 
         <motion.button whileTap={{scale:.97}} onClick={generate} disabled={selTopics.size===0}
-          className={"w-full py-4 rounded-2xl font-extrabold text-lg shadow-xl text-white transition-all "+(selTopics.size>0?'bg-gradient-to-r '+GC[co]+' active:shadow-md':'bg-gray-300')}>
-          ✨ 生成試卷（{DIFF_INFO[difficulty].nm}·已選{selTopics.size}個課題）
+          className={"w-full py-5 rounded-3xl font-extrabold text-xl shadow-xl text-white transition-all "+(selTopics.size>0?'bg-gradient-to-r '+GC[co]+' active:shadow-md':'bg-gray-300')}>
+          {L('generateBtn',DIFF_INFO[difficulty].nm,selTopics.size)}
         </motion.button>
       </div>
     </div>
@@ -211,19 +312,19 @@ export default function App(){
 
   /* ════════ EXAM ════════ */
   return(
-    <div className="min-h-screen bg-gray-50 p-3 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-stone-50 to-orange-50 p-3 pb-24">
       <AnimatePresence>{showSubmit&&(
         <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{background:'rgba(0,0,0,.5)'}}>
           <motion.div initial={{scale:.9}} animate={{scale:1}} className="bg-white rounded-2xl p-5 w-full max-w-sm shadow-2xl">
-            <h3 className="font-extrabold text-lg text-center mb-3">✍️ 確認交卷</h3>
+            <h3 className="font-extrabold text-lg text-center mb-3">{L('confirmSubmitTitle')}</h3>
             <div className="text-center mb-4">
               <div className="text-4xl font-black text-indigo-600">{answeredQs}<span className="text-lg text-gray-300">/{totalQs}</span></div>
-              <p className="text-sm text-gray-500 mt-1">已完成題目</p>
-              {answeredQs<totalQs&&<p className="text-xs text-orange-500 font-bold mt-2">⚠️ 尚有 {totalQs-answeredQs} 題未作答</p>}
+              <p className="text-sm text-gray-500 mt-1">{L('answeredLabel')}</p>
+              {answeredQs<totalQs&&<p className="text-xs text-orange-500 font-bold mt-2">{L('unanswered',totalQs-answeredQs)}</p>}
             </div>
             <div className="flex gap-2">
-              <button onClick={()=>setShowSubmit(false)} className="flex-1 py-2.5 border-2 border-gray-200 rounded-xl font-bold text-sm text-gray-500 active:bg-gray-100">繼續作答</button>
-              <button onClick={markExam} className="flex-1 py-2.5 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl font-bold text-sm">確認交卷</button>
+              <button onClick={()=>setShowSubmit(false)} className="flex-1 py-2.5 border-2 border-gray-200 rounded-xl font-bold text-sm text-gray-500 active:bg-gray-100">{L('continueBtn')}</button>
+              <button onClick={markExam} className="flex-1 py-2.5 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl font-bold text-sm">{L('confirmBtn')}</button>
             </div>
           </motion.div>
         </motion.div>
@@ -232,13 +333,13 @@ export default function App(){
       <AnimatePresence>{showPrint&&(
         <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{background:'rgba(0,0,0,.5)'}}>
           <motion.div initial={{scale:.9}} animate={{scale:1}} className="bg-white rounded-2xl p-5 w-full max-w-sm shadow-2xl">
-            <div className="flex justify-between items-center mb-3"><h3 className="font-extrabold text-lg">🖨️ 列印</h3><button onClick={()=>setShowPrint(false)} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center"><X size={16}/></button></div>
-            <input type="text" value={studentName} onChange={e=>setStudentName(e.target.value)} placeholder="學生姓名（可選）" className="w-full px-3 py-2 border-2 rounded-xl text-sm mb-3 focus:border-indigo-400 focus:outline-none"/>
+            <div className="flex justify-between items-center mb-3"><h3 className="font-extrabold text-lg">{L('printTitle')}</h3><button onClick={()=>setShowPrint(false)} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center"><X size={16}/></button></div>
+            <input type="text" value={studentName} onChange={e=>setStudentName(e.target.value)} placeholder={L('studentNamePH')} className="w-full px-3 py-2 border-2 rounded-xl text-sm mb-3 focus:border-indigo-400 focus:outline-none"/>
             <div className="flex gap-2 mb-3">
-              <button onClick={()=>setPrintAns(false)} className={"flex-1 py-2 rounded-xl text-sm font-bold border-2 "+(!printAns?'border-indigo-500 bg-indigo-50':'border-gray-200 text-gray-400')}>📄 學生版</button>
-              <button onClick={()=>setPrintAns(true)} className={"flex-1 py-2 rounded-xl text-sm font-bold border-2 "+(printAns?'border-emerald-500 bg-emerald-50':'border-gray-200 text-gray-400')}>✅ 附答案</button>
+              <button onClick={()=>setPrintAns(false)} className={"flex-1 py-2 rounded-xl text-sm font-bold border-2 "+(!printAns?'border-indigo-500 bg-indigo-50':'border-gray-200 text-gray-400')}>{L('studentVer')}</button>
+              <button onClick={()=>setPrintAns(true)} className={"flex-1 py-2 rounded-xl text-sm font-bold border-2 "+(printAns?'border-emerald-500 bg-emerald-50':'border-gray-200 text-gray-400')}>{L('answerVer')}</button>
             </div>
-            <button onClick={()=>{printExam(sections,grade,printAns,studentName,difficulty);setShowPrint(false)}} className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-extrabold rounded-xl">🖨️ 開啟列印</button>
+            <button onClick={()=>{printExam(sections,grade,printAns,studentName,difficulty);setShowPrint(false)}} className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-extrabold rounded-xl">{L('openPrint')}</button>
           </motion.div>
         </motion.div>
       )}</AnimatePresence>
@@ -247,15 +348,15 @@ export default function App(){
         {/* Top bar */}
         <div className="bg-white rounded-2xl p-3 mb-2 shadow-sm border">
           <div className="flex items-center justify-between flex-wrap gap-1">
-            <button onClick={()=>{setRunning(false);setView('settings')}} className="text-indigo-600 text-sm font-bold flex items-center gap-1"><ArrowLeft size={14}/>設定</button>
+            <button onClick={()=>{setRunning(false);setView('settings')}} className="text-indigo-600 text-sm font-bold flex items-center gap-1"><ArrowLeft size={14}/>{L('settingsBtn')}</button>
             <div className="flex items-center gap-1.5">
               <span className={"text-xs font-bold px-2 py-0.5 rounded-full "+GCL[co]}>P{grade}</span>
               <span className={"text-xs font-bold px-2 py-0.5 rounded-full "+(difficulty===1?'bg-emerald-50 text-emerald-600':difficulty===3?'bg-rose-50 text-rose-600':'bg-amber-50 text-amber-600')}>{DIFF_INFO[difficulty].ic}{DIFF_INFO[difficulty].nm}</span>
             </div>
-            <span className="text-xs text-gray-400">共{totalQs}題·{grandTotal}分</span>
+            <span className="text-xs text-gray-400">{L('totalQS',totalQs,grandTotal)}</span>
           </div>
-          <h2 className="text-center font-black text-gray-800 mt-1">📐 數學模擬試卷</h2>
-          {trapCount>0&&<p className="text-center text-xs text-amber-600 font-bold flex items-center justify-center gap-1 mt-0.5"><AlertTriangle size={10}/>含 {trapCount} 題干擾項</p>}
+          <h2 className="text-center font-black text-gray-800 mt-1">{L('examTitle')}</h2>
+          {trapCount>0&&<p className="text-center text-xs text-amber-600 font-bold flex items-center justify-center gap-1 mt-0.5"><AlertTriangle size={10}/>{L('trapCount',trapCount)}</p>}
           {useTimer&&!isMarked&&(
             <div className="flex items-center justify-center gap-3 mt-2">
               <button onClick={()=>setRunning(!running)} className="p-1.5 rounded-lg bg-indigo-100 text-indigo-600 active:bg-indigo-200">{running?<Pause size={14}/>:<Play size={14}/>}</button>
@@ -264,7 +365,7 @@ export default function App(){
           )}
           {!isMarked&&(
             <div className="mt-2">
-              <div className="flex justify-between text-xs text-gray-400 mb-1"><span>進度</span><span className="font-bold">{answeredQs}/{totalQs}</span></div>
+              <div className="flex justify-between text-xs text-gray-400 mb-1"><span>{L('progress')}</span><span className="font-bold">{answeredQs}/{totalQs}</span></div>
               <div className="w-full bg-gray-200 rounded-full h-1.5"><div className="bg-indigo-500 h-1.5 rounded-full transition-all" style={{width:(totalQs>0?answeredQs/totalQs*100:0)+'%'}}/></div>
             </div>
           )}
@@ -273,14 +374,19 @@ export default function App(){
         {/* Score Report */}
         <AnimatePresence>{isMarked&&(
           <motion.div initial={{opacity:0,y:-20}} animate={{opacity:1,y:0}} className="bg-white rounded-2xl p-4 mb-3 shadow-lg border-2 border-indigo-200">
-            <div className="flex items-center justify-center gap-1 mb-1"><Trophy size={20} className="text-yellow-500"/><h3 className="font-black text-lg">成績報告</h3></div>
+            <div className="flex items-center justify-center gap-1 mb-1"><Trophy size={20} className="text-yellow-500"/><h3 className="font-black text-lg">{L('scoreReport')}</h3></div>
             <div className="text-center my-3">
               <div><span className="text-5xl font-black text-indigo-600">{totScore}</span><span className="text-2xl text-gray-300"> / {grandTotal}</span></div>
               <div className="w-full bg-gray-200 rounded-full h-3 mt-2 overflow-hidden">
                 <motion.div initial={{width:0}} animate={{width:pct+'%'}} transition={{duration:1}} className={"h-3 rounded-full "+(pct>=70?'bg-emerald-500':pct>=50?'bg-amber-500':'bg-red-500')}/>
               </div>
               <span className="text-sm font-bold text-gray-500 mt-1 inline-block">{pct}%</span>
-              <div className="mt-2"><span className="text-4xl">{fb.e}</span><p className={"text-sm font-extrabold mt-1 "+fb.c}>{fb.m}</p></div>
+              <div className="mt-2">
+                <motion.img src={pct>=80?'/mascot-happy.png':pct>=50?'/mascot-ok.png':'/mascot-sad.png'} alt="mascot"
+                  initial={{scale:0.7,opacity:0}} animate={{scale:1,opacity:1}} transition={{type:'spring',stiffness:200}}
+                  className="w-44 h-44 object-cover rounded-3xl mx-auto shadow-md"/>
+                <p className={"text-sm font-extrabold mt-1 "+fb.c}>{fb.m}</p>
+              </div>
             </div>
             <div className="border-t pt-2 space-y-1">
               {sections.map((sec,si)=>{var ss=secScores(si);var sp=sec.total>0?Math.round(ss/sec.total*100):0;return(
@@ -293,9 +399,10 @@ export default function App(){
               )})}
             </div>
             <div className="flex gap-2 mt-3 flex-wrap">
-              <button onClick={()=>setWrongOnly(!wrongOnly)} className={"flex-1 min-w-[80px] py-2 rounded-xl text-xs font-bold border-2 "+(wrongOnly?'border-red-400 bg-red-50 text-red-600':'border-gray-200 text-gray-500')}>{wrongOnly?'📋 全部':'❌ 錯題'}</button>
-              <button onClick={resetMarking} className="flex-1 min-w-[80px] py-2 rounded-xl text-xs font-bold border-2 border-blue-200 text-blue-600 flex items-center justify-center gap-1"><RotateCcw size={12}/>重做</button>
-              <button onClick={generate} className="flex-1 min-w-[80px] py-2 rounded-xl text-xs font-bold border-2 border-indigo-200 text-indigo-600 flex items-center justify-center gap-1"><RotateCcw size={12}/>新卷</button>
+              <button onClick={()=>setWrongOnly(!wrongOnly)} className={"flex-1 min-w-[80px] py-2 rounded-xl text-xs font-bold border-2 "+(wrongOnly?'border-red-400 bg-red-50 text-red-600':'border-gray-200 text-gray-500')}>{wrongOnly?L('showAll'):L('showWrong')}</button>
+              <button onClick={resetMarking} className="flex-1 min-w-[80px] py-2 rounded-xl text-xs font-bold border-2 border-blue-200 text-blue-600 flex items-center justify-center gap-1"><RotateCcw size={12}/>{L('retry')}</button>
+              <button onClick={generate} className="flex-1 min-w-[80px] py-2 rounded-xl text-xs font-bold border-2 border-indigo-200 text-indigo-600 flex items-center justify-center gap-1"><RotateCcw size={12}/>{L('newExam')}</button>
+              {Object.values(markRes).some(r=>!r.ok)&&<button onClick={retryWrong} className="w-full py-2 rounded-xl text-xs font-bold border-2 border-rose-300 bg-rose-50 text-rose-600 flex items-center justify-center gap-1 mt-1">{L('reviewWrong')}</button>}
             </div>
           </motion.div>
         )}</AnimatePresence>
@@ -332,7 +439,7 @@ export default function App(){
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start gap-1.5 flex-wrap">
-                            <p className="text-sm font-semibold text-gray-800 whitespace-pre-line flex-1">{q.q}</p>
+                            <p className="text-base font-semibold text-gray-800 whitespace-pre-line flex-1">{q.q}</p>
                             {q.trap&&!isMarked&&<span className="shrink-0 text-[10px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 flex items-center gap-0.5"><AlertTriangle size={8}/>含干擾</span>}
                           </div>
                           {q.sc>2&&<span className="text-xs text-gray-400">（{q.sc}分）</span>}
@@ -354,17 +461,17 @@ export default function App(){
                           )}
                           {!q.isMC&&(sec.id==='work'?(
                             <textarea value={answers[k]||''} onChange={e=>{if(!isMarked)setAnswers(p=>({...p,[k]:e.target.value}))}}
-                              placeholder="列式計算..." disabled={isMarked}
-                              className={"w-full mt-2 px-3 py-2 border-2 rounded-xl text-sm resize-y focus:outline-none "+(isMarked?(mr&&mr.ok?'border-emerald-300 bg-emerald-50':'border-red-300 bg-red-50'):'border-gray-200 focus:border-indigo-400')} rows={3}/>
+                              placeholder={L('workPH')} disabled={isMarked}
+                              className={"w-full mt-2 px-4 py-3 border-2 rounded-2xl text-base resize-y focus:outline-none "+(isMarked?(mr&&mr.ok?'border-emerald-300 bg-emerald-50':'border-red-300 bg-red-50'):'border-gray-200 focus:border-indigo-400')} rows={3}/>
                           ):(
                             <input type="text" inputMode="decimal" value={answers[k]||''} onChange={e=>{if(!isMarked)setAnswers(p=>({...p,[k]:e.target.value}))}}
-                              placeholder="輸入答案..." disabled={isMarked}
-                              className={"w-full mt-2 px-3 py-2.5 border-2 rounded-xl text-sm focus:outline-none "+(isMarked?(mr&&mr.ok?'border-emerald-300 bg-emerald-50':'border-red-300 bg-red-50'):'border-gray-200 focus:border-indigo-400')}/>
+                              placeholder={L('ansPH')} disabled={isMarked}
+                              className={"w-full mt-2 px-4 py-3 border-2 rounded-2xl text-base focus:outline-none "+(isMarked?(mr&&mr.ok?'border-emerald-300 bg-emerald-50':'border-red-300 bg-red-50'):'border-gray-200 focus:border-indigo-400')}/>
                           ))}
                           {isMarked&&mr&&(
                             <div className={"mt-2 px-3 py-2 rounded-lg border "+(mr.ok?'bg-emerald-50 border-emerald-200':'bg-red-50 border-red-200')}>
-                              {mr.ok?<span className="text-emerald-700 font-bold text-sm">✅ 正確！+{mr.pts}分</span>
-                              :<div><span className="text-red-600 font-bold text-sm">❌ 正確答案：</span><span className="text-red-800 font-bold text-sm">{q.a}</span></div>}
+                              {mr.ok?<span className="text-emerald-700 font-bold text-sm">{L('correct',mr.pts)}</span>
+                              :<div><span className="text-red-600 font-bold text-sm">{L('wrongAns')}</span><span className="text-red-800 font-bold text-sm">{q.a}</span></div>}
                             </div>
                           )}
                           {isMarked&&q.trap&&(
@@ -372,8 +479,8 @@ export default function App(){
                               <div className="flex items-start gap-1.5">
                                 <AlertTriangle size={14} className="text-amber-500 mt-0.5 shrink-0"/>
                                 <div>
-                                  <p className="text-xs font-bold text-amber-700">干擾資訊</p>
-                                  <p className="text-xs text-amber-600 mt-0.5">本題干擾項：<b>{q.trap}</b>（與解題無關）</p>
+                                  <p className="text-xs font-bold text-amber-700">{L('trapInfoTitle')}</p>
+                                  <p className="text-xs text-amber-600 mt-0.5">{L('trapInfoDesc',q.trap)}</p>
                                 </div>
                               </div>
                             </div>
@@ -383,7 +490,7 @@ export default function App(){
                           )}
                           {(isS||(isMarked&&mr&&!mr.ok))&&q.s&&(
                             <div className="mt-2 bg-sky-50 rounded-lg px-3 py-2 border border-sky-200">
-                              <p className="text-xs font-bold text-sky-600 mb-1">📖 解題步驟</p>
+                              <p className="text-xs font-bold text-sky-600 mb-1">{L('stepsTitle')}</p>
                               {q.s.map((st,i)=>(
                                 <p key={i} className={"text-xs mt-0.5 "+(st.startsWith('🔍')?'text-amber-700 font-bold':'text-sky-700')}>
                                   {st.startsWith('🔍')?st:(st.startsWith('❌')||st.startsWith('✅')?st:'步驟'+(i+1)+'：'+st)}
@@ -413,13 +520,13 @@ export default function App(){
         {/* Bottom actions */}
         <div className="grid grid-cols-2 gap-2 mt-2 pb-4">
           {isMarked?<>
-            <button onClick={resetMarking} className="py-2.5 bg-white border-2 border-blue-200 text-blue-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-blue-50"><RotateCcw size={14}/>重做本卷</button>
-            <button onClick={generate} className={"py-2.5 bg-gradient-to-r "+GC[co]+" text-white font-bold rounded-xl text-sm flex items-center justify-center gap-1"}><RotateCcw size={14}/>新試卷</button>
-            <button onClick={()=>setShowPrint(true)} className="py-2.5 bg-white border-2 border-purple-200 text-purple-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-purple-50"><Printer size={14}/>列印</button>
-            <button onClick={()=>{setRunning(false);setView('home')}} className="py-2.5 bg-white border-2 border-gray-200 text-gray-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-gray-100"><Home size={14}/>主頁</button>
+            <button onClick={resetMarking} className="py-2.5 bg-white border-2 border-blue-200 text-blue-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-blue-50"><RotateCcw size={14}/>{L('retryFull')}</button>
+            <button onClick={generate} className={"py-2.5 bg-gradient-to-r "+GC[co]+" text-white font-bold rounded-xl text-sm flex items-center justify-center gap-1"}><RotateCcw size={14}/>{L('newExamFull')}</button>
+            <button onClick={()=>setShowPrint(true)} className="py-2.5 bg-white border-2 border-purple-200 text-purple-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-purple-50"><Printer size={14}/>{L('print')}</button>
+            <button onClick={()=>{setRunning(false);setView('home')}} className="py-2.5 bg-white border-2 border-gray-200 text-gray-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-gray-100"><Home size={14}/>{L('home')}</button>
           </>:<>
-            <button onClick={()=>setShowPrint(true)} className="py-2.5 bg-white border-2 border-purple-200 text-purple-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-purple-50"><Printer size={14}/>列印</button>
-            <button onClick={generate} className={"py-2.5 bg-gradient-to-r "+GC[co]+" text-white font-bold rounded-xl text-sm flex items-center justify-center gap-1"}><RotateCcw size={14}/>重新生成</button>
+            <button onClick={()=>setShowPrint(true)} className="py-2.5 bg-white border-2 border-purple-200 text-purple-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-purple-50"><Printer size={14}/>{L('print')}</button>
+            <button onClick={generate} className={"py-2.5 bg-gradient-to-r "+GC[co]+" text-white font-bold rounded-xl text-sm flex items-center justify-center gap-1"}><RotateCcw size={14}/>{L('newExamFull')}</button>
           </>}
         </div>
       </div>
@@ -427,9 +534,10 @@ export default function App(){
       {/* Floating submit button */}
       {!isMarked&&(
         <motion.button initial={{y:20,opacity:0}} animate={{y:0,opacity:1}}
-          onClick={()=>setShowSubmit(true)}
-          className="fixed bottom-4 left-1/2 -translate-x-1/2 px-6 py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white font-extrabold rounded-2xl shadow-2xl z-40 flex items-center gap-2 active:shadow-lg">
-          <Send size={18}/><span>交卷</span><span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">{answeredQs}/{totalQs}</span>
+          onClick={()=>{if(soundOn)playSubmit();setShowSubmit(true);}}
+
+          className="fixed bottom-5 left-1/2 -translate-x-1/2 px-8 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white font-extrabold text-lg rounded-3xl shadow-2xl z-40 flex items-center gap-2 active:shadow-lg">
+          <Send size={18}/><span>{L('submit')}</span><span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">{answeredQs}/{totalQs}</span>
         </motion.button>
       )}
     </div>

@@ -1,0 +1,16 @@
+{
+  "appId": "com.mathexam.app",
+  "appName": "math-exam",
+  "webDir": "dist",
+  "ios": {
+    "contentInset": "always"
+  },
+  "android": {
+    "allowMixedContent": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 3000
+    }
+  }
+}
