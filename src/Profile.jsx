@@ -25,7 +25,7 @@ function daysUntilBirthday(birthday){
   return Math.ceil((next-now)/(1000*60*60*24));
 }
 
-export default function Profile({onBack,lang='zh',studentName,setStudentName,streak}){
+export default function Profile({onBack,lang='zh',studentName,setStudentName,streak,user,signOut,goToLogin}){
   const isZh=lang==='zh';
   const[name,setName]=useState(studentName||'');
   const[birthday,setBirthday]=useState(()=>localStorage.getItem('student_birthday')||'');
@@ -52,6 +52,19 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
           <button onClick={onBack} className="p-2 rounded-2xl bg-white border shadow-sm active:bg-gray-100"><ArrowLeft size={18}/></button>
           <h2 className="font-black text-xl text-gray-800">{isZh?'個人設定':'Profile Settings'}</h2>
         </div>
+
+        {/* Auth status banner */}
+        {user ? (
+          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-3 flex items-center justify-between">
+            <span className="text-emerald-700 text-xs font-bold">✅ {isZh?'已登入：':'Signed in as '}{user.email}</span>
+            <button onClick={signOut} className="text-red-500 text-xs font-bold hover:underline">{isZh?'登出 🚪':'Sign Out 🚪'}</button>
+          </div>
+        ) : (
+          <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 mb-3 flex items-center justify-between">
+            <span className="text-orange-700 text-xs font-bold">{isZh?'⚠️ 訪客模式 — 進度不會同步到雲端':'⚠️ Guest Mode — progress won\'t sync to cloud'}</span>
+            <button onClick={goToLogin} className="bg-purple-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg">{isZh?'立即註冊':'Sign Up Now'}</button>
+          </div>
+        )}
 
         {/* Mascot + birthday banner */}
         <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} className="text-center mb-5">

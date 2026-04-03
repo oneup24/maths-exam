@@ -36,6 +36,7 @@ export default function App(){
   const[markRes,setMarkRes]=useState({});
   const[totScore,setTotScore]=useState(0);
   const[showSubmit,setShowSubmit]=useState(false);
+  const[showSignUpPrompt,setShowSignUpPrompt]=useState(false);
   const[wrongOnly,setWrongOnly]=useState(false);
   const[history,setHistory]=useState([]);
   const timerRef=useRef(null);
@@ -155,7 +156,7 @@ export default function App(){
   if(!onboarded)return <Onboarding onComplete={completeOnboarding} lang={lang}/>;
 
   /* ════════ PROFILE ════════ */
-  if(view==='profile')return <Profile onBack={()=>setView('home')} lang={lang} studentName={studentName} setStudentName={setStudentName} streak={streak}/>;
+  if(view==='profile')return <Profile onBack={()=>setView('home')} lang={lang} studentName={studentName} setStudentName={setStudentName} streak={streak} user={user} signOut={async()=>{await signOut();setSkippedLogin(false);}} goToLogin={()=>setSkippedLogin(false)}/>;
 
   /* ════════ HOME ════════ */
   if(view==='home')return(
@@ -193,6 +194,12 @@ export default function App(){
             <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full flex items-center gap-0.5"><AlertTriangle size={10}/> {L('hasTrap')}</span>
           </div>
         </motion.div>
+        {!user&&(
+          <div className="bg-orange-50 border border-orange-300 rounded-xl p-3 mb-3 flex items-center justify-between gap-2">
+            <span className="text-orange-700 text-xs font-bold flex-1">{lang==='zh'?'👻 訪客模式 — 成績不會同步到雲端。註冊以保存進度！':'👻 Guest Mode — Scores won\'t sync. Sign up to save!'}</span>
+            <button onClick={()=>setSkippedLogin(false)} className="bg-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg shrink-0">{lang==='zh'?'註冊':'Sign Up'}</button>
+          </div>
+        )}
         <div className="grid grid-cols-2 gap-3 mb-4">
           {[1,2,3,4,5,6].map(g=>{
             var best=gradeBest[g]||0;
@@ -360,6 +367,20 @@ export default function App(){
               <button onClick={()=>setPrintAns(true)} className={"flex-1 py-2 rounded-xl text-sm font-bold border-2 "+(printAns?'border-emerald-500 bg-emerald-50':'border-gray-200 text-gray-400')}>{L('answerVer')}</button>
             </div>
             <button onClick={()=>{printExam(sections,grade,printAns,studentName,difficulty);setShowPrint(false)}} className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-extrabold rounded-xl">{L('openPrint')}</button>
+          </motion.div>
+        </motion.div>
+      )}</AnimatePresence>
+
+      <AnimatePresence>{showSignUpPrompt&&(
+        <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{background:'rgba(0,0,0,.5)'}}>
+          <motion.div initial={{scale:.9}} animate={{scale:1}} className="bg-white rounded-2xl p-5 w-full max-w-sm shadow-2xl text-center">
+            <p className="text-4xl mb-3">🔒</p>
+            <h3 className="font-extrabold text-lg mb-2">{lang==='zh'?'註冊以解鎖列印功能':'Sign Up to Unlock Printing'}</h3>
+            <p className="text-sm text-gray-500 mb-4">{lang==='zh'?'建立免費帳戶，即可列印試卷給孩子！':'Create a free account to print papers!'}</p>
+            <div className="flex gap-2">
+              <button onClick={()=>setShowSignUpPrompt(false)} className="flex-1 py-2.5 border-2 border-gray-200 rounded-xl font-bold text-sm text-gray-500 active:bg-gray-100">{lang==='zh'?'稍後再說':'Maybe Later'}</button>
+              <button onClick={()=>{setShowSignUpPrompt(false);setSkippedLogin(false);}} className="flex-1 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-bold text-sm">{lang==='zh'?'免費註冊':'Sign Up Free'}</button>
+            </div>
           </motion.div>
         </motion.div>
       )}</AnimatePresence>
@@ -542,10 +563,10 @@ export default function App(){
           {isMarked?<>
             <button onClick={resetMarking} className="py-2.5 bg-white border-2 border-blue-200 text-blue-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-blue-50"><RotateCcw size={14}/>{L('retryFull')}</button>
             <button onClick={generate} className={"py-2.5 bg-gradient-to-r "+GC[co]+" text-white font-bold rounded-xl text-sm flex items-center justify-center gap-1"}><RotateCcw size={14}/>{L('newExamFull')}</button>
-            <button onClick={()=>setShowPrint(true)} className="py-2.5 bg-white border-2 border-purple-200 text-purple-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-purple-50"><Printer size={14}/>{L('print')}</button>
+            <button onClick={()=>user?setShowPrint(true):setShowSignUpPrompt(true)} className="py-2.5 bg-white border-2 border-purple-200 text-purple-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-purple-50"><Printer size={14}/>{L('print')}</button>
             <button onClick={()=>{setRunning(false);setView('home')}} className="py-2.5 bg-white border-2 border-gray-200 text-gray-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-gray-100"><Home size={14}/>{L('home')}</button>
           </>:<>
-            <button onClick={()=>setShowPrint(true)} className="py-2.5 bg-white border-2 border-purple-200 text-purple-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-purple-50"><Printer size={14}/>{L('print')}</button>
+            <button onClick={()=>user?setShowPrint(true):setShowSignUpPrompt(true)} className="py-2.5 bg-white border-2 border-purple-200 text-purple-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-purple-50"><Printer size={14}/>{L('print')}</button>
             <button onClick={generate} className={"py-2.5 bg-gradient-to-r "+GC[co]+" text-white font-bold rounded-xl text-sm flex items-center justify-center gap-1"}><RotateCcw size={14}/>{L('newExamFull')}</button>
           </>}
         </div>
