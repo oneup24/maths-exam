@@ -1231,16 +1231,18 @@ export function buildExam(grade,topics,examType,difficulty){
   difficulty=difficulty||2;
   var totalTarget=EXAM_TARGETS[examType]||24;
   var allowed=DIFF_ALLOW[difficulty]||[1,2,3];
+  var tMap={};(TOPICS[grade]||[]).forEach(function(t){tMap[t.id]=t.nm});
   var allGens={calc:[],fill:[],mc:[],short:[],work:[]};
   topics.forEach(tid=>{
     var pool=(Q[grade]||{})[tid];if(!pool)return;
+    var tnm=tMap[tid]||tid;
     pool.forEach(gen=>{
       try{
         var q=gen();
         if(!q||!q.tp||!allGens[q.tp])return;
         /* check difficulty compatibility */
         if(!allowed.includes(q.d||2))return;
-        allGens[q.tp].push(gen);
+        allGens[q.tp].push({fn:gen,tid:tid,tnm:tnm});
       }catch(e){}
     });
   });
@@ -1252,7 +1254,7 @@ export function buildExam(grade,topics,examType,difficulty){
   types.forEach(t=>{
     var need=dist[t]||0,gens=allGens[t],qs=[],seen={},seenT={};
     for(var i=0;i<need*80&&qs.length<need;i++){
-      try{var q=pk(gens)();if(!q||!q.q)continue;if(!allowed.includes(q.d||2))continue;var k=q.q+'|'+q.a;if(seen[k])continue;var tc=seenT[q.q]||0;if(tc>=1)continue;seen[k]=true;seenT[q.q]=tc+1;qs.push(q)}catch(e){}
+      try{var item=pk(gens);var q=item.fn();if(!q||!q.q)continue;if(!allowed.includes(q.d||2))continue;var k=q.q+'|'+q.a;if(seen[k])continue;var tc=seenT[q.q]||0;if(tc>=1)continue;seen[k]=true;seenT[q.q]=tc+1;q.topicId=item.tid;q.topicName=item.tnm;qs.push(q)}catch(e){}
     }
     if(qs.length>0){generated[t]=qs;count+=qs.length}
   });
@@ -1261,7 +1263,7 @@ export function buildExam(grade,topics,examType,difficulty){
   var safety=0;
   while(count<totalTarget&&safety<500){
     safety++;var t=pk(types);var gens=allGens[t];if(!gens.length)continue;if(!generated[t])generated[t]=[];
-    try{var q=pk(gens)();if(!q||!q.q)continue;if(!allowed.includes(q.d||2))continue;var k=q.q+'|'+q.a;if(gSeen[k])continue;if((gSeenT[q.q]||0)>=1)continue;gSeen[k]=true;gSeenT[q.q]=(gSeenT[q.q]||0)+1;generated[t].push(q);count++}catch(e){}
+    try{var item=pk(gens);var q=item.fn();if(!q||!q.q)continue;if(!allowed.includes(q.d||2))continue;var k=q.q+'|'+q.a;if(gSeen[k])continue;if((gSeenT[q.q]||0)>=1)continue;gSeen[k]=true;gSeenT[q.q]=(gSeenT[q.q]||0)+1;q.topicId=item.tid;q.topicName=item.tnm;generated[t].push(q);count++}catch(e){}
   }
   while(count>totalTarget){
     var longest=types.filter(t=>(generated[t]||[]).length>1).sort((a,b)=>(generated[b]||[]).length-(generated[a]||[]).length);

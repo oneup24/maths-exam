@@ -44,6 +44,7 @@ export default function App(){
   const[pendingRevealKey,setPendingRevealKey]=useState(null);
   const[pendingRevealType,setPendingRevealType]=useState(null);
   const[wrongOnly,setWrongOnly]=useState(false);
+  const[topicSummary,setTopicSummary]=useState([]);
   const[history,setHistory]=useState([]);
   const timerRef=useRef(null);
   const[onboarded,setOnboarded]=useState(()=>!!localStorage.getItem('onboarding_done'));
@@ -135,11 +136,30 @@ export default function App(){
     /* save to history */
     saveHistory({grade,difficulty,examType,score:sc,total:grandTotal,pct:grandTotal>0?Math.round(sc/grandTotal*100):0,qCount:totalQs,date:new Date().toLocaleDateString('zh-HK')});
     setHistory(loadHistory());
+    /* compute topic breakdown from marked results */
+    var tb={};
+    sections.forEach(function(sec,si){sec.qs.forEach(function(q,qi){
+      var tid=q.topicId||'unknown';
+      if(!tb[tid])tb[tid]={total:0,wrong:0};
+      tb[tid].total++;
+      var mr=res[si+'-'+qi];
+      if(mr&&!mr.ok)tb[tid].wrong++;
+    })});
+    /* build topic summary for results UI */
+    var tNameMap={};
+    sections.forEach(function(sec){sec.qs.forEach(function(q){if(q.topicId&&q.topicName)tNameMap[q.topicId]=q.topicName})});
+    var ts=Object.keys(tb).filter(function(k){return k!=='unknown'}).map(function(tid){
+      var c=tb[tid].total-tb[tid].wrong;
+      return{id:tid,name:tNameMap[tid]||tid,total:tb[tid].total,correct:c,wrong:tb[tid].wrong,pct:Math.round(c/tb[tid].total*100)};
+    }).sort(function(a,b){return a.pct-b.pct});
+    setTopicSummary(ts);
     /* save to Supabase cloud */
     if(user){
       var correctCount=Object.values(res).filter(r=>r.ok).length;
       var elapsed=useTimer?timerMins*60-timeLeft:0;
-      saveExamResult({userId:user.id,grade:String(grade),topic:'mixed',totalQuestions:totalQs,correctAnswers:correctCount,scorePercent:sp,timeSpent:elapsed})
+      var tids=Object.keys(tb).filter(function(k){return k!=='unknown'});
+      var topicVal=tids.length===1?tids[0]:'mixed';
+      saveExamResult({userId:user.id,grade:String(grade),topic:topicVal,topicBreakdown:tb,totalQuestions:totalQs,correctAnswers:correctCount,scorePercent:sp,timeSpent:elapsed})
         .then(({error})=>{if(!error)setCloudSaved(true);});
     }
     setTimeout(()=>window.scrollTo({top:0,behavior:'smooth'}),100);
@@ -486,6 +506,20 @@ export default function App(){
                 </div>
               )})}
             </div>
+            {topicSummary.length>0&&(
+              <div className="mt-3 rounded-xl p-3" style={{background:'#f8f9fa'}}>
+                <h4 className="font-bold text-sm text-gray-700 mb-2">📊 {lang==='zh'?'各單元表現':'Topic Performance'}</h4>
+                <div className="space-y-1.5">
+                  {topicSummary.map(t=>{var color=t.pct>=80?'#22c55e':t.pct>=50?'#f59e0b':'#ef4444';var emoji=t.pct>=80?'✅':t.pct>=50?'⚠️':'❌';return(
+                    <div key={t.id} className="flex items-center gap-2 bg-white rounded-lg px-3 py-2" style={{borderLeft:'4px solid '+color}}>
+                      <span className="text-sm shrink-0">{emoji}</span>
+                      <span className="text-xs font-bold text-gray-700 flex-1 truncate">{t.name}</span>
+                      <span className="text-xs font-bold shrink-0" style={{color}}>{t.correct}/{t.total} ({t.pct}%)</span>
+                    </div>
+                  )})}
+                </div>
+              </div>
+            )}
             <div className="flex gap-2 mt-3 flex-wrap">
               <button onClick={()=>setWrongOnly(!wrongOnly)} className={"flex-1 min-w-[80px] py-2 rounded-xl text-xs font-bold border-2 "+(wrongOnly?'border-red-400 bg-red-50 text-red-600':'border-gray-200 text-gray-500')}>{wrongOnly?L('showAll'):L('showWrong')}</button>
               <button onClick={resetMarking} className="flex-1 min-w-[80px] py-2 rounded-xl text-xs font-bold border-2 border-blue-200 text-blue-600 flex items-center justify-center gap-1"><RotateCcw size={12}/>{L('retry')}</button>

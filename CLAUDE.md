@@ -8,7 +8,8 @@ React 19 + Vite 8 + Tailwind 4 + Supabase + Capacitor (iOS).
 - `pnpm dev` — start dev server
 - `pnpm build` — production build to dist/
 - `pnpm preview` — preview production build
-- Main branch: `main` | Feature branch: `supabase-auth`
+- `pnpm dev` runs on port 5175 (strictPort — won't auto-increment)
+- Main branch: `main` (supabase-auth merged)
 
 ## Architecture
 - **Monolithic SPA** — all routing + state in `src/App.jsx` via useState + `view` variable

@@ -50,7 +50,11 @@
 
 ## Phase 3: Stabilize — IN PROGRESS
 
-- [ ] Merge `supabase-auth` branch to `main`
+- [x] Merge `supabase-auth` branch to `main`
+- [x] Supabase RLS policies (SELECT/INSERT/UPDATE/DELETE own rows)
+- [x] Clean up 20 unused stub files
+- [x] Fix broken import in main.jsx
+- [x] Pin Vite dev server to port 5175
 - [ ] End-to-end testing: full exam flow (all grades, all types)
 - [ ] Test guest mode flow (no auth, localStorage only)
 - [ ] Test auth flow (signup, confirm email, login, session restore)
@@ -58,8 +62,8 @@
 - [ ] Test parent PIN (set, lock, unlock, reset)
 - [ ] Test i18n (switch lang mid-session, all strings render)
 - [ ] Test edge cases: empty answers, special chars, fraction formats
-- [ ] Supabase RLS policies (currently relying on client-side user_id filtering)
-- [ ] Clean up unused stubs (pages/, components/, hooks/useExam, hooks/useTimer, utils/scoring)
+- [ ] Add password reset flow (currently missing)
+- [ ] Fix Capacitor build (capacitor.js fails in vite build)
 - [ ] Production env vars + deployment (Vercel / Netlify)
 - [ ] Lighthouse audit (performance, accessibility, PWA score)
 

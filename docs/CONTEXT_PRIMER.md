@@ -73,21 +73,6 @@ src/
   PrivacyPolicy.jsx    — COPPA/PDPO compliance modal
 ```
 
-### Stubs (scaffolded, not implemented)
-```
-  components/          — OptionButton, ProgressBar, QuestionCard, Timer (all stubs)
-  hooks/useExam.js     — stub
-  hooks/useTimer.js    — stub
-  utils/scoring.js     — stub (logic lives in App.jsx)
-  pages/ExamPage.jsx   — stub (logic lives in App.jsx)
-  pages/HomePage.jsx   — stub
-  pages/ResultPage.jsx — stub
-  pages/ReviewPage.jsx — stub
-  app/routes.jsx       — defined but not wired
-  styles/theme.js      — color/font config (Tailwind handles most styling)
-  data/questionBank.js — re-exports from engine.js
-```
-
 ### Config
 ```
 vite.config.js         — Vite + React + Tailwind plugins
@@ -146,6 +131,8 @@ exam_sessions (
   created_at timestamptz
 )
 ```
+
+**RLS enabled** — users can only SELECT/INSERT/UPDATE/DELETE their own rows (`auth.uid() = user_id`).
 
 ---
 

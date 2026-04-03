@@ -4,7 +4,18 @@ All notable changes to **Maths Quests** (數學特訓).
 
 ---
 
-## [supabase-auth] — 2026-04
+## [main] — 2026-04-03
+
+### eaed8a2 — feat: cleanup 20 dead files, fix imports, add RLS policies
+- Delete 20 unused stub files (components/, engines/, hooks/, utils/, pages/, data/, styles/, app/)
+- Fix broken import in main.jsx (was pointing to deleted app/App.jsx)
+- Add RLS policies to exam_sessions table (SELECT/INSERT/UPDATE/DELETE own rows only)
+- Add RLS policies for profiles table
+- Pin Vite dev server to port 5175 with strictPort
+
+### 1130339 — docs: add project docs + CLAUDE.md for AI context
+- Add CLAUDE.md (auto-loaded every session)
+- Add docs/CHANGELOG.md, CONTEXT_PRIMER.md, MASTER_PLAN_v2.md
 
 ### 0d6461d — fix: CSS conflict in Profile + defensive optional chaining
 - Fix conflicting `block` class on birthday label in Profile.jsx
@@ -39,7 +50,7 @@ All notable changes to **Maths Quests** (數學特訓).
 
 ---
 
-## [main] — Pre-auth baseline
+## Pre-auth baseline
 
 ### ef91693 — modular src/ structure + dependency setup
 - Add modular folder structure: pages/, components/, engines/, hooks/, services/, data/, utils/, styles/

@@ -1,16 +1,17 @@
 import { supabase } from './supabase';
 
 // Save exam result to cloud
-export async function saveExamResult({ userId, grade, topic, totalQuestions, correctAnswers, scorePercent, timeSpent }) {
+export async function saveExamResult({ userId, grade, topic, topicBreakdown, totalQuestions, correctAnswers, scorePercent, timeSpent }) {
   const { data, error } = await supabase
     .from('exam_sessions')
     .insert([{
       user_id: userId,
-      grade,
-      topic: topic || 'mixed',
+      level: grade,
+      topic_code: topic || 'mixed',
+      topic_breakdown: topicBreakdown || null,
       total_questions: totalQuestions,
-      correct_answers: correctAnswers,
-      score_percent: scorePercent,
+      correct_count: correctAnswers,
+      score_percentage: scorePercent,
       time_spent: timeSpent || 0,
     }])
     .select();
@@ -25,10 +26,19 @@ export async function loadExamHistory(userId) {
     .from('exam_sessions')
     .select('*')
     .eq('user_id', userId)
-    .order('created_at', { ascending: false });
+    .order('completed_at', { ascending: false });
 
   if (error) console.error('Load history error:', error);
-  return { data: data || [], error };
+  const mapped = (data || []).map(e => ({
+    ...e,
+    grade: e.level,
+    topic: e.topic_code,
+    correct_answers: e.correct_count,
+    score_percent: e.score_percentage,
+    created_at: e.completed_at,
+    topicBreakdown: e.topic_breakdown,
+  }));
+  return { data: mapped, error };
 }
 
 // Get summary stats for a user
@@ -41,8 +51,8 @@ export async function getUserStats(userId) {
   if (error) return { totalExams: 0, avgScore: 0, bestScore: 0 };
 
   const totalExams = data.length;
-  const avgScore = totalExams > 0 ? Math.round(data.reduce((sum, e) => sum + e.score_percent, 0) / totalExams) : 0;
-  const bestScore = totalExams > 0 ? Math.max(...data.map(e => e.score_percent)) : 0;
+  const avgScore = totalExams > 0 ? Math.round(data.reduce((sum, e) => sum + e.score_percentage, 0) / totalExams) : 0;
+  const bestScore = totalExams > 0 ? Math.max(...data.map(e => e.score_percentage)) : 0;
 
   return { totalExams, avgScore, bestScore };
 }
