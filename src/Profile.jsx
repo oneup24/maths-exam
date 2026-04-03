@@ -33,6 +33,10 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
   const[saved,setSaved]=useState(false);
   const[cloudStats,setCloudStats]=useState(null);
   const[recentExams,setRecentExams]=useState([]);
+  const[pin,setPin]=useState(()=>localStorage.getItem('parent_pin')||'');
+  const[newPin,setNewPin]=useState('');
+  const[pinEditing,setPinEditing]=useState(false);
+  const[pinSaved,setPinSaved]=useState(false);
 
   useEffect(()=>{
     if(user){
@@ -118,6 +122,42 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
             className={"w-full py-3.5 rounded-2xl font-extrabold text-base text-white flex items-center justify-center gap-2 transition-all shadow-md "+(saved?'bg-emerald-500':'bg-gradient-to-r from-indigo-500 to-purple-500')}>
             {saved?<><Check size={18}/>{isZh?'已儲存！':'Saved!'}</>:<><Save size={18}/>{isZh?'儲存':'Save'}</>}
           </motion.button>
+        </div>
+
+        {/* Parent PIN Settings */}
+        <div className="bg-white rounded-3xl p-5 shadow-sm border mb-4">
+          <h3 className="font-bold text-gray-700 flex items-center gap-2 mb-3">
+            <Lock size={16} className="text-rose-500"/>
+            {isZh?'家長設定':'Parent Settings'}
+          </h3>
+          {pin&&!pinEditing?(
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-emerald-600 font-bold">✅ {isZh?'已設定密碼':'PIN is set'}</span>
+                <span className="text-xs text-gray-300 font-mono">{'●'.repeat(4)}</span>
+              </div>
+              <p className="text-xs text-gray-400 mb-3">{isZh?'查看答案和解題步驟時需要輸入密碼':'PIN required to view answers and solution steps'}</p>
+              <div className="flex gap-2">
+                <button onClick={()=>{setPinEditing(true);setNewPin('');}} className="flex-1 py-2 rounded-xl border-2 border-indigo-200 text-indigo-600 text-xs font-bold active:bg-indigo-50">{isZh?'更改密碼':'Change PIN'}</button>
+                <button onClick={()=>{localStorage.removeItem('parent_pin');setPin('');setPinSaved(false);}} className="flex-1 py-2 rounded-xl border-2 border-red-200 text-red-500 text-xs font-bold active:bg-red-50">{isZh?'移除密碼':'Remove PIN'}</button>
+              </div>
+            </div>
+          ):(
+            <div>
+              <p className="text-xs text-gray-400 mb-2">{pin?isZh?'輸入新的4位數字密碼：':'Enter new 4-digit PIN:':isZh?'設定4位數字密碼，防止孩子偷看答案':'Set a 4-digit PIN to prevent peeking at answers'}</p>
+              <div className="flex gap-2 items-center">
+                <input type="password" inputMode="numeric" maxLength={4} pattern="[0-9]*" value={newPin} onChange={e=>setNewPin(e.target.value.replace(/\D/g,''))}
+                  placeholder="0000"
+                  className="w-28 text-center text-xl font-mono tracking-[0.4em] border-2 border-indigo-200 rounded-xl py-2.5 focus:border-indigo-500 focus:outline-none"/>
+                <button onClick={()=>{if(newPin.length===4){localStorage.setItem('parent_pin',newPin);setPin(newPin);setNewPin('');setPinEditing(false);setPinSaved(true);setTimeout(()=>setPinSaved(false),2000);}}}
+                  disabled={newPin.length!==4}
+                  className={"flex-1 py-2.5 rounded-xl font-bold text-sm transition-all "+(newPin.length===4?'bg-indigo-500 text-white':'bg-gray-200 text-gray-400')}>
+                  {pinSaved?'✅':(isZh?'設定':'Set')}
+                </button>
+                {pinEditing&&<button onClick={()=>setPinEditing(false)} className="py-2.5 px-3 rounded-xl border-2 border-gray-200 text-gray-400 text-sm font-bold active:bg-gray-100">{isZh?'取消':'Cancel'}</button>}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Streak */}

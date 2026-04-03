@@ -10,7 +10,7 @@ import {ArrowLeft,RotateCcw,Eye,Printer,ChevronDown,ChevronUp,X,Check,Play,Pause
 import {TOPICS,GRADE_INFO,DIFF_INFO,buildExam,printExam,chkAns,saveHistory,loadHistory,clearHistory} from './lib/engine';
 import {t} from './lib/i18n';
 import { useAuth } from './hooks/useAuth';
-import { saveExamResult, loadExamHistory, getUserStats, updateProfileScore } from './services/api';
+import { saveExamResult } from './services/api';
 import Login from './pages/Login';
 
 const fmt=t=>{var m=Math.floor(t/60),s=t%60;return m+':'+(s<10?'0':'')+s};
@@ -39,6 +39,10 @@ export default function App(){
   const[showSubmit,setShowSubmit]=useState(false);
   const[showSignUpPrompt,setShowSignUpPrompt]=useState(false);
   const[cloudSaved,setCloudSaved]=useState(false);
+  const[pinUnlocked,setPinUnlocked]=useState(false);
+  const[showPinModal,setShowPinModal]=useState(false);
+  const[pendingRevealKey,setPendingRevealKey]=useState(null);
+  const[pendingRevealType,setPendingRevealType]=useState(null);
   const[wrongOnly,setWrongOnly]=useState(false);
   const[history,setHistory]=useState([]);
   const timerRef=useRef(null);
@@ -57,6 +61,18 @@ export default function App(){
   useEffect(()=>{setHistory(loadHistory())},[]);
   useEffect(()=>{if(running&&timeLeft>0){timerRef.current=setInterval(()=>{setTimeLeft(t=>{if(t<=1){setRunning(false);return 0}if(t<=60&&soundOn)playTick();return t-1})},1000);return()=>clearInterval(timerRef.current)}if(running&&timeLeft<=0)setRunning(false)},[running,timeLeft,soundOn]);
 
+  var tryReveal=(key,type)=>{
+    var pin=localStorage.getItem('parent_pin');
+    if(!pin){/* no PIN set — reveal freely */if(type==='eye')setRevealed(r=>({...r,[key]:!r[key]}));else setStepsShown(r=>({...r,[key]:!r[key]}));return;}
+    if(pinUnlocked){if(type==='eye')setRevealed(r=>({...r,[key]:!r[key]}));else setStepsShown(r=>({...r,[key]:!r[key]}));return;}
+    setPendingRevealKey(key);setPendingRevealType(type);setShowPinModal(true);
+  };
+  var onPinSuccess=()=>{
+    setPinUnlocked(true);setShowPinModal(false);
+    if(pendingRevealKey!==null){if(pendingRevealType==='eye')setRevealed(r=>({...r,[pendingRevealKey]:!r[pendingRevealKey]}));else setStepsShown(r=>({...r,[pendingRevealKey]:!r[pendingRevealKey]}));}
+    setPendingRevealKey(null);setPendingRevealType(null);
+  };
+
   var completeOnboarding=n=>{
     if(n){setStudentName(n);localStorage.setItem('student_name',n);}
     localStorage.setItem('onboarding_done','1');
@@ -65,7 +81,7 @@ export default function App(){
 
   var generate=useCallback(()=>{
     var exam=buildExam(grade,Array.from(selTopics),examType,difficulty);
-    setSections(exam);setRevealed({});setStepsShown({});setAnswers({});setMcSel({});setIsMarked(false);setMarkRes({});setTotScore(0);setWrongOnly(false);setCloudSaved(false);
+    setSections(exam);setRevealed({});setStepsShown({});setAnswers({});setMcSel({});setIsMarked(false);setMarkRes({});setTotScore(0);setWrongOnly(false);setCloudSaved(false);setPinUnlocked(false);
     if(useTimer){setTimeLeft(timerMins*60);setRunning(true)}
     setView('exam');
   },[grade,selTopics,examType,difficulty,useTimer,timerMins]);
@@ -394,6 +410,25 @@ export default function App(){
         </motion.div>
       )}</AnimatePresence>
 
+      <AnimatePresence>{showPinModal&&(
+        <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{background:'rgba(0,0,0,.5)'}}>
+          <motion.div initial={{scale:.9}} animate={{scale:1}} className="bg-white rounded-2xl p-5 w-full max-w-sm shadow-2xl text-center">
+            <p className="text-4xl mb-2">🔐</p>
+            <h3 className="font-extrabold text-lg mb-1">{lang==='zh'?'家長密碼':'Parent PIN'}</h3>
+            <p className="text-xs text-gray-400 mb-3">{lang==='zh'?'請輸入4位數字密碼以查看答案':'Enter 4-digit PIN to view answers'}</p>
+            <input type="password" inputMode="numeric" maxLength={4} pattern="[0-9]*" autoFocus
+              id="pin-input"
+              className="w-32 mx-auto text-center text-2xl font-mono tracking-[0.5em] border-2 border-indigo-200 rounded-xl py-3 focus:border-indigo-500 focus:outline-none"
+              onKeyDown={e=>{if(e.key==='Enter'){var v=e.target.value;if(v===localStorage.getItem('parent_pin')){onPinSuccess()}else{e.target.value='';e.target.classList.add('border-red-400');setTimeout(()=>e.target.classList.remove('border-red-400'),800)}}}}
+            />
+            <div className="flex gap-2 mt-4">
+              <button onClick={()=>{setShowPinModal(false);setPendingRevealKey(null);setPendingRevealType(null);}} className="flex-1 py-2.5 border-2 border-gray-200 rounded-xl font-bold text-sm text-gray-500 active:bg-gray-100">{lang==='zh'?'取消':'Cancel'}</button>
+              <button onClick={()=>{var el=document.getElementById('pin-input');if(el&&el.value===localStorage.getItem('parent_pin')){onPinSuccess()}else if(el){el.value='';el.classList.add('border-red-400');setTimeout(()=>el.classList.remove('border-red-400'),800)}}} className="flex-1 py-2.5 bg-indigo-500 text-white rounded-xl font-bold text-sm">{lang==='zh'?'確認':'Confirm'}</button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}</AnimatePresence>
+
       <div className="max-w-xl mx-auto">
         {/* Top bar */}
         <div className="bg-white rounded-2xl p-3 mb-2 shadow-sm border">
@@ -554,8 +589,8 @@ export default function App(){
                         </div>
                         {!isMarked&&(
                           <div className="flex flex-col gap-1 shrink-0">
-                            <button onClick={()=>setRevealed(r=>({...r,[k]:!r[k]}))} className={"text-xs px-2 py-1.5 rounded-lg font-bold transition-colors "+(isR?'bg-emerald-200 text-emerald-700':'bg-gray-100 text-gray-400 active:bg-gray-200')}><Eye size={12}/></button>
-                            <button onClick={()=>setStepsShown(r=>({...r,[k]:!r[k]}))} className="text-xs px-2 py-1.5 rounded-lg font-bold bg-gray-100 text-gray-400 active:bg-gray-200">{isS?<ChevronUp size={12}/>:<ChevronDown size={12}/>}</button>
+                            <button onClick={()=>tryReveal(k,'eye')} className={"text-xs px-2 py-1.5 rounded-lg font-bold transition-colors "+(isR?'bg-emerald-200 text-emerald-700':'bg-gray-100 text-gray-400 active:bg-gray-200')}><Eye size={12}/></button>
+                            <button onClick={()=>tryReveal(k,'steps')} className="text-xs px-2 py-1.5 rounded-lg font-bold bg-gray-100 text-gray-400 active:bg-gray-200">{isS?<ChevronUp size={12}/>:<ChevronDown size={12}/>}</button>
                           </div>
                         )}
                         {isMarked&&mr&&!mr.ok&&(
