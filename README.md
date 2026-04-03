@@ -1,16 +1,35 @@
-# React + Vite
+# Maths Quests 數學練習
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+AI-powered primary school maths diagnostic tool for Hong Kong students (P1–P6).
 
-Currently, two official plugins are available:
+## Features
+- Generates curriculum-aligned maths quizzes by grade level
+- Automatic marking with per-topic weakness breakdown (各單元表現)
+- Cloud save via Supabase (exam history, progress tracking)
+- Mascot: Curlboo 🐻
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Tech Stack
+- Frontend: React + Vite + Tailwind CSS
+- Mobile: Capacitor (iOS)
+- Backend: Supabase (Auth + Database)
 
-## React Compiler
+## Run Locally
+npm install
+cp .env.local.example .env.local   # Add your Supabase keys
+npm run dev
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Environment Variables Required
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-## Expanding the ESLint configuration
+## Status
+- [x] Quiz generation engine
+- [x] Auto-marking
+- [x] Per-topic breakdown (各單元表現)
+- [x] Cloud save (Supabase)
+- [x] Auth (Google + Email)
+- [ ] PDF export (in progress)
+- [ ] Paywall (Phase 2)
+- [ ] Progress history UI (Phase 2)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Built by oneup24.com

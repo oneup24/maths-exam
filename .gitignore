@@ -1,3 +1,11 @@
+# Environment variables
+.env
+.env.local
+
+# Capacitor native builds
+ios/
+android/
+
 # Logs
 logs
 *.log
@@ -23,3 +31,7 @@ dist-ssr
 *.sln
 *.sw?
 .expo
+
+# Claude Code
+.claude/
+__pycache__/
