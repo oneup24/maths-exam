@@ -4,10 +4,13 @@ import {playCorrect,playWrong,playTick,playFanfare,playSubmit} from './lib/sound
 import Onboarding from './Onboarding';
 import PrivacyPolicy from './PrivacyPolicy';
 import Profile from './Profile';
+// eslint-disable-next-line no-unused-vars
 import {motion,AnimatePresence} from 'framer-motion';
 import {ArrowLeft,RotateCcw,Eye,Printer,ChevronDown,ChevronUp,X,Check,Play,Pause,BookOpen,Send,Trophy,AlertTriangle,Home,Clock,History,Trash2} from 'lucide-react';
 import {TOPICS,GRADE_INFO,DIFF_INFO,buildExam,printExam,chkAns,saveHistory,loadHistory,clearHistory} from './lib/engine';
 import {t} from './lib/i18n';
+import { useAuth } from './hooks/useAuth';
+import Login from './pages/Login';
 
 const fmt=t=>{var m=Math.floor(t/60),s=t%60;return m+':'+(s<10?'0':'')+s};
 
@@ -37,6 +40,8 @@ export default function App(){
   const[history,setHistory]=useState([]);
   const timerRef=useRef(null);
   const[onboarded,setOnboarded]=useState(()=>!!localStorage.getItem('onboarding_done'));
+  const[skippedLogin,setSkippedLogin]=useState(false);
+  const { user, loading: authLoading, signUp, signIn, signOut } = useAuth();
   const[streak,setStreak]=useState(()=>+(localStorage.getItem('streak_count')||0));
   const[soundOn,setSoundOn]=useState(()=>localStorage.getItem('sound_on')!=='0');
   const[showPrivacy,setShowPrivacy]=useState(false);
@@ -130,6 +135,21 @@ export default function App(){
   var GCL={rose:'bg-rose-50 border-rose-200 text-rose-700',orange:'bg-orange-50 border-orange-200 text-orange-700',amber:'bg-amber-50 border-amber-200 text-amber-700',emerald:'bg-emerald-50 border-emerald-200 text-emerald-700',sky:'bg-sky-50 border-sky-200 text-sky-700',violet:'bg-violet-50 border-violet-200 text-violet-700'};
   var co=GRADE_INFO[grade]?GRADE_INFO[grade].co:'indigo';
   var catColors={'數':'bg-blue-100 text-blue-700','代數':'bg-purple-100 text-purple-700','度量':'bg-green-100 text-green-700','圖形與空間':'bg-orange-100 text-orange-700','數據處理':'bg-pink-100 text-pink-700'};
+
+  /* ════════ AUTH LOADING ════════ */
+  if(authLoading) return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-stone-50 to-orange-50">
+      <div className="text-center">
+        <span className="text-5xl">🧮</span>
+        <p className="text-gray-400 mt-3 font-bold">Loading...</p>
+      </div>
+    </div>
+  );
+
+  /* ════════ LOGIN ════════ */
+  if(!user && !skippedLogin) return (
+    <Login onAuth={{ signUp, signIn, skip: () => setSkippedLogin(true) }} />
+  );
 
   /* ════════ ONBOARDING ════════ */
   if(!onboarded)return <Onboarding onComplete={completeOnboarding} lang={lang}/>;
