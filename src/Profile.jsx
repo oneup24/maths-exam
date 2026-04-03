@@ -106,7 +106,7 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
             className="w-full px-4 py-3 border-2 border-indigo-100 rounded-2xl text-base font-bold focus:outline-none focus:border-indigo-400 bg-indigo-50/30 mb-4"/>
 
           {/* Birthday */}
-          <label className="block text-xs font-bold text-gray-500 mb-1 flex items-center gap-1">
+          <label className="text-xs font-bold text-gray-500 mb-1 flex items-center gap-1">
             <Cake size={12}/>{isZh?'生日':'Birthday'}
           </label>
           <input type="date" value={birthday} onChange={e=>setBirthday(e.target.value)}
