@@ -1,13 +1,16 @@
 @import "tailwindcss";
 
-/* ✅ Background Gradient */
-body {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  min-height: 100vh;
-  font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
-}
-
-/* ✅ Smooth Scrolling */
 html {
   scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: #fffbf5;
+  min-height: 100vh;
+  font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }

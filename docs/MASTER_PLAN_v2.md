@@ -55,6 +55,10 @@
 - [x] Clean up 20 unused stub files
 - [x] Fix broken import in main.jsx
 - [x] Pin Vite dev server to port 5175
+- [x] Fix all 33 lint errors (0 remaining) + qty bug in engine.js
+- [x] Per-topic performance breakdown on results screen
+- [x] PDF exam report export (`ExportPDFButton`)
+- [x] Production env vars + deployment (Vercel) — **v1.2-beta live**
 - [ ] End-to-end testing: full exam flow (all grades, all types)
 - [ ] Test guest mode flow (no auth, localStorage only)
 - [ ] Test auth flow (signup, confirm email, login, session restore)
@@ -64,7 +68,6 @@
 - [ ] Test edge cases: empty answers, special chars, fraction formats
 - [ ] Add password reset flow (currently missing)
 - [ ] Fix Capacitor build (capacitor.js fails in vite build)
-- [ ] Production env vars + deployment (Vercel / Netlify)
 - [ ] Lighthouse audit (performance, accessibility, PWA score)
 
 ## Phase 4: Mobile App (Capacitor iOS)

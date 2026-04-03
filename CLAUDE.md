@@ -3,6 +3,7 @@
 ## Project
 HK primary school maths exam app (P1-P6). Brand: OneUp24 / Curlboo Bear mascot.
 React 19 + Vite 8 + Tailwind 4 + Supabase + Capacitor (iOS).
+Current version: **v1.2-beta** — live on Vercel.
 
 ## Quick reference
 - `pnpm dev` — start dev server
@@ -10,6 +11,7 @@ React 19 + Vite 8 + Tailwind 4 + Supabase + Capacitor (iOS).
 - `pnpm preview` — preview production build
 - `pnpm dev` runs on port 5175 (strictPort — won't auto-increment)
 - Main branch: `main` (supabase-auth merged)
+- Deployed: Vercel (production)
 
 ## Architecture
 - **Monolithic SPA** — all routing + state in `src/App.jsx` via useState + `view` variable
@@ -29,6 +31,7 @@ React 19 + Vite 8 + Tailwind 4 + Supabase + Capacitor (iOS).
 | `src/pages/Login.jsx` | Auth page |
 | `src/Profile.jsx` | Settings, stats, PIN |
 | `src/Onboarding.jsx` | Welcome wizard |
+| `src/components/ExportPDFButton.jsx` | PDF exam report export |
 | `supabase/setup.sql` | Database schema |
 
 ## Conventions

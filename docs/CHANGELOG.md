@@ -4,7 +4,28 @@ All notable changes to **Maths Quests** (數學特訓).
 
 ---
 
-## [main] — 2026-04-03
+## [v1.2-beta] — 2026-04-04
+
+### e99c4ba — deploy: live on Vercel with env vars
+- Production deployment on Vercel with environment variables configured
+- Shorten PDF export filename format: `MQ_P{grade}_{username}_{MMdd}_{HHmm}.pdf`
+- Fallback to "guest" instead of "Student" when no username available
+- Add `.vercel` to `.gitignore`
+
+### bdbc8de — chore: fix all 33 lint errors, fix qty bug in engine.js
+- Fix all 33 ESLint errors across the codebase (0 remaining)
+- Fix quantity bug in engine.js
+
+### df153c2 — v1.0-beta: clean codebase, README, env template
+- Clean up codebase for v1.0-beta release
+- Add README and `.env.template` for onboarding
+
+### dabc4f4 — feat: add per-topic performance breakdown on results screen
+- Show per-topic score breakdown after exam marking
+- Topic summary table with correct/total/percentage per topic
+- Visual indicators: checkmark (>=80%), triangle (50-79%), cross (<50%)
+
+## [pre-v1.0] — 2026-04-03
 
 ### eaed8a2 — feat: cleanup 20 dead files, fix imports, add RLS policies
 - Delete 20 unused stub files (components/, engines/, hooks/, utils/, pages/, data/, styles/, app/)

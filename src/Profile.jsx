@@ -63,8 +63,8 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
       <div className="max-w-lg mx-auto">
 
         {/* Header */}
-        <div className="flex items-center gap-3 mb-5">
-          <button onClick={onBack} aria-label="Back" className="p-2.5 min-w-[44px] min-h-[44px] rounded-2xl bg-white border shadow-sm active:bg-gray-100 active:scale-95 transition-all duration-200 flex items-center justify-center"><ArrowLeft size={18}/></button>
+        <div className="flex items-center gap-3 mb-4">
+          <button onClick={onBack} aria-label="Back" className="p-2.5 min-w-[44px] min-h-[44px] rounded-xl bg-white border shadow-sm active:bg-gray-100 active:scale-[0.97] transition-all duration-200 flex items-center justify-center"><ArrowLeft size={18}/></button>
           <h2 className="font-black text-xl text-gray-800">{isZh?'個人設定':'Profile Settings'}</h2>
         </div>
 
@@ -72,17 +72,17 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
         {user ? (
           <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-3 flex items-center justify-between">
             <span className="text-emerald-700 text-xs font-bold">✅ {isZh?'已登入：':'Signed in as '}{user.email}</span>
-            <button onClick={signOut} className="text-red-500 text-xs font-bold hover:underline active:scale-95 transition-all duration-200">{isZh?'登出 🚪':'Sign Out 🚪'}</button>
+            <button onClick={signOut} className="text-red-500 text-xs font-bold hover:underline active:scale-[0.97] transition-all duration-200">{isZh?'登出 🚪':'Sign Out 🚪'}</button>
           </div>
         ) : (
           <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 mb-3 flex items-center justify-between">
             <span className="text-orange-700 text-xs font-bold">{isZh?'⚠️ 訪客模式 — 進度不會同步到雲端':'⚠️ Guest Mode — progress won\'t sync to cloud'}</span>
-            <button onClick={goToLogin} className="bg-purple-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg active:scale-95 transition-all duration-200">{isZh?'立即註冊':'Sign Up Now'}</button>
+            <button onClick={goToLogin} className="bg-purple-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg active:scale-[0.97] transition-all duration-200">{isZh?'立即註冊':'Sign Up Now'}</button>
           </div>
         )}
 
         {/* Mascot + birthday banner */}
-        <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} className="text-center mb-5">
+        <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} className="text-center mb-4">
           <img src={isToday?'/mascot-happy.png':'/mascot.png'} alt="Curlboo Bear mascot"
             className="w-32 h-32 object-cover rounded-3xl mx-auto shadow-md"/>
           {isToday&&(
@@ -94,7 +94,7 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
         </motion.div>
 
         {/* Student info */}
-        <div className="bg-white rounded-3xl p-5 shadow-sm border mb-4">
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-5 shadow-sm border border-white/50 mb-3">
           <h3 className="font-bold text-gray-700 flex items-center gap-2 mb-4">
             <User size={16} className="text-indigo-500"/>
             {isZh?'學生資料':'Student Info'}
@@ -126,7 +126,7 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
         </div>
 
         {/* Parent PIN Settings */}
-        <div className="bg-white rounded-3xl p-5 shadow-sm border mb-4">
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-5 shadow-sm border border-white/50 mb-3">
           <h3 className="font-bold text-gray-700 flex items-center gap-2 mb-3">
             <Lock size={16} className="text-rose-500"/>
             {isZh?'家長設定':'Parent Settings'}
@@ -139,8 +139,8 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
               </div>
               <p className="text-xs text-gray-400 mb-3">{isZh?'查看答案和解題步驟時需要輸入密碼':'PIN required to view answers and solution steps'}</p>
               <div className="flex gap-2">
-                <button onClick={()=>{setPinEditing(true);setNewPin('');}} className="flex-1 py-2 rounded-xl border-2 border-indigo-200 text-indigo-600 text-xs font-bold active:bg-indigo-50 active:scale-95 transition-all duration-200">{isZh?'更改密碼':'Change PIN'}</button>
-                <button onClick={()=>{localStorage.removeItem('parent_pin');setPin('');setPinSaved(false);}} className="flex-1 py-2 rounded-xl border-2 border-red-200 text-red-500 text-xs font-bold active:bg-red-50 active:scale-95 transition-all duration-200">{isZh?'移除密碼':'Remove PIN'}</button>
+                <button onClick={()=>{setPinEditing(true);setNewPin('');}} className="flex-1 py-2 rounded-xl border-2 border-indigo-200 text-indigo-600 text-xs font-bold active:bg-indigo-50 active:scale-[0.97] transition-all duration-200">{isZh?'更改密碼':'Change PIN'}</button>
+                <button onClick={()=>{localStorage.removeItem('parent_pin');setPin('');setPinSaved(false);}} className="flex-1 py-2 rounded-xl border-2 border-red-200 text-red-500 text-xs font-bold active:bg-red-50 active:scale-[0.97] transition-all duration-200">{isZh?'移除密碼':'Remove PIN'}</button>
               </div>
             </div>
           ):(
@@ -162,14 +162,14 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
         </div>
 
         {/* Streak */}
-        <div className="bg-white rounded-3xl p-5 shadow-sm border mb-4">
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-5 shadow-sm border border-white/50 mb-3">
           <h3 className="font-bold text-gray-700 flex items-center gap-2 mb-3">
             <Zap size={16} className="text-orange-500"/>
             {isZh?'練習記錄':'Practice Record'}
           </h3>
           <div className="flex items-center gap-3">
             <div className="w-14 h-14 rounded-2xl bg-orange-100 flex flex-col items-center justify-center">
-              <span className="text-2xl">🔥</span>
+              <motion.span animate={{scale:[1,1.15,1]}} transition={{duration:2,repeat:Infinity,ease:'easeInOut'}} className="text-2xl inline-block">🔥</motion.span>
             </div>
             <div>
               <p className="text-3xl font-black text-orange-500">{streak}<span className="text-base font-bold text-orange-300 ml-1">{isZh?'天':'days'}</span></p>
@@ -180,7 +180,7 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
 
         {/* Cloud Stats — only for logged-in users */}
         {user&&cloudStats&&(
-          <div className="bg-white rounded-3xl p-5 shadow-sm border mb-4">
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-5 shadow-sm border border-white/50 mb-3">
             <h3 className="font-bold text-gray-700 flex items-center gap-2 mb-3">
               📊 {isZh?'我的統計（雲端）':'My Stats (Cloud)'}
             </h3>
@@ -203,7 +203,7 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
 
         {/* Recent Exams — only for logged-in users */}
         {user&&(
-          <div className="bg-white rounded-3xl p-5 shadow-sm border mb-4">
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-5 shadow-sm border border-white/50 mb-3">
             <h3 className="font-bold text-gray-700 flex items-center gap-2 mb-3">
               📝 {isZh?'最近考試':'Recent Exams'}
             </h3>
@@ -231,7 +231,7 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
         )}
 
         {/* Daily Challenge slot — placeholder */}
-        <div className="bg-white rounded-3xl p-5 shadow-sm border border-dashed border-indigo-200 opacity-70">
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-5 shadow-sm border border-dashed border-indigo-200 opacity-70">
           <h3 className="font-bold text-gray-500 flex items-center gap-2 mb-3">
             <Lock size={16} className="text-indigo-300"/>
             {isZh?'每日挑戰記錄':'Daily Challenge Record'}

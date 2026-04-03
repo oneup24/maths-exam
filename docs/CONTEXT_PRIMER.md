@@ -1,6 +1,6 @@
 # Context Primer
 
-Architecture, tech stack, and file map for **Maths Quests**.
+Architecture, tech stack, and file map for **Maths Quests** (v1.2-beta, live on Vercel).
 
 ---
 
@@ -13,7 +13,9 @@ Architecture, tech stack, and file map for **Maths Quests**.
 | Animation | Framer Motion 12 |
 | Icons | Lucide React, React Icons |
 | Backend | Supabase (Auth + PostgreSQL) |
+| PDF Export | jsPDF + jspdf-autotable (Noto Sans TC for Chinese) |
 | Mobile | Capacitor 8 (iOS/Android) + React Native 0.84 + Expo 55 |
+| Hosting | Vercel (production) |
 | Audio | Web Audio API (custom, no library) |
 | PWA | manifest.json + service worker |
 | Package manager | pnpm |
@@ -71,6 +73,9 @@ src/
   Onboarding.jsx       — 4-step welcome wizard
   Profile.jsx          — Settings, stats, PIN, streak, cloud history
   PrivacyPolicy.jsx    — COPPA/PDPO compliance modal
+
+  components/
+    ExportPDFButton.jsx — PDF exam report export (jsPDF + autotable, Chinese font support)
 ```
 
 ### Config

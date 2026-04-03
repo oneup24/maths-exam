@@ -51,6 +51,8 @@ export const i18n={
     stepsTitle:'📖 解題步驟',
     workPH:'列式計算...',ansPH:'輸入答案...',
     reviewWrong:'🎯 重溫錯題',
+    noHistory:'還沒有練習記錄',
+    noHistoryDesc:'完成一次考試後，記錄會出現在這裡！',
     /* onboarding */
     obStep1Title:'歡迎！',obStep1Sub:'小學數學模擬試卷',
     obStep1Desc:'專為香港小學生設計，涵蓋 P1–P6 全部課題，幫你備戰考試！',
@@ -114,6 +116,8 @@ export const i18n={
     stepsTitle:'📖 Solution Steps',
     workPH:'Show your work...',ansPH:'Enter answer...',
     reviewWrong:'🎯 Review Wrong Answers',
+    noHistory:'No practice history yet',
+    noHistoryDesc:'Complete an exam and your results will appear here!',
     /* onboarding */
     obStep1Title:'Welcome!',obStep1Sub:"Curlboo & Fluffy's Maths Quests",
     obStep1Desc:'Designed for HK primary students, covering P1–P6 topics to help you prepare for exams!',
