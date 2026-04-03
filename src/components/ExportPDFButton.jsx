@@ -26,13 +26,12 @@ async function loadFont(doc){
 
 function generateFilename(grade,studentName){
   const now=new Date();
-  const yy=String(now.getFullYear()).slice(2);
   const mm=String(now.getMonth()+1).padStart(2,'0');
   const dd=String(now.getDate()).padStart(2,'0');
   const hh=String(now.getHours()).padStart(2,'0');
   const min=String(now.getMinutes()).padStart(2,'0');
-  const safeName=(studentName||'Student').replace(/[/\\:*?"<>|]/g,'').trim().slice(0,20);
-  return 'MQ_P'+grade+'_'+safeName+'_'+yy+mm+dd+'_'+hh+min+'.pdf';
+  const safeName=(studentName||'guest').replace(/[/\\:*?"<>|]/g,'').trim().slice(0,20);
+  return 'MQ_P'+grade+'_'+safeName+'_'+mm+dd+'_'+hh+min+'.pdf';
 }
 
 export default function ExportPDFButton({sections,markRes,answers,mcSel,topicSummary,totScore,grandTotal,pct,grade,lang,studentName}){
