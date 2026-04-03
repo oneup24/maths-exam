@@ -1,12 +1,13 @@
 import React from 'react';
+// eslint-disable-next-line no-unused-vars -- motion is used as <motion.div> in JSX
 import {motion} from 'framer-motion';
 import {X,Shield} from 'lucide-react';
 
 export default function PrivacyPolicy({onClose}){
   return(
     <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
-      style={{background:'rgba(0,0,0,.5)'}} onClick={onClose}>
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50"
+      role="dialog" aria-modal="true" onClick={onClose}>
       <motion.div initial={{y:80,opacity:0}} animate={{y:0,opacity:1}} exit={{y:80,opacity:0}}
         onClick={e=>e.stopPropagation()}
         className="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[90vh] flex flex-col">
@@ -18,7 +19,7 @@ export default function PrivacyPolicy({onClose}){
             <h2 className="font-black text-lg text-gray-800">隱私政策</h2>
             <span className="text-xs text-gray-400">Privacy Policy</span>
           </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center active:bg-gray-200">
+          <button onClick={onClose} aria-label="Close privacy policy" className="w-8 h-8 min-w-[44px] min-h-[44px] rounded-full bg-gray-100 flex items-center justify-center active:bg-gray-200 active:scale-95 transition-all duration-200">
             <X size={16}/>
           </button>
         </div>

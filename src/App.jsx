@@ -12,6 +12,7 @@ import {t} from './lib/i18n';
 import { useAuth } from './hooks/useAuth';
 import { saveExamResult } from './services/api';
 import Login from './pages/Login';
+import ExportPDFButton from './components/ExportPDFButton';
 
 const fmt=t=>{var m=Math.floor(t/60),s=t%60;return m+':'+(s<10?'0':'')+s};
 
@@ -208,16 +209,16 @@ export default function App(){
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-stone-50 to-orange-50 p-4 pb-20">
       <div className="max-w-lg mx-auto">
         <div className="flex justify-between items-center mb-1">
-          <button onClick={()=>{const v=lang==='zh'?'en':'zh';setLang(v);localStorage.setItem('lang',v);}}
-            className="text-xs font-black px-3 py-1.5 rounded-full bg-white/60 active:bg-white border border-stone-200 shadow-sm text-gray-600">
+          <button onClick={()=>{const v=lang==='zh'?'en':'zh';setLang(v);localStorage.setItem('lang',v);}} aria-label={lang==='zh'?'Switch to English':'切換至中文'}
+            className="text-xs font-black px-3 py-2 min-h-[44px] rounded-full bg-white/60 active:bg-white active:scale-95 border border-stone-200 shadow-sm text-gray-600 transition-all duration-200 hover:shadow-md">
             {lang==='zh'?'EN':'中'}
           </button>
-          <button onClick={()=>setView('profile')}
-            className="text-xl p-2 rounded-full bg-white/60 active:bg-white border border-stone-200 shadow-sm">
+          <button onClick={()=>setView('profile')} aria-label={lang==='zh'?'設定':'Settings'}
+            className="text-xl p-2.5 min-w-[44px] min-h-[44px] rounded-full bg-white/60 active:bg-white active:scale-95 border border-stone-200 shadow-sm transition-all duration-200 hover:shadow-md">
             ⚙️
           </button>
-          <button onClick={()=>{const v=!soundOn;setSoundOn(v);localStorage.setItem('sound_on',v?'1':'0');}}
-            className="text-xl p-2 rounded-full bg-white/60 active:bg-white border border-stone-200 shadow-sm">
+          <button onClick={()=>{const v=!soundOn;setSoundOn(v);localStorage.setItem('sound_on',v?'1':'0');}} aria-label={soundOn?(lang==='zh'?'關閉聲音':'Mute'):(lang==='zh'?'開啟聲音':'Unmute')}
+            className="text-xl p-2.5 min-w-[44px] min-h-[44px] rounded-full bg-white/60 active:bg-white active:scale-95 border border-stone-200 shadow-sm transition-all duration-200 hover:shadow-md">
             {soundOn?'🔊':'🔇'}
           </button>
         </div>
@@ -251,7 +252,7 @@ export default function App(){
             var stars=best>=80?3:best>=60?2:best>=40?1:0;
             return(
               <motion.button key={g} whileTap={{scale:.96}} onClick={()=>{setGrade(g);setView('settings')}}
-                className={"relative p-5 rounded-3xl bg-gradient-to-br "+GC[GRADE_INFO[g].co]+" text-white shadow-lg active:shadow-md transition-shadow"}>
+                className={"relative p-5 rounded-3xl bg-gradient-to-br "+GC[GRADE_INFO[g].co]+" text-white shadow-lg active:shadow-md hover:shadow-xl transition-all duration-200"}>
                 {stars>0&&<div className="absolute top-2 right-2 flex gap-0.5">
                   {[1,2,3].map(s=><span key={s} className={"text-base "+(s<=stars?'opacity-100':'opacity-25')}>⭐</span>)}
                 </div>}
@@ -267,7 +268,7 @@ export default function App(){
           <div className="bg-white rounded-2xl p-4 shadow-sm border mb-3">
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-bold text-gray-700 flex items-center gap-1.5"><History size={16}/>{L('historyTitle')}</h3>
-              <button onClick={()=>{clearHistory();setHistory([])}} className="text-xs text-red-400 flex items-center gap-0.5"><Trash2 size={12}/>{L('clearHistory')}</button>
+              <button onClick={()=>{clearHistory();setHistory([])}} aria-label={L('clearHistory')} className="text-xs text-red-400 flex items-center gap-0.5 py-1 px-1.5 rounded-lg active:bg-red-50 transition-all duration-200"><Trash2 size={12}/>{L('clearHistory')}</button>
             </div>
             <div className="space-y-1.5 max-h-48 overflow-y-auto">
               {history.slice(0,8).map((h,i)=>(
@@ -277,7 +278,7 @@ export default function App(){
                     <span className="text-xs text-gray-400">{DIFF_INFO[h.difficulty]?.ic}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className={"w-12 bg-gray-200 rounded-full h-1.5"}><div className={"h-1.5 rounded-full "+(h.pct>=70?'bg-emerald-500':h.pct>=50?'bg-amber-500':'bg-red-400')} style={{width:h.pct+'%'}}/></div>
+                    <div className={"w-14 bg-gray-200 rounded-full h-2"}><div className={"h-2 rounded-full "+(h.pct>=70?'bg-emerald-500':h.pct>=50?'bg-amber-500':'bg-red-400')} style={{width:h.pct+'%'}}/></div>
                     <span className="text-xs font-bold text-gray-600 w-14 text-right">{h.score}/{h.total}</span>
                     <span className="text-xs text-gray-300">{h.date}</span>
                   </div>
@@ -310,7 +311,7 @@ export default function App(){
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-stone-50 to-orange-50 p-3 pb-20">
       <div className="max-w-lg mx-auto">
         <div className="flex items-center gap-3 mb-4">
-          <button onClick={()=>setView('home')} className="p-2 rounded-xl bg-white border active:bg-gray-100"><ArrowLeft size={18}/></button>
+          <button onClick={()=>setView('home')} aria-label={lang==='zh'?'返回':'Back'} className="p-2.5 min-w-[44px] min-h-[44px] rounded-xl bg-white border active:bg-gray-100 active:scale-95 transition-all duration-200 flex items-center justify-center"><ArrowLeft size={18}/></button>
           <div><h2 className="font-black text-lg text-gray-800">P{grade} {GRADE_INFO[grade].nm}</h2></div>
         </div>
 
@@ -320,7 +321,7 @@ export default function App(){
           <div className="grid grid-cols-3 gap-2">
             {[1,2,3].map(d=>{var di=DIFF_INFO[d];var dcol={1:'border-emerald-500 bg-emerald-50 text-emerald-700',2:'border-amber-500 bg-amber-50 text-amber-700',3:'border-rose-500 bg-rose-50 text-rose-700'};return(
               <button key={d} onClick={()=>setDifficulty(d)}
-                className={"py-3 rounded-xl border-2 text-center transition-all "+(difficulty===d?dcol[d]:'border-gray-200 text-gray-400 bg-gray-50')}>
+                className={"py-3 rounded-xl border-2 text-center transition-all duration-200 active:scale-95 "+(difficulty===d?dcol[d]:'border-gray-200 text-gray-400 bg-gray-50')}>
                 <div className="text-lg">{di.ic}</div>
                 <div className="text-sm font-bold">{di.nm}</div>
                 <div className="text-[10px] opacity-70 mt-0.5">{di.desc}</div>
@@ -333,12 +334,12 @@ export default function App(){
         <div className="bg-white rounded-2xl p-4 shadow-sm border mb-3">
           <div className="flex justify-between items-center mb-3">
             <h3 className="font-bold text-gray-700 flex items-center gap-1"><BookOpen size={16}/>{L('topicsTitle')}</h3>
-            <button onClick={toggleAll} className="text-xs px-3 py-1 rounded-lg bg-indigo-100 text-indigo-600 font-bold">{selTopics.size===TOPICS[grade].length?L('deselectAll'):L('selectAll')}</button>
+            <button onClick={toggleAll} className="text-xs px-3 py-1.5 rounded-lg bg-indigo-100 text-indigo-600 font-bold active:scale-95 transition-all duration-200">{selTopics.size===TOPICS[grade].length?L('deselectAll'):L('selectAll')}</button>
           </div>
           <div className="space-y-1.5">
             {TOPICS[grade].map(t=>(
               <button key={t.id} onClick={()=>toggleTopic(t.id)}
-                className={"w-full p-2.5 rounded-xl border-2 text-left transition-all flex items-center gap-2 "+(selTopics.has(t.id)?GCL[co]+' border-current':'bg-gray-50 border-gray-200 text-gray-400')}>
+                className={"w-full p-2.5 rounded-xl border-2 text-left transition-all duration-200 active:scale-[0.98] flex items-center gap-2 "+(selTopics.has(t.id)?GCL[co]+' border-current':'bg-gray-50 border-gray-200 text-gray-400')}>
                 <span className="text-lg">{t.ic}</span>
                 <div className="flex-1 min-w-0">
                   <span className="text-sm font-bold block truncate">{t.nm}</span>
@@ -356,7 +357,7 @@ export default function App(){
           <div className="flex gap-2">
             {[{v:'practice',lk:'practice',dk:'practiceQ'},{v:'test',lk:'test',dk:'testQ'},{v:'exam',lk:'exam',dk:'examQ'}].map(e=>(
               <button key={e.v} onClick={()=>{setExamType(e.v);setTimerMins(e.v==='test'?30:e.v==='exam'?55:30);setUseTimer(e.v!=='practice')}}
-                className={"flex-1 py-2.5 rounded-xl border-2 transition-all "+(examType===e.v?'border-indigo-500 bg-indigo-50 text-indigo-700':'border-gray-200 text-gray-400')}>
+                className={"flex-1 py-2.5 rounded-xl border-2 transition-all duration-200 active:scale-95 "+(examType===e.v?'border-indigo-500 bg-indigo-50 text-indigo-700':'border-gray-200 text-gray-400')}>
                 <div className="text-sm font-bold">{L(e.lk)}</div><div className="text-xs opacity-70">{L(e.dk)}</div>
               </button>
             ))}
@@ -386,7 +387,7 @@ export default function App(){
   return(
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-stone-50 to-orange-50 p-3 pb-24">
       <AnimatePresence>{showSubmit&&(
-        <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{background:'rgba(0,0,0,.5)'}}>
+        <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" role="dialog" aria-modal="true">
           <motion.div initial={{scale:.9}} animate={{scale:1}} className="bg-white rounded-2xl p-5 w-full max-w-sm shadow-2xl">
             <h3 className="font-extrabold text-lg text-center mb-3">{L('confirmSubmitTitle')}</h3>
             <div className="text-center mb-4">
@@ -395,17 +396,17 @@ export default function App(){
               {answeredQs<totalQs&&<p className="text-xs text-orange-500 font-bold mt-2">{L('unanswered',totalQs-answeredQs)}</p>}
             </div>
             <div className="flex gap-2">
-              <button onClick={()=>setShowSubmit(false)} className="flex-1 py-2.5 border-2 border-gray-200 rounded-xl font-bold text-sm text-gray-500 active:bg-gray-100">{L('continueBtn')}</button>
-              <button onClick={markExam} className="flex-1 py-2.5 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl font-bold text-sm">{L('confirmBtn')}</button>
+              <button onClick={()=>setShowSubmit(false)} className="flex-1 py-2.5 border-2 border-gray-200 rounded-xl font-bold text-sm text-gray-500 active:bg-gray-100 active:scale-95 transition-all duration-200">{L('continueBtn')}</button>
+              <button onClick={markExam} className="flex-1 py-2.5 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl font-bold text-sm active:scale-95 transition-all duration-200">{L('confirmBtn')}</button>
             </div>
           </motion.div>
         </motion.div>
       )}</AnimatePresence>
 
       <AnimatePresence>{showPrint&&(
-        <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{background:'rgba(0,0,0,.5)'}}>
+        <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" role="dialog" aria-modal="true">
           <motion.div initial={{scale:.9}} animate={{scale:1}} className="bg-white rounded-2xl p-5 w-full max-w-sm shadow-2xl">
-            <div className="flex justify-between items-center mb-3"><h3 className="font-extrabold text-lg">{L('printTitle')}</h3><button onClick={()=>setShowPrint(false)} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center"><X size={16}/></button></div>
+            <div className="flex justify-between items-center mb-3"><h3 className="font-extrabold text-lg">{L('printTitle')}</h3><button onClick={()=>setShowPrint(false)} aria-label="Close" className="w-9 h-9 min-w-[44px] min-h-[44px] rounded-full bg-gray-100 flex items-center justify-center active:bg-gray-200 transition-all duration-200"><X size={16}/></button></div>
             <input type="text" value={studentName} onChange={e=>setStudentName(e.target.value)} placeholder={L('studentNamePH')} className="w-full px-3 py-2 border-2 rounded-xl text-sm mb-3 focus:border-indigo-400 focus:outline-none"/>
             <div className="flex gap-2 mb-3">
               <button onClick={()=>setPrintAns(false)} className={"flex-1 py-2 rounded-xl text-sm font-bold border-2 "+(!printAns?'border-indigo-500 bg-indigo-50':'border-gray-200 text-gray-400')}>{L('studentVer')}</button>
@@ -417,7 +418,7 @@ export default function App(){
       )}</AnimatePresence>
 
       <AnimatePresence>{showSignUpPrompt&&(
-        <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{background:'rgba(0,0,0,.5)'}}>
+        <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" role="dialog" aria-modal="true">
           <motion.div initial={{scale:.9}} animate={{scale:1}} className="bg-white rounded-2xl p-5 w-full max-w-sm shadow-2xl text-center">
             <p className="text-4xl mb-3">🔒</p>
             <h3 className="font-extrabold text-lg mb-2">{lang==='zh'?'註冊以解鎖列印功能':'Sign Up to Unlock Printing'}</h3>
@@ -431,7 +432,7 @@ export default function App(){
       )}</AnimatePresence>
 
       <AnimatePresence>{showPinModal&&(
-        <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{background:'rgba(0,0,0,.5)'}}>
+        <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" role="dialog" aria-modal="true">
           <motion.div initial={{scale:.9}} animate={{scale:1}} className="bg-white rounded-2xl p-5 w-full max-w-sm shadow-2xl text-center">
             <p className="text-4xl mb-2">🔐</p>
             <h3 className="font-extrabold text-lg mb-1">{lang==='zh'?'家長密碼':'Parent PIN'}</h3>
@@ -453,7 +454,7 @@ export default function App(){
         {/* Top bar */}
         <div className="bg-white rounded-2xl p-3 mb-2 shadow-sm border">
           <div className="flex items-center justify-between flex-wrap gap-1">
-            <button onClick={()=>{setRunning(false);setView('settings')}} className="text-indigo-600 text-sm font-bold flex items-center gap-1"><ArrowLeft size={14}/>{L('settingsBtn')}</button>
+            <button onClick={()=>{setRunning(false);setView('settings')}} aria-label={lang==='zh'?'返回設定':'Back to settings'} className="text-indigo-600 text-sm font-bold flex items-center gap-1 py-1 active:opacity-70 transition-all duration-200"><ArrowLeft size={14}/>{L('settingsBtn')}</button>
             <div className="flex items-center gap-1.5">
               <span className={"text-xs font-bold px-2 py-0.5 rounded-full "+GCL[co]}>P{grade}</span>
               <span className={"text-xs font-bold px-2 py-0.5 rounded-full "+(difficulty===1?'bg-emerald-50 text-emerald-600':difficulty===3?'bg-rose-50 text-rose-600':'bg-amber-50 text-amber-600')}>{DIFF_INFO[difficulty].ic}{DIFF_INFO[difficulty].nm}</span>
@@ -464,14 +465,14 @@ export default function App(){
           {trapCount>0&&<p className="text-center text-xs text-amber-600 font-bold flex items-center justify-center gap-1 mt-0.5"><AlertTriangle size={10}/>{L('trapCount',trapCount)}</p>}
           {useTimer&&!isMarked&&(
             <div className="flex items-center justify-center gap-3 mt-2">
-              <button onClick={()=>setRunning(!running)} className="p-1.5 rounded-lg bg-indigo-100 text-indigo-600 active:bg-indigo-200">{running?<Pause size={14}/>:<Play size={14}/>}</button>
+              <button onClick={()=>setRunning(!running)} aria-label={running?(lang==='zh'?'暫停':'Pause'):(lang==='zh'?'開始':'Play')} className="p-2.5 min-w-[44px] min-h-[44px] rounded-lg bg-indigo-100 text-indigo-600 active:bg-indigo-200 active:scale-95 transition-all duration-200 flex items-center justify-center">{running?<Pause size={16}/>:<Play size={16}/>}</button>
               <span className={"text-xl font-mono font-black "+(timeLeft<60?'text-red-500 animate-pulse':'text-gray-700')}>{fmt(timeLeft)}</span>
             </div>
           )}
           {!isMarked&&(
             <div className="mt-2">
               <div className="flex justify-between text-xs text-gray-400 mb-1"><span>{L('progress')}</span><span className="font-bold">{answeredQs}/{totalQs}</span></div>
-              <div className="w-full bg-gray-200 rounded-full h-1.5"><div className="bg-indigo-500 h-1.5 rounded-full transition-all" style={{width:(totalQs>0?answeredQs/totalQs*100:0)+'%'}}/></div>
+              <div className="w-full bg-gray-200 rounded-full h-2.5"><div className="bg-indigo-500 h-2.5 rounded-full transition-all duration-300" style={{width:(totalQs>0?answeredQs/totalQs*100:0)+'%'}}/></div>
             </div>
           )}
         </div>
@@ -501,30 +502,34 @@ export default function App(){
                 <div key={si} className="flex items-center gap-2 text-sm">
                   <span className="font-bold text-gray-500 w-6">{sec.label}.</span>
                   <span className="flex-1 text-gray-600 truncate">{sec.nm}（{sec.qs.length}題）</span>
-                  <div className="w-16 bg-gray-200 rounded-full h-1.5"><div className={"h-1.5 rounded-full "+(sp>=70?'bg-emerald-500':sp>=50?'bg-amber-500':'bg-red-400')} style={{width:sp+'%'}}/></div>
+                  <div className="w-20 bg-gray-200 rounded-full h-2"><div className={"h-2 rounded-full transition-all duration-300 "+(sp>=70?'bg-emerald-500':sp>=50?'bg-amber-500':'bg-red-400')} style={{width:sp+'%'}}/></div>
                   <span className="text-xs font-bold w-12 text-right">{ss}/{sec.total}</span>
                 </div>
               )})}
             </div>
             {topicSummary.length>0&&(
-              <div className="mt-3 rounded-xl p-3" style={{background:'#f8f9fa'}}>
+              <div className="mt-3 rounded-xl p-3 bg-gray-50">
                 <h4 className="font-bold text-sm text-gray-700 mb-2">📊 {lang==='zh'?'各單元表現':'Topic Performance'}</h4>
                 <div className="space-y-1.5">
-                  {topicSummary.map(t=>{var color=t.pct>=80?'#22c55e':t.pct>=50?'#f59e0b':'#ef4444';var emoji=t.pct>=80?'✅':t.pct>=50?'⚠️':'❌';return(
-                    <div key={t.id} className="flex items-center gap-2 bg-white rounded-lg px-3 py-2" style={{borderLeft:'4px solid '+color}}>
-                      <span className="text-sm shrink-0">{emoji}</span>
-                      <span className="text-xs font-bold text-gray-700 flex-1 truncate">{t.name}</span>
-                      <span className="text-xs font-bold shrink-0" style={{color}}>{t.correct}/{t.total} ({t.pct}%)</span>
+                  {topicSummary.map(t=>{var tcls=t.pct>=80?'border-l-emerald-500':t.pct>=50?'border-l-amber-500':'border-l-red-500';var txtcls=t.pct>=80?'text-emerald-600':t.pct>=50?'text-amber-600':'text-red-500';var barcls=t.pct>=80?'bg-emerald-500':t.pct>=50?'bg-amber-500':'bg-red-400';var emoji=t.pct>=80?'✅':t.pct>=50?'⚠️':'❌';return(
+                    <div key={t.id} className={"bg-white rounded-lg px-3 py-2 border-l-4 "+tcls}>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm shrink-0">{emoji}</span>
+                        <span className="text-xs font-bold text-gray-700 flex-1 truncate">{t.name}</span>
+                        <span className={"text-xs font-bold shrink-0 "+txtcls}>{t.correct}/{t.total} ({t.pct}%)</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1.5"><div className={"h-1.5 rounded-full transition-all duration-300 "+barcls} style={{width:t.pct+'%'}}/></div>
                     </div>
                   )})}
                 </div>
               </div>
             )}
             <div className="flex gap-2 mt-3 flex-wrap">
-              <button onClick={()=>setWrongOnly(!wrongOnly)} className={"flex-1 min-w-[80px] py-2 rounded-xl text-xs font-bold border-2 "+(wrongOnly?'border-red-400 bg-red-50 text-red-600':'border-gray-200 text-gray-500')}>{wrongOnly?L('showAll'):L('showWrong')}</button>
-              <button onClick={resetMarking} className="flex-1 min-w-[80px] py-2 rounded-xl text-xs font-bold border-2 border-blue-200 text-blue-600 flex items-center justify-center gap-1"><RotateCcw size={12}/>{L('retry')}</button>
-              <button onClick={generate} className="flex-1 min-w-[80px] py-2 rounded-xl text-xs font-bold border-2 border-indigo-200 text-indigo-600 flex items-center justify-center gap-1"><RotateCcw size={12}/>{L('newExam')}</button>
-              {Object.values(markRes).some(r=>!r.ok)&&<button onClick={retryWrong} className="w-full py-2 rounded-xl text-xs font-bold border-2 border-rose-300 bg-rose-50 text-rose-600 flex items-center justify-center gap-1 mt-1">{L('reviewWrong')}</button>}
+              <button onClick={()=>setWrongOnly(!wrongOnly)} className={"flex-1 min-w-[80px] py-2.5 rounded-xl text-xs font-bold border-2 transition-all duration-200 active:scale-95 "+(wrongOnly?'border-red-400 bg-red-50 text-red-600':'border-gray-200 text-gray-500')}>{wrongOnly?L('showAll'):L('showWrong')}</button>
+              <button onClick={resetMarking} className="flex-1 min-w-[80px] py-2.5 rounded-xl text-xs font-bold border-2 border-blue-200 text-blue-600 flex items-center justify-center gap-1 transition-all duration-200 active:scale-95"><RotateCcw size={12}/>{L('retry')}</button>
+              <button onClick={generate} className="flex-1 min-w-[80px] py-2.5 rounded-xl text-xs font-bold border-2 border-indigo-200 text-indigo-600 flex items-center justify-center gap-1 transition-all duration-200 active:scale-95"><RotateCcw size={12}/>{L('newExam')}</button>
+              <ExportPDFButton sections={sections} markRes={markRes} answers={answers} mcSel={mcSel} topicSummary={topicSummary} totScore={totScore} grandTotal={grandTotal} pct={pct} grade={grade} lang={lang} studentName={studentName}/>
+              {Object.values(markRes).some(r=>!r.ok)&&<button onClick={retryWrong} className="w-full py-2.5 rounded-xl text-xs font-bold border-2 border-rose-300 bg-rose-50 text-rose-600 flex items-center justify-center gap-1 mt-1 transition-all duration-200 active:scale-95">{L('reviewWrong')}</button>}
             </div>
           </motion.div>
         )}</AnimatePresence>
@@ -532,7 +537,7 @@ export default function App(){
         {/* Section nav */}
         <div className="flex gap-1 mb-2 overflow-x-auto pb-1 -mx-1 px-1">
           {sections.map((sec,i)=>(
-            <a key={i} href={'#s'+i} className="shrink-0 px-3 py-1.5 bg-white border rounded-lg text-xs font-bold text-gray-600 hover:bg-indigo-50 active:bg-indigo-100 flex items-center gap-1 transition-colors">
+            <a key={i} href={'#s'+i} className="shrink-0 px-3 py-2 bg-white border rounded-lg text-xs font-bold text-gray-600 hover:bg-indigo-50 active:bg-indigo-100 active:scale-95 flex items-center gap-1 transition-all duration-200">
               {sec.label}（{sec.qs.length}）{isMarked&&<span className="text-xs text-gray-400">{secScores(i)}/{sec.total}</span>}
             </a>
           ))}
@@ -553,10 +558,10 @@ export default function App(){
                   var q=item.q,qi=item.qi,k=item.k;
                   var isR=revealed[k],isS=stepsShown[k],mr=markRes[k];
                   return(
-                    <div key={qi} className={"p-3 transition-colors "+(isMarked?(mr&&mr.ok?'bg-emerald-50/30':'bg-red-50/30'):'')}>
+                    <div key={qi} className={"p-4 transition-colors duration-200 "+(isMarked?(mr&&mr.ok?'bg-emerald-50/30':'bg-red-50/30'):'')}>
                       <div className="flex items-start gap-2">
                         <div className="flex items-center gap-1 shrink-0 w-8">
-                          <span className="text-sm font-extrabold text-gray-300">{qi+1}.</span>
+                          <span className="text-base font-extrabold text-gray-300">{qi+1}.</span>
                           {isMarked&&(mr&&mr.ok?<Check size={14} className="text-emerald-500"/>:<X size={14} className="text-red-500"/>)}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -572,7 +577,7 @@ export default function App(){
                               var cls=isMarked?(o.l===q.a?'border-emerald-400 bg-emerald-50 font-bold text-emerald-700':isSel&&o.l!==q.a?'border-red-400 bg-red-50 text-red-700 line-through':'border-gray-200 bg-gray-50 text-gray-400'):(isSel?'border-indigo-400 bg-indigo-100 font-bold text-indigo-700 ring-2 ring-indigo-200':'border-gray-200 bg-gray-50 hover:bg-gray-100 cursor-pointer');
                               return(
                                 <button key={o.l} onClick={()=>{if(!isMarked)setMcSel(p=>({...p,[k]:o.l}))}} disabled={isMarked}
-                                  className={"text-xs px-3 py-2.5 rounded-lg border-2 text-left flex items-center gap-2 transition-all "+cls}>
+                                  className={"text-sm px-3 py-3 rounded-xl border-2 text-left flex items-center gap-2 transition-all duration-200 "+cls}>
                                   <span className={"w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 text-xs font-bold "+(isSel&&!isMarked?'bg-indigo-500 border-indigo-500 text-white':isMarked&&o.l===q.a?'bg-emerald-500 border-emerald-500 text-white':'border-gray-300 text-gray-400')}>{o.l}</span>
                                   <span>{o.v}</span>
                                   {isMarked&&o.l===q.a&&<Check size={14} className="ml-auto text-emerald-500"/>}
@@ -623,12 +628,12 @@ export default function App(){
                         </div>
                         {!isMarked&&(
                           <div className="flex flex-col gap-1 shrink-0">
-                            <button onClick={()=>tryReveal(k,'eye')} className={"text-xs px-2 py-1.5 rounded-lg font-bold transition-colors "+(isR?'bg-emerald-200 text-emerald-700':'bg-gray-100 text-gray-400 active:bg-gray-200')}><Eye size={12}/></button>
-                            <button onClick={()=>tryReveal(k,'steps')} className="text-xs px-2 py-1.5 rounded-lg font-bold bg-gray-100 text-gray-400 active:bg-gray-200">{isS?<ChevronUp size={12}/>:<ChevronDown size={12}/>}</button>
+                            <button onClick={()=>tryReveal(k,'eye')} aria-label={lang==='zh'?'顯示答案':'Show answer'} className={"p-2.5 min-w-[44px] min-h-[44px] rounded-lg font-bold transition-all duration-200 flex items-center justify-center "+(isR?'bg-emerald-200 text-emerald-700':'bg-gray-100 text-gray-400 active:bg-gray-200 active:scale-95')}><Eye size={14}/></button>
+                            <button onClick={()=>tryReveal(k,'steps')} aria-label={lang==='zh'?'顯示步驟':'Show steps'} className="p-2.5 min-w-[44px] min-h-[44px] rounded-lg font-bold bg-gray-100 text-gray-400 active:bg-gray-200 active:scale-95 transition-all duration-200 flex items-center justify-center">{isS?<ChevronUp size={14}/>:<ChevronDown size={14}/>}</button>
                           </div>
                         )}
                         {isMarked&&mr&&!mr.ok&&(
-                          <button onClick={()=>setStepsShown(r=>({...r,[k]:!r[k]}))} className="text-xs px-2 py-1.5 rounded-lg font-bold bg-sky-100 text-sky-600 shrink-0 self-start mt-1 active:bg-sky-200">📖</button>
+                          <button onClick={()=>setStepsShown(r=>({...r,[k]:!r[k]}))} aria-label={lang==='zh'?'解題步驟':'Solution steps'} className="p-2.5 min-w-[44px] min-h-[44px] rounded-lg font-bold bg-sky-100 text-sky-600 shrink-0 self-start mt-1 active:bg-sky-200 active:scale-95 transition-all duration-200 flex items-center justify-center">📖</button>
                         )}
                       </div>
                     </div>
@@ -642,13 +647,13 @@ export default function App(){
         {/* Bottom actions */}
         <div className="grid grid-cols-2 gap-2 mt-2 pb-4">
           {isMarked?<>
-            <button onClick={resetMarking} className="py-2.5 bg-white border-2 border-blue-200 text-blue-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-blue-50"><RotateCcw size={14}/>{L('retryFull')}</button>
-            <button onClick={generate} className={"py-2.5 bg-gradient-to-r "+GC[co]+" text-white font-bold rounded-xl text-sm flex items-center justify-center gap-1"}><RotateCcw size={14}/>{L('newExamFull')}</button>
-            <button onClick={()=>user?setShowPrint(true):setShowSignUpPrompt(true)} className="py-2.5 bg-white border-2 border-purple-200 text-purple-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-purple-50"><Printer size={14}/>{L('print')}</button>
-            <button onClick={()=>{setRunning(false);setView('home')}} className="py-2.5 bg-white border-2 border-gray-200 text-gray-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-gray-100"><Home size={14}/>{L('home')}</button>
+            <button onClick={resetMarking} className="py-2.5 bg-white border-2 border-blue-200 text-blue-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-blue-50 active:scale-95 transition-all duration-200"><RotateCcw size={14}/>{L('retryFull')}</button>
+            <button onClick={generate} className={"py-2.5 bg-gradient-to-r "+GC[co]+" text-white font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:scale-95 transition-all duration-200"}><RotateCcw size={14}/>{L('newExamFull')}</button>
+            <button onClick={()=>user?setShowPrint(true):setShowSignUpPrompt(true)} className="py-2.5 bg-white border-2 border-purple-200 text-purple-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-purple-50 active:scale-95 transition-all duration-200"><Printer size={14}/>{L('print')}</button>
+            <button onClick={()=>{setRunning(false);setView('home')}} className="py-2.5 bg-white border-2 border-gray-200 text-gray-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-gray-100 active:scale-95 transition-all duration-200"><Home size={14}/>{L('home')}</button>
           </>:<>
-            <button onClick={()=>user?setShowPrint(true):setShowSignUpPrompt(true)} className="py-2.5 bg-white border-2 border-purple-200 text-purple-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-purple-50"><Printer size={14}/>{L('print')}</button>
-            <button onClick={generate} className={"py-2.5 bg-gradient-to-r "+GC[co]+" text-white font-bold rounded-xl text-sm flex items-center justify-center gap-1"}><RotateCcw size={14}/>{L('newExamFull')}</button>
+            <button onClick={()=>user?setShowPrint(true):setShowSignUpPrompt(true)} className="py-2.5 bg-white border-2 border-purple-200 text-purple-600 font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:bg-purple-50 active:scale-95 transition-all duration-200"><Printer size={14}/>{L('print')}</button>
+            <button onClick={generate} className={"py-2.5 bg-gradient-to-r "+GC[co]+" text-white font-bold rounded-xl text-sm flex items-center justify-center gap-1 active:scale-95 transition-all duration-200"}><RotateCcw size={14}/>{L('newExamFull')}</button>
           </>}
         </div>
       </div>

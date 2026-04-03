@@ -9,7 +9,7 @@ const tone=(freq,type,duration,vol,delay=0)=>{
     g.gain.setValueAtTime(vol,c.currentTime+delay);
     g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+delay+duration);
     osc.start(c.currentTime+delay);osc.stop(c.currentTime+delay+duration);
-  }catch(e){}
+  }catch{/* intentionally empty — audio may be blocked by browser policy */}
 };
 
 export const playCorrect=()=>{

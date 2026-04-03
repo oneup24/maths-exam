@@ -1,4 +1,5 @@
 import React,{useState} from 'react';
+// eslint-disable-next-line no-unused-vars -- motion is used as <motion.div> in JSX
 import {motion,AnimatePresence} from 'framer-motion';
 import {ChevronRight,Check} from 'lucide-react';
 import {t} from './lib/i18n';
@@ -30,7 +31,7 @@ export default function Onboarding({onComplete,lang='zh'}){
           <motion.div key={step} initial={{opacity:0,x:40}} animate={{opacity:1,x:0}} exit={{opacity:0,x:-40}} transition={{duration:0.25}}
             className="flex flex-col items-center text-center w-full">
 
-            <motion.img src={s.mascot} alt="mascot" className="w-64 h-64 object-cover rounded-3xl mb-5 shadow-lg"
+            <motion.img src={s.mascot} alt="Curlboo Bear mascot" className="w-64 h-64 object-cover rounded-3xl mb-5 shadow-lg"
               initial={{scale:0.85,opacity:0}} animate={{scale:1,opacity:1}} transition={{delay:0.1}}/>
 
             <h1 className="text-3xl font-black text-gray-800 mb-1">{L(s.tk)}</h1>
@@ -42,6 +43,7 @@ export default function Onboarding({onComplete,lang='zh'}){
                 <input type="text" value={name} onChange={e=>setName(e.target.value)}
                   onKeyDown={e=>e.key==='Enter'&&name.trim()&&next()}
                   placeholder={L('obNamePH')}
+                  aria-label="Enter your name"
                   className="w-full px-4 py-3 border-2 border-indigo-200 rounded-2xl text-center text-xl font-bold focus:outline-none focus:border-indigo-500 bg-white"
                   autoFocus/>
                 <p className="text-xs text-gray-400 mt-2">{L('obNameNote')}</p>
@@ -63,7 +65,7 @@ export default function Onboarding({onComplete,lang='zh'}){
         </motion.button>
 
         {!isLast&&(
-          <button onClick={()=>onComplete('')} className="mt-4 text-sm text-gray-400 underline">
+          <button onClick={()=>onComplete('')} className="mt-4 text-sm text-gray-400 underline transition-all duration-200 active:scale-95">
             {L('obSkip')}
           </button>
         )}

@@ -246,7 +246,7 @@ Q[4]={
 ],
 '4N5':[
   ()=>{var a=ri(30,80),b=ri(15,40),c=ri(5,12);return{d:1,tp:'calc',q:'('+a+' + '+b+') × '+c+' = ?',a:String((a+b)*c),s:['括號先算'],sc:2}},
-  ()=>{var a=ri(100,300),b=ri(20,60),c=ri(5,9),d=ri(10,30);return{d:2,tp:'calc',q:a+' − '+b+' × '+c+' + '+d+' = ?',a:String(a-b*c+d),s:['先乘後加減'],sc:2}},
+  ()=>{for(var i=0;i<50;i++){var a=ri(100,300),b=ri(20,60),c=ri(5,9),d=ri(10,30);if(a-b*c>=0)return{d:2,tp:'calc',q:a+' − '+b+' × '+c+' + '+d+' = ?',a:String(a-b*c+d),s:['先乘後加減'],sc:2}}var fa=300,fb=20,fc=5,fd=10;return{d:2,tp:'calc',q:fa+' − '+fb+' × '+fc+' + '+fd+' = ?',a:String(fa-fb*fc+fd),s:['先乘後加減'],sc:2}},
   ()=>{var small=ri(15,25),big=small+ri(3,8),n=ri(200,350);var dMember=ri(1000,5000),dOpen=ri(8,22);return{d:2,tp:'work',q:'超市有會員'+dMember+'人，每日營業'+dOpen+'小時。細包裝每包$'+small+'，大包裝比細包裝貴$'+(big-small)+'。各買'+n+'包需付多少元？',a:String((small+big)*n),trap:'會員數和營業時間',s:['🔍 會員和營業時間無關','大: '+big,'兩種×'+n+': '+(small+big)*n],sc:3}},
   ()=>{var girls=ri(20,40),leave=ri(3,10),ratio=ri(10,20);var dArea=ri(100,300);return{d:3,tp:'work',q:'禮堂面積'+dArea+'平方米，有女學生'+girls+'人。'+leave+'人離開後，男學生是餘下女學生的'+ratio+'倍。男學生有多少人？',a:String((girls-leave)*ratio),trap:'禮堂面積',s:['🔍 面積無關','餘下: '+(girls-leave),'男: '+(girls-leave)*ratio],sc:3}}
 ],
@@ -510,35 +510,16 @@ _addQ('4N1',
     var price=ri(5,25),qty=ri(3,8),total=price*qty;
     return{d:2,tp:'work',
       q: (function(){
-  var scenes = [
-    // 1. Buy toys (original)
-    {act:'買了',unit:'件',item:'玩具',cost:'共花了$'+total,ask:'每件多少錢？'},
-    // 2. Buy pens
-    {act:'買了',unit:'枝',item:'鉛筆',cost:'共花了$'+total,ask:'每枝多少錢？'},
-    // 3. Buy books
-    {act:'買了',unit:'本',item:'故事書',cost:'共花了$'+total,ask:'每本多少錢？'},
-    // 4. Share candies
-    {act:'有'+total+'粒糖果，平均分給',unit:'',item:'',cost:'',ask:''},
-    // 5. Cut rope
-    {act:'有一條',unit:'',item:'繩子',cost:'長'+total+'cm',ask:''},
-    // 6. Read pages
-    {act:'要看一本',unit:'',item:'',cost:total+'頁的書',ask:''},
-    // 7. Pack cookies
-    {act:'有'+total+'塊曲奇餅，平均放入',unit:'',item:'',cost:'',ask:''},
-    // 8. Students in groups
-    {act:'有'+total+'個學生，平均分成',unit:'',item:'',cost:'',ask:''}
-  ];
-  // Pick a random scene type (cleaner templates below)
   var t = pk([1,2,3,4,5,6,7,8]);
   switch(t){
-    case 1: return nm()+'買了'+n+'件玩具，共花了$'+total+'。每件多少錢？';
-    case 2: return nm()+'買了'+n+'枝鉛筆，共花了$'+total+'。每枝多少錢？';
-    case 3: return nm()+'買了'+n+'本故事書，共花了$'+total+'。每本多少錢？';
-    case 4: return nm()+'有'+total+'粒糖果，平均分給'+n+'個小朋友。每人分到多少粒？';
-    case 5: return '一條繩子長'+total+'cm，平均剪成'+n+'段。每段長多少cm？';
-    case 6: return nm()+'要在'+n+'天內看完一本'+total+'頁的書。每天要看多少頁？';
-    case 7: return nm()+'有'+total+'塊曲奇餅，平均放入'+n+'個盒子。每個盒子放多少塊？';
-    case 8: return '有'+total+'個學生，平均分成'+n+'組。每組有多少人？';
+    case 1: return nm()+'買了'+qty+'件玩具，共花了$'+total+'。每件多少錢？';
+    case 2: return nm()+'買了'+qty+'枝鉛筆，共花了$'+total+'。每枝多少錢？';
+    case 3: return nm()+'買了'+qty+'本故事書，共花了$'+total+'。每本多少錢？';
+    case 4: return nm()+'有'+total+'粒糖果，平均分給'+qty+'個小朋友。每人分到多少粒？';
+    case 5: return '一條繩子長'+total+'cm，平均剪成'+qty+'段。每段長多少cm？';
+    case 6: return nm()+'要在'+qty+'天內看完一本'+total+'頁的書。每天要看多少頁？';
+    case 7: return nm()+'有'+total+'塊曲奇餅，平均放入'+qty+'個盒子。每個盒子放多少塊？';
+    case 8: return '有'+total+'個學生，平均分成'+qty+'組。每組有多少人？';
   }
 })(),
       a:String(price),s:['$'+total+'÷'+qty+' = $'+price]};
@@ -683,7 +664,7 @@ _addQ('4N3',
     while(d1===d2) d2=pk([2,3,4]);
     var lo=10,hi=50,results=[];
     for(var i=lo;i<=hi;i++) if(i%d1===0&&i%d2===0) results.push(i);
-    if(results.length===0){d1=3;d2=5;results=[];for(var i=lo;i<=hi;i++) if(i%d1===0&&i%d2===0) results.push(i);}
+    if(results.length===0){d1=3;d2=5;results=[];for(var j=lo;j<=hi;j++) if(j%d1===0&&j%d2===0) results.push(j);}
     return{d:3,tp:'fill',
       q:lo+'至'+hi+'之間，同時是'+d1+'和'+d2+'的倍數的數有哪些？（用逗號分隔）',
       a:results.join(','),
@@ -1174,7 +1155,7 @@ _addQ('4M1',
   },
   // Half perimeter
   ()=>{
-    var w=ri(10,22),h=ri(6,16),peri=(w+h)*2;
+    var w=ri(10,22),h=ri(6,16),_peri=(w+h)*2;
     return{d:2,tp:'short',
       q:'下圖長方形的周界的一半是多少cm？',
       fig:FIG.rect(w,h),
@@ -1243,7 +1224,7 @@ export function buildExam(grade,topics,examType,difficulty){
         /* check difficulty compatibility */
         if(!allowed.includes(q.d||2))return;
         allGens[q.tp].push({fn:gen,tid:tid,tnm:tnm});
-      }catch(e){}
+      }catch{/* intentionally empty — skip broken generators */}
     });
   });
   var types=['calc','fill','mc','short','work'].filter(t=>allGens[t].length>0);
@@ -1254,7 +1235,7 @@ export function buildExam(grade,topics,examType,difficulty){
   types.forEach(t=>{
     var need=dist[t]||0,gens=allGens[t],qs=[],seen={},seenT={};
     for(var i=0;i<need*80&&qs.length<need;i++){
-      try{var item=pk(gens);var q=item.fn();if(!q||!q.q)continue;if(!allowed.includes(q.d||2))continue;var k=q.q+'|'+q.a;if(seen[k])continue;var tc=seenT[q.q]||0;if(tc>=1)continue;seen[k]=true;seenT[q.q]=tc+1;q.topicId=item.tid;q.topicName=item.tnm;qs.push(q)}catch(e){}
+      try{var item=pk(gens);var q=item.fn();if(!q||!q.q)continue;if(!allowed.includes(q.d||2))continue;var k=q.q+'|'+q.a;if(seen[k])continue;var tc=seenT[q.q]||0;if(tc>=1)continue;seen[k]=true;seenT[q.q]=tc+1;q.topicId=item.tid;q.topicName=item.tnm;qs.push(q)}catch{/* intentionally empty — skip broken generators */}
     }
     if(qs.length>0){generated[t]=qs;count+=qs.length}
   });
@@ -1263,7 +1244,7 @@ export function buildExam(grade,topics,examType,difficulty){
   var safety=0;
   while(count<totalTarget&&safety<500){
     safety++;var t=pk(types);var gens=allGens[t];if(!gens.length)continue;if(!generated[t])generated[t]=[];
-    try{var item=pk(gens);var q=item.fn();if(!q||!q.q)continue;if(!allowed.includes(q.d||2))continue;var k=q.q+'|'+q.a;if(gSeen[k])continue;if((gSeenT[q.q]||0)>=1)continue;gSeen[k]=true;gSeenT[q.q]=(gSeenT[q.q]||0)+1;q.topicId=item.tid;q.topicName=item.tnm;generated[t].push(q);count++}catch(e){}
+    try{var item=pk(gens);var q=item.fn();if(!q||!q.q)continue;if(!allowed.includes(q.d||2))continue;var k=q.q+'|'+q.a;if(gSeen[k])continue;if((gSeenT[q.q]||0)>=1)continue;gSeen[k]=true;gSeenT[q.q]=(gSeenT[q.q]||0)+1;q.topicId=item.tid;q.topicName=item.tnm;generated[t].push(q);count++}catch{/* intentionally empty — skip broken generators */}
   }
   while(count>totalTarget){
     var longest=types.filter(t=>(generated[t]||[]).length>1).sort((a,b)=>(generated[b]||[]).length-(generated[a]||[]).length);
@@ -1317,16 +1298,16 @@ export function saveHistory(entry){
     hist.unshift({...entry,ts:Date.now()});
     if(hist.length>50)hist=hist.slice(0,50);
     localStorage.setItem(STORAGE_KEY,JSON.stringify(hist));
-  }catch(e){}
+  }catch{/* intentionally empty — localStorage may be unavailable */}
 }
 
 export function loadHistory(){
   try{
     var raw=localStorage.getItem(STORAGE_KEY);
     return raw?JSON.parse(raw):[];
-  }catch(e){return[]}
+  }catch{/* intentionally empty — return default */return[]}
 }
 
 export function clearHistory(){
-  try{localStorage.removeItem(STORAGE_KEY)}catch(e){}
+  try{localStorage.removeItem(STORAGE_KEY)}catch{/* intentionally empty — localStorage may be unavailable */}
 }

@@ -1,4 +1,5 @@
 import React,{useState,useEffect} from 'react';
+// eslint-disable-next-line no-unused-vars -- motion is used as <motion.div> in JSX
 import {motion} from 'framer-motion';
 import {ArrowLeft,Save,User,Cake,Zap,Lock,Check} from 'lucide-react';
 import { getUserStats, loadExamHistory } from './services/api';
@@ -63,7 +64,7 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-5">
-          <button onClick={onBack} className="p-2 rounded-2xl bg-white border shadow-sm active:bg-gray-100"><ArrowLeft size={18}/></button>
+          <button onClick={onBack} aria-label="Back" className="p-2.5 min-w-[44px] min-h-[44px] rounded-2xl bg-white border shadow-sm active:bg-gray-100 active:scale-95 transition-all duration-200 flex items-center justify-center"><ArrowLeft size={18}/></button>
           <h2 className="font-black text-xl text-gray-800">{isZh?'個人設定':'Profile Settings'}</h2>
         </div>
 
@@ -71,18 +72,18 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
         {user ? (
           <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-3 flex items-center justify-between">
             <span className="text-emerald-700 text-xs font-bold">✅ {isZh?'已登入：':'Signed in as '}{user.email}</span>
-            <button onClick={signOut} className="text-red-500 text-xs font-bold hover:underline">{isZh?'登出 🚪':'Sign Out 🚪'}</button>
+            <button onClick={signOut} className="text-red-500 text-xs font-bold hover:underline active:scale-95 transition-all duration-200">{isZh?'登出 🚪':'Sign Out 🚪'}</button>
           </div>
         ) : (
           <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 mb-3 flex items-center justify-between">
             <span className="text-orange-700 text-xs font-bold">{isZh?'⚠️ 訪客模式 — 進度不會同步到雲端':'⚠️ Guest Mode — progress won\'t sync to cloud'}</span>
-            <button onClick={goToLogin} className="bg-purple-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg">{isZh?'立即註冊':'Sign Up Now'}</button>
+            <button onClick={goToLogin} className="bg-purple-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg active:scale-95 transition-all duration-200">{isZh?'立即註冊':'Sign Up Now'}</button>
           </div>
         )}
 
         {/* Mascot + birthday banner */}
         <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} className="text-center mb-5">
-          <img src={isToday?'/mascot-happy.png':'/mascot.png'} alt="mascot"
+          <img src={isToday?'/mascot-happy.png':'/mascot.png'} alt="Curlboo Bear mascot"
             className="w-32 h-32 object-cover rounded-3xl mx-auto shadow-md"/>
           {isToday&&(
             <motion.div initial={{scale:0}} animate={{scale:1}} transition={{type:'spring',stiffness:200}}
@@ -138,8 +139,8 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
               </div>
               <p className="text-xs text-gray-400 mb-3">{isZh?'查看答案和解題步驟時需要輸入密碼':'PIN required to view answers and solution steps'}</p>
               <div className="flex gap-2">
-                <button onClick={()=>{setPinEditing(true);setNewPin('');}} className="flex-1 py-2 rounded-xl border-2 border-indigo-200 text-indigo-600 text-xs font-bold active:bg-indigo-50">{isZh?'更改密碼':'Change PIN'}</button>
-                <button onClick={()=>{localStorage.removeItem('parent_pin');setPin('');setPinSaved(false);}} className="flex-1 py-2 rounded-xl border-2 border-red-200 text-red-500 text-xs font-bold active:bg-red-50">{isZh?'移除密碼':'Remove PIN'}</button>
+                <button onClick={()=>{setPinEditing(true);setNewPin('');}} className="flex-1 py-2 rounded-xl border-2 border-indigo-200 text-indigo-600 text-xs font-bold active:bg-indigo-50 active:scale-95 transition-all duration-200">{isZh?'更改密碼':'Change PIN'}</button>
+                <button onClick={()=>{localStorage.removeItem('parent_pin');setPin('');setPinSaved(false);}} className="flex-1 py-2 rounded-xl border-2 border-red-200 text-red-500 text-xs font-bold active:bg-red-50 active:scale-95 transition-all duration-200">{isZh?'移除密碼':'Remove PIN'}</button>
               </div>
             </div>
           ):(
