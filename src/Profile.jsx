@@ -1,6 +1,7 @@
-import React,{useState} from 'react';
+import React,{useState,useEffect} from 'react';
 import {motion} from 'framer-motion';
 import {ArrowLeft,Save,User,Cake,Zap,Lock,Check} from 'lucide-react';
+import { getUserStats, loadExamHistory } from './services/api';
 
 function calcAge(birthday){
   if(!birthday)return null;
@@ -30,6 +31,15 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
   const[name,setName]=useState(studentName||'');
   const[birthday,setBirthday]=useState(()=>localStorage.getItem('student_birthday')||'');
   const[saved,setSaved]=useState(false);
+  const[cloudStats,setCloudStats]=useState(null);
+  const[recentExams,setRecentExams]=useState([]);
+
+  useEffect(()=>{
+    if(user){
+      getUserStats(user.id).then(stats=>setCloudStats(stats));
+      loadExamHistory(user.id).then(({data})=>setRecentExams(data.slice(0,10)));
+    }
+  },[user]);
 
   const save=()=>{
     var n=name.trim();
@@ -126,6 +136,58 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
             </div>
           </div>
         </div>
+
+        {/* Cloud Stats — only for logged-in users */}
+        {user&&cloudStats&&(
+          <div className="bg-white rounded-3xl p-5 shadow-sm border mb-4">
+            <h3 className="font-bold text-gray-700 flex items-center gap-2 mb-3">
+              📊 {isZh?'我的統計（雲端）':'My Stats (Cloud)'}
+            </h3>
+            <div className="flex gap-3">
+              <div className="flex-1 bg-purple-50 rounded-xl p-3 text-center">
+                <p className="text-2xl font-black text-purple-600">{cloudStats.totalExams}</p>
+                <p className="text-xs text-purple-400 font-bold">{isZh?'總考試':'Total'}</p>
+              </div>
+              <div className="flex-1 bg-sky-50 rounded-xl p-3 text-center">
+                <p className="text-2xl font-black text-sky-600">{cloudStats.avgScore}%</p>
+                <p className="text-xs text-sky-400 font-bold">{isZh?'平均分':'Avg'}</p>
+              </div>
+              <div className="flex-1 bg-amber-50 rounded-xl p-3 text-center">
+                <p className="text-2xl font-black text-amber-600">{cloudStats.bestScore}%</p>
+                <p className="text-xs text-amber-400 font-bold">{isZh?'最高分':'Best'}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Recent Exams — only for logged-in users */}
+        {user&&(
+          <div className="bg-white rounded-3xl p-5 shadow-sm border mb-4">
+            <h3 className="font-bold text-gray-700 flex items-center gap-2 mb-3">
+              📝 {isZh?'最近考試':'Recent Exams'}
+            </h3>
+            {recentExams.length>0?(
+              <div className="space-y-0">
+                {recentExams.map((e,i)=>{
+                  var d=new Date(e.created_at);
+                  var dateStr=(d.getMonth()+1)+'/'+ d.getDate();
+                  return(
+                    <div key={e.id||i} className={"flex items-center justify-between py-2 "+(i<recentExams.length-1?'border-b border-gray-100':'')}>
+                      <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">P{e.grade}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-16 bg-gray-200 rounded-full h-1.5"><div className={"h-1.5 rounded-full "+(e.score_percent>=70?'bg-emerald-500':e.score_percent>=50?'bg-amber-500':'bg-red-400')} style={{width:e.score_percent+'%'}}/></div>
+                        <span className={"text-sm font-bold "+(e.score_percent>=70?'text-emerald-600':e.score_percent>=50?'text-amber-600':'text-red-500')}>{e.score_percent}%</span>
+                        <span className="text-xs text-gray-300">{dateStr}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ):(
+              <p className="text-center text-sm text-gray-400 py-4">{isZh?'還沒有考試記錄！去練習吧！🎯':'No exams yet! Go practice! 🎯'}</p>
+            )}
+          </div>
+        )}
 
         {/* Daily Challenge slot — placeholder */}
         <div className="bg-white rounded-3xl p-5 shadow-sm border border-dashed border-indigo-200 opacity-70">

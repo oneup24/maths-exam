@@ -10,6 +10,7 @@ import {ArrowLeft,RotateCcw,Eye,Printer,ChevronDown,ChevronUp,X,Check,Play,Pause
 import {TOPICS,GRADE_INFO,DIFF_INFO,buildExam,printExam,chkAns,saveHistory,loadHistory,clearHistory} from './lib/engine';
 import {t} from './lib/i18n';
 import { useAuth } from './hooks/useAuth';
+import { saveExamResult, loadExamHistory, getUserStats, updateProfileScore } from './services/api';
 import Login from './pages/Login';
 
 const fmt=t=>{var m=Math.floor(t/60),s=t%60;return m+':'+(s<10?'0':'')+s};
@@ -37,6 +38,7 @@ export default function App(){
   const[totScore,setTotScore]=useState(0);
   const[showSubmit,setShowSubmit]=useState(false);
   const[showSignUpPrompt,setShowSignUpPrompt]=useState(false);
+  const[cloudSaved,setCloudSaved]=useState(false);
   const[wrongOnly,setWrongOnly]=useState(false);
   const[history,setHistory]=useState([]);
   const timerRef=useRef(null);
@@ -63,7 +65,7 @@ export default function App(){
 
   var generate=useCallback(()=>{
     var exam=buildExam(grade,Array.from(selTopics),examType,difficulty);
-    setSections(exam);setRevealed({});setStepsShown({});setAnswers({});setMcSel({});setIsMarked(false);setMarkRes({});setTotScore(0);setWrongOnly(false);
+    setSections(exam);setRevealed({});setStepsShown({});setAnswers({});setMcSel({});setIsMarked(false);setMarkRes({});setTotScore(0);setWrongOnly(false);setCloudSaved(false);
     if(useTimer){setTimeLeft(timerMins*60);setRunning(true)}
     setView('exam');
   },[grade,selTopics,examType,difficulty,useTimer,timerMins]);
@@ -117,6 +119,13 @@ export default function App(){
     /* save to history */
     saveHistory({grade,difficulty,examType,score:sc,total:grandTotal,pct:grandTotal>0?Math.round(sc/grandTotal*100):0,qCount:totalQs,date:new Date().toLocaleDateString('zh-HK')});
     setHistory(loadHistory());
+    /* save to Supabase cloud */
+    if(user){
+      var correctCount=Object.values(res).filter(r=>r.ok).length;
+      var elapsed=useTimer?timerMins*60-timeLeft:0;
+      saveExamResult({userId:user.id,grade:String(grade),topic:'mixed',totalQuestions:totalQs,correctAnswers:correctCount,scorePercent:sp,timeSpent:elapsed})
+        .then(({error})=>{if(!error)setCloudSaved(true);});
+    }
     setTimeout(()=>window.scrollTo({top:0,behavior:'smooth'}),100);
   };
   var resetMarking=()=>{setAnswers({});setMcSel({});setIsMarked(false);setMarkRes({});setTotScore(0);setWrongOnly(false);setRevealed({});setStepsShown({})};
@@ -427,6 +436,9 @@ export default function App(){
                   initial={{scale:0.7,opacity:0}} animate={{scale:1,opacity:1}} transition={{type:'spring',stiffness:200}}
                   className="w-44 h-44 object-cover rounded-3xl mx-auto shadow-md"/>
                 <p className={"text-sm font-extrabold mt-1 "+fb.c}>{fb.m}</p>
+                <p className={"text-xs mt-1 "+(user&&cloudSaved?'text-emerald-500':user?'text-gray-400':'text-gray-400')}>
+                  {user&&cloudSaved?(lang==='zh'?'☁️ 已保存到雲端':'☁️ Saved to cloud'):user?(lang==='zh'?'⏳ 保存中...':'⏳ Saving...'):(lang==='zh'?'💾 僅本地保存':'💾 Local only')}
+                </p>
               </div>
             </div>
             <div className="border-t pt-2 space-y-1">
