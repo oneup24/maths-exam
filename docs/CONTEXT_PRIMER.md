@@ -24,13 +24,15 @@ Architecture, tech stack, and file map for **Maths Quests** (v1.2-beta, live on 
 
 ## Architecture
 
-**Monolithic single-page app.** All routing and state lives in `App.jsx` via `useState` + a `view` variable. No React Router wired up (installed but unused).
+**Monolithic single-page app.** All routing and state lives in `App.jsx` (~426 lines) via `useState` + a `view` variable. UI is composed from 15+ extracted components. No React Router wired up (installed but unused).
 
 ```
 User opens app
   -> useAuth() checks Supabase session
-  -> Login page (or skip to guest mode)
-  -> Onboarding (first time only)
+  -> Onboarding (first time only — 6-step "hook before ask" flow)
+     1. Language picker → 2. Value splash → 3. Grade picker
+     4. Try one question → 5. Result → 6. Auth gate (signup/login/guest)
+  -> Login page (returning users only, if not signed in)
   -> Home (pick grade P1-P6)
   -> Settings (difficulty, topics, exam type, timer)
   -> Exam (generated questions, timer, answer input)
@@ -51,7 +53,7 @@ User opens app
 
 ```
 src/
-  App.jsx              — Main app: routing, exam UI, state, marking (~1200 lines)
+  App.jsx              — Main app: routing, exam UI, state, marking (~426 lines)
   main.jsx             — React root mount
   index.css            — Tailwind imports + global styles
 
@@ -59,6 +61,8 @@ src/
     engine.js          — Question engine: generators, exam builder, answer checker (~1000+ lines)
     i18n.js            — zh/en translation strings
     sounds.js          — Web Audio sound effects (correct, wrong, tick, fanfare, submit)
+    colors.js          — Grade colors, category colors, difficulty colors
+    animations.js      — Shared Framer Motion variants (pageTransition, fadeInUp, stagger)
 
   hooks/
     useAuth.js         — Supabase auth: session, signUp, signIn, signOut, skip
@@ -68,14 +72,25 @@ src/
     api.js             — Cloud ops: saveExamResult, loadExamHistory, getUserStats
 
   pages/
-    Login.jsx          — Email auth + guest skip
+    Login.jsx          — Email auth + guest skip (returning users only)
 
-  Onboarding.jsx       — 4-step welcome wizard
+  Onboarding.jsx       — 6-step "hook before ask" wizard (lang→value→grade→question→result→auth)
   Profile.jsx          — Settings, stats, PIN, streak, cloud history
   PrivacyPolicy.jsx    — COPPA/PDPO compliance modal
 
   components/
     ExportPDFButton.jsx — PDF exam report export (jsPDF + autotable, Chinese font support)
+    ui/
+      Modal.jsx        — Base modal (AnimatePresence + backdrop)
+      PageShell.jsx    — Warm gradient wrapper
+    home/
+      GradeCard.jsx, GradeGrid.jsx, HistoryList.jsx, GuestBanner.jsx, TrapInfoBox.jsx
+    settings/
+      SettingsView.jsx — Complete settings view
+    exam/
+      ExamHeader.jsx, ScoreReport.jsx, ExamActions.jsx, FloatingSubmit.jsx
+    modals/
+      SubmitModal.jsx, PrintModal.jsx, SignUpPromptModal.jsx, PinModal.jsx
 ```
 
 ### Config

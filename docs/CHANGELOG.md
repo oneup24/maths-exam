@@ -6,6 +6,36 @@ All notable changes to **Maths Quests** (數學特訓).
 
 ## [v1.2-beta] — 2026-04-04
 
+### e647f83 — feat: redesign onboarding — 6-step "hook before ask" flow
+- Replace 4-step text-heavy onboarding with interactive 6-step flow:
+  1. Language picker (zh/en, auto-advance)
+  2. Value splash (3 icon cards: Smart Questions, Trap Training, Track Score)
+  3. Grade picker (3×2 grid with stagger animation, auto-advance on tap)
+  4. Try one question (grade-matched MC, correct/wrong feedback)
+  5. Result screen (scale pop celebration or shake encouragement)
+  6. Auth gate (soft sell with benefits, inline signup/login, guest always available)
+- Onboarding now runs BEFORE auth ("hook before ask" pattern)
+- Auth embedded in step 6 instead of separate login page
+- Horizontal slide transitions (x: 80→0→-80)
+- Back button on steps 1-5, smart auth form handling
+- 5-dot progress indicator (orange active, completed, gray future)
+- Warm orange/amber CTA buttons matching app palette
+- Grade selection saved to localStorage, applied on app load
+- All strings bilingual via i18n (26 new keys)
+
+### 522b99c — feat: full UI/UX redesign — component extraction, design system, animations
+- Extract App.jsx from 672→426 lines into 15 reusable components
+- 4 exam components (ExamHeader, ScoreReport, ExamActions, FloatingSubmit)
+- 5 home components (GradeCard, GradeGrid, HistoryList, GuestBanner, TrapInfoBox)
+- 4 modal components (SubmitModal, PrintModal, SignUpPromptModal, PinModal)
+- 2 UI primitives (Modal, PageShell) + SettingsView
+- Design system: rounding/shadow/spacing/typography tokens, glass card effect
+- Visual upgrades: animated score counter, view transitions, skeleton loading
+- Streak flame pulse, MC whileTap, history stagger, empty states
+- Accessibility: aria-live, role=progressbar, WCAG contrast fixes
+- iOS safe area: env(safe-area-inset-*) padding
+- Delete 226-line dead App.css
+
 ### e99c4ba — deploy: live on Vercel with env vars
 - Production deployment on Vercel with environment variables configured
 - Shorten PDF export filename format: `MQ_P{grade}_{username}_{MMdd}_{HHmm}.pdf`

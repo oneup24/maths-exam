@@ -14,8 +14,11 @@ Current version: **v1.2-beta** — live on Vercel.
 - Deployed: Vercel (production)
 
 ## Architecture
-- **Monolithic SPA** — all routing + state in `src/App.jsx` via useState + `view` variable
+- **Monolithic SPA** — routing + state in `src/App.jsx` (~426 lines) via useState + `view` variable
+- **15+ extracted components** — `src/components/{ui,home,settings,exam,modals}/`
 - **Question engine** — `src/lib/engine.js` (~1000+ lines, ~600+ procedural generators)
+- **Design system** — `src/lib/colors.js` (grade/category/difficulty colors), `src/lib/animations.js` (shared Framer Motion variants)
+- **Onboarding** — `src/Onboarding.jsx` — 6-step "hook before ask" flow (runs BEFORE auth)
 - **Auth** — `src/hooks/useAuth.js` wraps Supabase; guest mode supported
 - **Cloud** — `src/services/api.js` saves exam results to Supabase `exam_sessions` table
 - **i18n** — `src/lib/i18n.js`, use `t(lang, key)` — always support both zh and en
@@ -28,9 +31,12 @@ Current version: **v1.2-beta** — live on Vercel.
 | `src/lib/engine.js` | Question generators, exam builder, answer checker |
 | `src/hooks/useAuth.js` | Supabase session management |
 | `src/services/api.js` | Cloud save/load operations |
-| `src/pages/Login.jsx` | Auth page |
+| `src/pages/Login.jsx` | Auth page (returning users only) |
 | `src/Profile.jsx` | Settings, stats, PIN |
-| `src/Onboarding.jsx` | Welcome wizard |
+| `src/Onboarding.jsx` | 6-step onboarding (lang→value→grade→question→result→auth) |
+| `src/lib/colors.js` | Grade/category/difficulty color tokens |
+| `src/lib/animations.js` | Shared Framer Motion variants |
+| `src/components/` | 15+ extracted components (ui, home, settings, exam, modals) |
 | `src/components/ExportPDFButton.jsx` | PDF exam report export |
 | `supabase/setup.sql` | Database schema |
 
@@ -55,7 +61,12 @@ Current version: **v1.2-beta** — live on Vercel.
 - Revenue model: Freemium → subscription
 - See full business plan: github.com/oneup24/Oneup24 (private)
 
+## App Flow
+1. Onboarding (first time): language → value splash → grade → try question → result → auth gate
+2. Login (returning users only, if not signed in)
+3. Home → Settings → Exam → Results → Profile
+
 ## Docs
 - `docs/CHANGELOG.md` — commit history and features
 - `docs/CONTEXT_PRIMER.md` — architecture deep dive
-- `docs/MASTER_PLAN_v2.md` — dev roadmap
+- `docs/MASTER_PLAN_v3.md` — dev roadmap (current)
