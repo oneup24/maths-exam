@@ -47,7 +47,7 @@ function useCountUp(target,duration=1200){
 
 export default function App(){
   const[view,setView]=useState('home');
-  const[grade,setGrade]=useState(4);
+  const[grade,setGrade]=useState(()=>+(localStorage.getItem('selected_grade'))||4);
   const[selTopics,setSelTopics]=useState(new Set());
   const[examType,setExamType]=useState('exam');
   const[difficulty,setDifficulty]=useState(2);
@@ -104,9 +104,11 @@ export default function App(){
     setPendingRevealKey(null);setPendingRevealType(null);
   };
 
-  var completeOnboarding=n=>{
-    if(n){setStudentName(n);localStorage.setItem('student_name',n);}
-    localStorage.setItem('onboarding_done','1');
+  var completeOnboarding=(authData,chosenLang,chosenGrade)=>{
+    if(chosenLang){setLang(chosenLang);localStorage.setItem('lang',chosenLang);}
+    if(chosenGrade){setGrade(chosenGrade);}
+    // authData is null for guest, truthy for signed-in user
+    if(!authData)setSkippedLogin(true);
     setOnboarded(true);
   };
 
@@ -230,13 +232,13 @@ export default function App(){
     </div>
   );
 
-  /* ════════ LOGIN ════════ */
+  /* ════════ ONBOARDING (before auth — hook before ask) ════════ */
+  if(!onboarded)return <Onboarding onComplete={completeOnboarding} lang={lang} signUp={signUp} signIn={signIn}/>;
+
+  /* ════════ LOGIN (returning users only) ════════ */
   if(!user && !skippedLogin) return (
     <Login onAuth={{ signUp, signIn, skip: () => setSkippedLogin(true) }} />
   );
-
-  /* ════════ ONBOARDING ════════ */
-  if(!onboarded)return <Onboarding onComplete={completeOnboarding} lang={lang}/>;
 
   /* ════════ PROFILE ════════ */
   if(view==='profile')return <Profile onBack={()=>setView('home')} lang={lang} studentName={studentName} setStudentName={setStudentName} streak={streak} user={user} signOut={async()=>{await signOut();setSkippedLogin(false);}} goToLogin={()=>setSkippedLogin(false)}/>;
