@@ -1,40 +1,14 @@
--- ========================================
--- exam_sessions: stores each completed exam
--- ========================================
-CREATE TABLE IF NOT EXISTS public.exam_sessions (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id text NOT NULL,
-  level text NOT NULL,
-  topic_code text DEFAULT 'mixed',
-  total_questions integer NOT NULL,
-  correct_count integer NOT NULL,
-  score_percentage numeric NOT NULL,
-  time_spent integer DEFAULT 0,
-  topic_breakdown jsonb DEFAULT NULL,
-  completed_at timestamptz DEFAULT now()
-);
+-- RLS for questions (public read)
+ALTER TABLE public.questions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can read questions"
+  ON public.questions FOR SELECT
+  USING (true);
 
-CREATE INDEX IF NOT EXISTS idx_exam_sessions_user ON public.exam_sessions(user_id);
-CREATE INDEX IF NOT EXISTS idx_exam_sessions_completed ON public.exam_sessions(completed_at DESC);
-
--- ========================================
--- Row Level Security: users own their rows
--- ========================================
-ALTER TABLE public.exam_sessions ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can select own rows"
-  ON public.exam_sessions FOR SELECT
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can insert own rows"
-  ON public.exam_sessions FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can update own rows"
-  ON public.exam_sessions FOR UPDATE
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can delete own rows"
-  ON public.exam_sessions FOR DELETE
-  USING (auth.uid() = user_id);
+-- RLS for user_errors (insert only)
+ALTER TABLE public.user_errors ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can insert errors"
+  ON public.user_errors FOR INSERT
+  WITH CHECK (true);
+CREATE POLICY "No public read on errors"
+  ON public.user_errors FOR SELECT
+  USING (false);

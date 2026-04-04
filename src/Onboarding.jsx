@@ -3,6 +3,7 @@ import React,{useState} from 'react';
 import {motion,AnimatePresence} from 'framer-motion';
 import {ChevronRight,ArrowLeft,Loader2} from 'lucide-react';
 import {t} from './lib/i18n';
+import {track} from './lib/track';
 
 /* ── Sample questions per grade ── */
 const SAMPLE_QS={
@@ -57,25 +58,30 @@ export default function Onboarding({onComplete,lang:initialLang,signUp,signIn}){
 
   const L=(key,...args)=>t(lang,key,...args);
 
+  // Track onboarding start once on mount
+  useState(()=>{track('onboarding_start')});
+
   const goBack=()=>{
     if(step===5&&authMode){setAuthMode(null);setError('');return;} // back from auth form → auth options
     if(step===3){setSelectedOpt(null);setWasCorrect(null);} // reset question state when going back
     if(step>0)setStep(step-1);
   };
-  const pickLang=(l)=>{setLang(l);localStorage.setItem('lang',l);setStep(1);};
-  const pickGrade=(g)=>{setGrade(g);setTimeout(()=>setStep(3),400);};
+  const pickLang=(l)=>{setLang(l);localStorage.setItem('lang',l);track('onboarding_language',{language:l});setStep(1);};
+  const pickGrade=(g)=>{setGrade(g);track('onboarding_grade',{grade:g});setTimeout(()=>setStep(3),400);};
   const answerQ=(opt)=>{
     if(selectedOpt!==null)return;
     var sq=SAMPLE_QS[grade||4];
     var correct=opt===sq.a;
     setSelectedOpt(opt);
     setWasCorrect(correct);
+    track('onboarding_question_answered',{grade:grade||4,correct:correct});
     setTimeout(()=>setStep(4),900);
   };
   const finish=(authData)=>{
     localStorage.setItem('onboarding_done','true');
     if(grade)localStorage.setItem('selected_grade',String(grade));
     localStorage.setItem('app_language',lang);
+    if(!authData)track('onboarding_guest');
     onComplete(authData,lang,grade);
   };
   const handleAuth=async(e)=>{
@@ -84,6 +90,7 @@ export default function Onboarding({onComplete,lang:initialLang,signUp,signIn}){
     try{
       if(authMode==='signup'){
         await signUp(email,password);
+        track('onboarding_signup');
         setSignupDone(true);
       }else{
         var result=await signIn(email,password);

@@ -13,6 +13,7 @@ import { useAuth } from './hooks/useAuth';
 import { saveExamResult } from './services/api';
 import Login from './pages/Login';
 import {GC} from './lib/colors';
+import {track} from './lib/track';
 import {pageTransition} from './lib/animations';
 import SubmitModal from './components/modals/SubmitModal';
 import PrintModal from './components/modals/PrintModal';
@@ -116,6 +117,7 @@ export default function App(){
     var exam=buildExam(grade,Array.from(selTopics),examType,difficulty);
     setSections(exam);setRevealed({});setStepsShown({});setAnswers({});setMcSel({});setIsMarked(false);setMarkRes({});setTotScore(0);setWrongOnly(false);setCloudSaved(false);setPinUnlocked(false);
     if(useTimer){setTimeLeft(timerMins*60);setRunning(true)}
+    track('quiz_start',{grade:grade,topic:Array.from(selTopics).join(',')});
     setView('exam');
   },[grade,selTopics,examType,difficulty,useTimer,timerMins]);
 
@@ -134,6 +136,8 @@ export default function App(){
       var pts=ok?(q.sc||2):0;sc+=pts;res[k]={ok,pts,max:q.sc||2};
     }));
     setMarkRes(res);setTotScore(sc);setIsMarked(true);setRunning(false);setShowSubmit(false);
+    var sp_pct=grandTotal>0?Math.round(sc/grandTotal*100):0;
+    track('quiz_complete',{grade:grade,topic:Array.from(selTopics).join(','),score:sp_pct,total:totalQs});
     /* sounds */
     if(soundOn){var sp0=grandTotal>0?Math.round(sc/grandTotal*100):0;setTimeout(()=>{if(sp0>=80)playFanfare();else if(sp0>=50)playCorrect();else playWrong();},400);}
     /* confetti */
