@@ -94,6 +94,7 @@ export default function Onboarding({onComplete,lang:initialLang,signUp,signIn}){
         setSignupDone(true);
       }else{
         var result=await signIn(email,password);
+        track('onboarding_login');
         finish(result||true);
       }
     }catch(err){setError(err.message);}
