@@ -75,6 +75,14 @@
 - [x] PWA support (manifest, service worker)
 - [x] Profile page (name, birthday, settings)
 
+### Question Generator (3-Layer Engine)
+- [x] Layer 1 hardcode engine — 217 generators across 6 grades, 5 question types
+- [x] Basic word problem context (hardcoded in each generator)
+- [ ] Separate context pools into `contexts.js` (HK-specific: 蛋撻, 港鐵, 百佳, 八達通, etc.)
+- [ ] Add `gradeRules` validation (max number, decimal/fraction/negative allowed per grade)
+- [ ] Wire contexts.js + gradeRules into existing engine.js generators
+- Note: Layer 1 is NOT throwaway — it becomes: offline fallback, free-tier engine, context library for AI prompts, and math validation backbone
+
 
 ## Phase 2: Auth + Cloud — DONE
 
@@ -92,6 +100,16 @@
 - [x] Flexible multi-part answer matching (space/newline/comma)
 - [x] Defensive optional chaining for guest mode stability
 - [x] CSS conflict fixes
+
+### Question Generator (3-Layer Engine)
+- [ ] Create `question_bank` table in Supabase with schema:
+  - id, grade, topic_id, difficulty, q_type, question_json (jsonb), source (hardcode|ai_v32|ai_r1|exam_mimic), hash (SHA256 for dedup, UNIQUE), quality_score (0-100), times_served, times_correct, avg_time_spent, status (verified|flagged|retired), context_version, created_at
+  - Index: (grade, topic_id, difficulty, q_type, status)
+  - Index: (quality_score DESC) WHERE status = 'verified'
+- [ ] Seed question bank: run all 217 generators × multiple seeds = ~2,000+ initial questions
+- [ ] Modify `buildExam()` flow: try Bank first → fill gaps with Layer 1 → AI only if both insufficient
+- [ ] Add dedup logic: hash(question + answer) to prevent duplicates
+- [ ] Track student-question history: ensure same student doesn't get same Bank question twice
 
 
 ## Phase 3: Stabilize — IN PROGRESS
@@ -118,6 +136,27 @@
 - [ ] Lighthouse audit (performance, accessibility, PWA score)
 - [ ] [STRATEGIC] Data schema documentation — document exam_sessions table structure, column types, JSONB shape, RLS policies. This is the single source of truth for the data layer. Include example topic_breakdown JSONB so any future dev or AI agent knows the exact shape.
 
+### Question Generator (3-Layer Engine)
+- [ ] Bank Learning System:
+  - After student answers: update times_served, times_correct, avg_time_spent on question_bank
+  - Add "Report wrong answer" button → flags question (status: flagged)
+  - Auto-compute quality_score = f(correct_rate, avg_time, report_count, source)
+  - Auto-retire questions with quality_score < threshold
+  - Questions with 40-70% correct rate = ideal difficulty, boost score
+- [ ] AI Generator MVP (DeepSeek V3.2):
+  - Generate 應用題 (word problems) only — hardcode handles calc/fill fine
+  - System prompt includes: grade, topicId, difficulty, contexts from contexts.js, gradeRules constraints, forbidden rules (no negatives for P1-P5, no decimals before P4, etc.)
+  - Output format: standard question JSON {d, tp, q, a, sc, isMC, opts, trap, fig, s[], topicId, topicName}
+  - Validation pipeline (auto, before serving):
+    1. Structure check: all required fields present, correct types
+    2. Math verification: parse question, solve independently (use Layer 1 chkAns logic), verify AI answer matches
+    3. Context check: numbers within gradeRules, realistic quantities, Traditional Chinese
+    4. Duplicate check: hash not already in Bank
+  - If validation passes → save to Bank (source: ai_v32, status: verified)
+  - If validation fails → log to qa_issues table, retry or discard
+  - NEVER serve unvalidated AI questions to students
+  - Estimated cost: ~$0.14/M input tokens, ~$0.28/M output tokens (DeepSeek V3.2)
+
 
 ## Phase 4: Mobile App + Product Hardening
 
@@ -133,6 +172,28 @@
 - [ ] [STRATEGIC] Smart retry per topic — replace current retryWrong() (retries ALL wrong) with per-topic drill. When parent taps a red topic in 各單元表現, generate a new mini-exam for THAT topic only. This is the natural action after seeing the diagnostic.
 - [ ] [STRATEGIC] Smart practice auto-generate — after 3+ sessions, auto-suggest "Your weakest topic is 分數的加減. Practice now?" on the home screen. Uses aggregated topic_breakdown data across sessions. This is the bridge between diagnostic (passive) and remediation (active).
 - [ ] [STRATEGIC] Future tables: student_profiles, content_bank, subscriptions — design and create Supabase tables BEFORE Phase 5 needs them. student_profiles enables multi-child. content_bank enables AI-as-Factory storage. subscriptions enables paywall state checking. Ship the schema now, wire the UI in Phase 5.
+
+### Question Generator (3-Layer Engine)
+- [ ] AI Generator Advanced (DeepSeek R1):
+  - R1 for complex multi-step problems (P5-P6 challenge mode)
+  - R1 for exam mimicking feature (user uploads real exam paper → AI generates similar questions with different numbers/contexts)
+  - Cost: ~$0.55/M input, ~$2.19/M output — justify with premium subscription revenue
+  - Same validation pipeline as V3.2, but stricter for multi-step (verify each solution step)
+- [ ] Model routing logic:
+  - Simple 應用題 → V3.2 (cheap, fast)
+  - Complex multi-step / challenge → R1 (reasoning needed)
+  - Exam mimicking → R1 (must understand paper structure)
+  - Basic calc/fill → Layer 1 only (no AI needed)
+- [ ] Exam mimicking feature (Premium):
+  - User uploads photo of real exam paper
+  - R1 analyzes: question types, topics, difficulty, structure
+  - Generates N similar-but-original questions
+  - Matches exam format (sections, scoring, layout)
+- [ ] Question Bank flywheel optimization:
+  - Bank should have 30,000-50,000+ verified questions
+  - AI costs dropping as Bank serves majority of requests
+  - Monthly context refresh in contexts.js (trending HK topics, seasonal)
+  - Target: <$5/month AI cost even at 5,000+ users
 
 
 ## Phase 5: Monetization (Subscription)
@@ -166,3 +227,39 @@
 - [ ] [STRATEGIC] AI cost model implementation — when AI generation layer is added, enforce this rule: every AI-generated question MUST be saved to content_bank before serving. Never call AI twice for the same content pattern. Target cost curve: Month 1 = ~$50/mo (generating seed content), Month 6 = ~$10/mo (mostly serving stored), Month 12 = ~$0/mo (full library built). Track actual_ai_cost_per_quiz as a KPI. This is the economic moat — competitors who use AI-as-service pay per query forever.
 - [ ] [STRATEGIC] Cognitive fingerprint data moat — document and communicate that topic_breakdown JSONB collected across all users is the company's most valuable asset. After 10K+ sessions, this dataset reveals: which topics are hardest by grade, which trap types fool the most students, how long mastery takes per topic, and seasonal difficulty patterns. This anonymized data becomes the B2B product for school licensing. Protect it. Back it up. Never delete it.
 - [ ] [STRATEGIC] topic_breakdown JSONB as strategic asset — every product decision should ask "does this create more topic_breakdown records?" More records = richer cognitive fingerprints = better AI recommendations = stronger moat. When evaluating new features, prioritize ones that generate MORE exam sessions (and therefore more topic_breakdown data) over features that are flashy but don't produce data. This is the flywheel: more data → better recommendations → more engagement → more data.
+
+
+---
+
+
+## Appendix: Question Generator — 3-Layer Architecture
+
+The question generation system has 3 layers:
+- **Layer 1: Hardcode Engine** — 217 generators, instant, offline, free, already built
+- **Layer 2: AI Generator** — DeepSeek V3.2 for basic, R1 for complex/exam-mimicking
+- **Layer 3: Question Bank** — Supabase table, reuses questions across students, self-improving quality score
+
+The flywheel: **More Users → More Questions in Bank → Less AI Cost Per User → Better Margins**
+
+
+### Cost Projection
+
+| Users   | Bank Qs  | AI Calls/mo | AI Cost/mo | Cost/User |
+|---------|----------|-------------|------------|-----------|
+| 100     | 2,000    | ~500        | ~$0.70     | $0.007    |
+| 1,000   | 8,000    | ~2,000      | ~$2.80     | $0.003    |
+| 5,000   | 30,000   | ~3,000      | ~$4.20     | $0.001    |
+| 20,000  | 50,000+  | ~1,000      | ~$1.40     | $0.00007  |
+
+AI cost DROPS as question bank GROWS. This is the structural cost advantage.
+
+
+### Model Selection Guide
+
+| Task | Model | Cost | Why |
+|------|-------|------|-----|
+| Basic 應用題 generation | DeepSeek V3.2 | $0.14/$0.28 per M tokens | Cheap, fast, good enough |
+| Complex multi-step (P5-P6) | DeepSeek R1 | $0.55/$2.19 per M tokens | Needs reasoning chain |
+| Exam paper mimicking | DeepSeek R1 | $0.55/$2.19 per M tokens | Must understand structure |
+| Basic calc/fill questions | Layer 1 Hardcode | $0 | No AI needed |
+| Answer validation | Layer 1 chkAns | $0 | Computational, not AI |

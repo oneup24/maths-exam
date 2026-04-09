@@ -23,6 +23,7 @@ Current version: **v1.2-beta** — live on Vercel.
 - **Cloud** — `src/services/api.js` saves exam results to Supabase `exam_sessions` table
 - **i18n** — `src/lib/i18n.js`, use `t(lang, key)` — always support both zh and en
 - **Sounds** — `src/lib/sounds.js` via Web Audio API
+- **Analytics** — `src/lib/track.js` — fire-and-forget Supabase insert, 9 events (no third-party)
 
 ## Key files
 | File | What |
@@ -37,8 +38,9 @@ Current version: **v1.2-beta** — live on Vercel.
 | `src/lib/colors.js` | Grade/category/difficulty color tokens |
 | `src/lib/animations.js` | Shared Framer Motion variants |
 | `src/components/` | 15+ extracted components (ui, home, settings, exam, modals) |
+| `src/lib/track.js` | Event tracking (fire-and-forget Supabase insert) |
 | `src/components/ExportPDFButton.jsx` | PDF exam report export |
-| `supabase/setup.sql` | Database schema |
+| `supabase/setup.sql` | Applied RLS policies (documentation only) |
 
 ## Conventions
 - All UI strings must be bilingual (zh + en) via i18n

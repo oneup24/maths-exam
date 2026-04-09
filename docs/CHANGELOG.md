@@ -6,6 +6,14 @@ All notable changes to **Maths Quests** (數學特訓).
 
 ## [v1.2-beta] — 2026-04-04
 
+### f289901 — feat: add event tracking via Supabase
+- Add `src/lib/track.js` — fire-and-forget analytics using existing Supabase `events` table
+- Generate persistent `device_id` (UUID) in localStorage on first visit
+- 7 onboarding events: `onboarding_start`, `onboarding_language`, `onboarding_grade`, `onboarding_question_answered`, `onboarding_signup`, `onboarding_guest`, `onboarding_login`
+- 2 quiz events: `quiz_start` (grade, topic), `quiz_complete` (grade, topic, score, total)
+- No third-party analytics — pure Supabase insert
+- Clean up `supabase/setup.sql` to only contain applied RLS policies (questions read-only, user_errors insert-only)
+
 ### e647f83 — feat: redesign onboarding — 6-step "hook before ask" flow
 - Replace 4-step text-heavy onboarding with interactive 6-step flow:
   1. Language picker (zh/en, auto-advance)

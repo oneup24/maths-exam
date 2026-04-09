@@ -16,6 +16,7 @@ Architecture, tech stack, and file map for **Maths Quests** (v1.2-beta, live on 
 | PDF Export | jsPDF + jspdf-autotable (Noto Sans TC for Chinese) |
 | Mobile | Capacitor 8 (iOS/Android) + React Native 0.84 + Expo 55 |
 | Hosting | Vercel (production) |
+| Analytics | Supabase `events` table (custom, no third-party) |
 | Audio | Web Audio API (custom, no library) |
 | PWA | manifest.json + service worker |
 | Package manager | pnpm |
@@ -61,6 +62,7 @@ src/
     engine.js          — Question engine: generators, exam builder, answer checker (~1000+ lines)
     i18n.js            — zh/en translation strings
     sounds.js          — Web Audio sound effects (correct, wrong, tick, fanfare, submit)
+    track.js           — Event tracking: fire-and-forget insert to Supabase events table
     colors.js          — Grade colors, category colors, difficulty colors
     animations.js      — Shared Framer Motion variants (pageTransition, fadeInUp, stagger)
 
@@ -158,6 +160,7 @@ exam_sessions (
 
 ## Key Patterns
 
+- **Event tracking** — `track(eventName, props)` in `src/lib/track.js`, fire-and-forget Supabase insert, 9 events (7 onboarding + 2 quiz)
 - **No React Router** — navigation via `setView('home'|'settings'|'exam'|'profile'|...)`
 - **No Redux/Context** — all state in App.jsx useState
 - **Offline-first** — localStorage always works; Supabase is additive
