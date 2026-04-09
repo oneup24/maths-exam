@@ -6,6 +6,15 @@ All notable changes to **Maths Quests** (數學特訓).
 
 ## [v1.2-beta] — 2026-04-04
 
+### 7b88236 — docs: Master Plan v4.0 complete rewrite
+- Replace MASTER_PLAN_v3.md with Master_Plan_v4.md — full rewrite of dev roadmap
+- Dual tracking: Diagnostic Milestones (D0–D3) + Delivery Phases (Phase 1–6)
+- Phase 3 expanded: 3A Testing, 3B Instrumentation (PostHog + Sentry), 3C Data Layer Prep, 3D Soft Launch gate
+- Phase 4 split: 4A Mobile App, 4B Smart Features + AI Engine
+- 3-Layer Question Generator architecture integrated (Hardcode → AI → Bank)
+- AI benchmark prerequisite added (V3.2 vs R1 before committing to model)
+- Appendices: cost projections, model selection, strategic principles, key dates & gates
+
 ### f289901 — feat: add event tracking via Supabase
 - Add `src/lib/track.js` — fire-and-forget analytics using existing Supabase `events` table
 - Generate persistent `device_id` (UUID) in localStorage on first visit

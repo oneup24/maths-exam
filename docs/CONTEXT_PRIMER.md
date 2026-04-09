@@ -101,7 +101,7 @@ vite.config.js         — Vite + React + Tailwind plugins
 capacitor.config.json  — appId: com.oneup24.mathsquest, webDir: dist
 app.json               — Expo config
 .env.local             — VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY
-supabase/setup.sql     — exam_sessions table DDL
+supabase/setup.sql     — Applied RLS policies (documentation only)
 ```
 
 ### Assets (public/)

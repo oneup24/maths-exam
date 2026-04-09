@@ -71,4 +71,4 @@ Current version: **v1.2-beta** — live on Vercel.
 ## Docs
 - `docs/CHANGELOG.md` — commit history and features
 - `docs/CONTEXT_PRIMER.md` — architecture deep dive
-- `docs/MASTER_PLAN_v3.md` — dev roadmap (current)
+- `docs/Master_Plan_v4.md` — dev roadmap (current)
