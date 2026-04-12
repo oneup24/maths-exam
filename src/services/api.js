@@ -57,6 +57,12 @@ export async function getUserStats(userId) {
   return { totalExams, avgScore, bestScore };
 }
 
+// Resend signup verification email
+export async function resendVerificationEmail(email) {
+  const { error } = await supabase.auth.resend({ type: 'signup', email });
+  if (error) throw error;
+}
+
 // Update profile total_score
 export async function updateProfileScore(userId, totalScore) {
   const { error } = await supabase

@@ -54,8 +54,6 @@ export default function Onboarding({onComplete,lang:initialLang,signUp,signIn}){
   const[password,setPassword]=useState('');
   const[error,setError]=useState('');
   const[loading,setLoading]=useState(false);
-  const[signupDone,setSignupDone]=useState(false);
-
   const L=(key,...args)=>t(lang,key,...args);
 
   // Track onboarding start once on mount
@@ -89,9 +87,9 @@ export default function Onboarding({onComplete,lang:initialLang,signUp,signIn}){
     setError('');setLoading(true);
     try{
       if(authMode==='signup'){
-        await signUp(email,password);
+        var result=await signUp(email,password);
         track('onboarding_signup');
-        setSignupDone(true);
+        finish(result||true);
       }else{
         var result=await signIn(email,password);
         track('onboarding_login');
@@ -108,7 +106,7 @@ export default function Onboarding({onComplete,lang:initialLang,signUp,signIn}){
       <div className="w-full max-w-sm flex flex-col items-center relative">
 
         {/* Back button — shown on steps 1-5 */}
-        {step>=1&&step<=5&&!signupDone&&(
+        {step>=1&&step<=5&&(
           <button onClick={goBack} aria-label="Back"
             className="absolute top-0 left-0 p-2 min-w-[44px] min-h-[44px] rounded-xl text-gray-400 active:bg-white/60 active:scale-[0.97] transition-all flex items-center justify-center z-10">
             <ArrowLeft size={20}/>
@@ -324,22 +322,6 @@ export default function Onboarding({onComplete,lang:initialLang,signUp,signIn}){
                   </div>
                 </>
               )}
-            </motion.div>
-          )}
-
-          {/* ═══ Signup confirmation ═══ */}
-          {step===5&&signupDone&&(
-            <motion.div key="confirm" variants={slideVariants} initial="enter" animate="center" exit="exit"
-              className="flex flex-col items-center text-center w-full pt-8">
-              <span className="text-7xl mb-4">📧</span>
-              <h1 className="text-2xl font-black text-gray-800 mb-2">{L('obCheckEmail')}</h1>
-              <p className="text-sm text-gray-500 mb-6 leading-relaxed">{L('obCheckEmailDesc',email)}</p>
-              <button onClick={()=>{setSignupDone(false);setAuthMode('login');setError('');}}
-                className="text-orange-600 font-bold text-sm hover:underline mb-4">{L('obBackToLogin')}</button>
-              <button onClick={()=>finish(null)}
-                className="text-xs text-gray-400 underline py-1 active:text-gray-500 transition-all">
-                {L('obContinueGuest')}
-              </button>
             </motion.div>
           )}
 

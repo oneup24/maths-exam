@@ -77,10 +77,10 @@ export const i18n={
     obSignUp:'註冊',
     obEmail:'電郵地址',
     obPassword:'密碼（至少6位）',
-    obCheckEmail:'請查看你的電郵！',
-    obCheckEmailDesc:(e)=>`我們已發送確認連結到 ${e}，點擊即可啟動帳戶。`,
-    obBackToLogin:'返回登入',
     obNext:'下一步',
+    pdfVerifyTitle:'請先驗證電郵以使用列印功能',
+    pdfVerifyBtn:'發送驗證電郵',
+    pdfVerifySent:'已發送，請查看電郵',
   },
   en:{
     appTitle:"Primary Maths Practice",
@@ -160,10 +160,10 @@ export const i18n={
     obSignUp:'Sign Up',
     obEmail:'Email',
     obPassword:'Password (min 6 chars)',
-    obCheckEmail:'Check your email!',
-    obCheckEmailDesc:(e)=>`We sent a confirmation link to ${e}. Click it to activate your account.`,
-    obBackToLogin:'Back to Login',
     obNext:'Next',
+    pdfVerifyTitle:'Please verify your email to use the print feature',
+    pdfVerifyBtn:'Send verification email',
+    pdfVerifySent:'Sent! Check your inbox',
   },
 };
 

@@ -3,6 +3,7 @@ import React,{useState,useEffect} from 'react';
 import {motion} from 'framer-motion';
 import {ArrowLeft,Save,User,Cake,Zap,Lock,Check} from 'lucide-react';
 import { getUserStats, loadExamHistory } from './services/api';
+import {track} from './lib/track';
 
 function calcAge(birthday){
   if(!birthday)return null;
@@ -150,7 +151,7 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
                 <input type="password" inputMode="numeric" maxLength={4} pattern="[0-9]*" value={newPin} onChange={e=>setNewPin(e.target.value.replace(/\D/g,''))}
                   placeholder="0000"
                   className="w-28 text-center text-xl font-mono tracking-[0.4em] border-2 border-indigo-200 rounded-xl py-2.5 focus:border-indigo-500 focus:outline-none"/>
-                <button onClick={()=>{if(newPin.length===4){localStorage.setItem('parent_pin',newPin);setPin(newPin);setNewPin('');setPinEditing(false);setPinSaved(true);setTimeout(()=>setPinSaved(false),2000);}}}
+                <button onClick={()=>{if(newPin.length===4){localStorage.setItem('parent_pin',newPin);setPin(newPin);setNewPin('');setPinEditing(false);setPinSaved(true);track('parent_pin_set');setTimeout(()=>setPinSaved(false),2000);}}}
                   disabled={newPin.length!==4}
                   className={"flex-1 py-2.5 rounded-xl font-bold text-sm transition-all "+(newPin.length===4?'bg-indigo-500 text-white':'bg-gray-200 text-gray-400')}>
                   {pinSaved?'✅':(isZh?'設定':'Set')}

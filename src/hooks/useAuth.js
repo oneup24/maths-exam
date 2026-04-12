@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
+import { identify, reset as phReset } from '../lib/posthog';
 
 export function useAuth() {
   const [user, setUser] = useState(null);
@@ -14,7 +15,12 @@ export function useAuth() {
     });
 
     const { data: { subscription } } = supabase?.auth.onAuthStateChange(
-      (_event, session) => setUser(session?.user ?? null)
+      (_event, session) => {
+        const u = session?.user ?? null;
+        setUser(u);
+        if (u) identify(u.id, { email: u.email });
+        else phReset();
+      }
     ) || { data: {} };
 
     return () => subscription?.unsubscribe();

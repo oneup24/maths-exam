@@ -1,4 +1,5 @@
 import {supabase} from '../services/supabase';
+import {ph} from './posthog';
 
 function getDeviceId(){
   var id=localStorage.getItem('device_id');
@@ -9,6 +10,10 @@ function getDeviceId(){
 }
 
 export function track(eventName,props={}){
+  // PostHog — primary analytics
+  ph.capture(eventName,{...props,device_id:getDeviceId()});
+
+  // Supabase — secondary (own data warehouse)
   if(!supabase)return;
   supabase.auth.getSession().then(({data})=>{
     supabase.from('events').insert({

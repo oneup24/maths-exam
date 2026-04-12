@@ -111,6 +111,7 @@ export default function App(){
     // authData is null for guest, truthy for signed-in user
     if(!authData)setSkippedLogin(true);
     setOnboarded(true);
+    track('onboarding_complete',{lang:chosenLang,grade:chosenGrade,guest:!authData});
   };
 
   var generate=useCallback(()=>{
@@ -138,6 +139,7 @@ export default function App(){
     setMarkRes(res);setTotScore(sc);setIsMarked(true);setRunning(false);setShowSubmit(false);
     var sp_pct=grandTotal>0?Math.round(sc/grandTotal*100):0;
     track('quiz_complete',{grade:grade,topic:Array.from(selTopics).join(','),score:sp_pct,total:totalQs});
+    track('results_view',{grade:grade,pct:sp_pct,total:totalQs});
     /* sounds */
     if(soundOn){var sp0=grandTotal>0?Math.round(sc/grandTotal*100):0;setTimeout(()=>{if(sp0>=80)playFanfare();else if(sp0>=50)playCorrect();else playWrong();},400);}
     /* confetti */
@@ -200,7 +202,7 @@ export default function App(){
     }
     setTimeout(()=>window.scrollTo({top:0,behavior:'smooth'}),100);
   };
-  var resetMarking=()=>{setAnswers({});setMcSel({});setIsMarked(false);setMarkRes({});setTotScore(0);setWrongOnly(false);setRevealed({});setStepsShown({})};
+  var resetMarking=()=>{setAnswers({});setMcSel({});setIsMarked(false);setMarkRes({});setTotScore(0);setWrongOnly(false);setRevealed({});setStepsShown({});track('retry_click',{grade:grade});};
   var retryWrong=()=>{
     var ws=sections.map((sec,si)=>{
       var wqs=sec.qs.filter((_,qi)=>{var mr=markRes[si+'-'+qi];return mr&&!mr.ok;});
@@ -251,7 +253,7 @@ export default function App(){
   if(view==='home')return(
     <motion.div key="home" {...pageTransition}><PageShell>
       <div className="flex justify-between items-center mb-1">
-        <button onClick={()=>{const v=lang==='zh'?'en':'zh';setLang(v);localStorage.setItem('lang',v);}} aria-label={lang==='zh'?'Switch to English':'切換至中文'}
+        <button onClick={()=>{const v=lang==='zh'?'en':'zh';setLang(v);localStorage.setItem('lang',v);track('lang_switch',{lang:v});}} aria-label={lang==='zh'?'Switch to English':'切換至中文'}
           className="p-2.5 min-w-[44px] min-h-[44px] rounded-xl bg-white/60 active:bg-white active:scale-[0.97] border border-stone-200 shadow-sm text-gray-500 transition-all duration-200 hover:shadow-md flex items-center justify-center">
           <Globe size={18}/>
         </button>
@@ -283,7 +285,7 @@ export default function App(){
         </div>
       </motion.div>
       {!user&&<GuestBanner onSignUp={()=>setSkippedLogin(false)} lang={lang}/>}
-      <GradeGrid gradeBest={gradeBest} onSelect={g=>{setGrade(g);setView('settings')}} L={L}/>
+      <GradeGrid gradeBest={gradeBest} onSelect={g=>{setGrade(g);track('grade_selected',{grade:g});setView('settings')}} L={L}/>
       <HistoryList history={history} onClear={()=>{clearHistory();setHistory([])}} L={L}/>
       <TrapInfoBox L={L}/>
       <p className="text-center text-xs text-gray-300 mt-6">
@@ -306,7 +308,7 @@ export default function App(){
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-stone-50 to-orange-50 p-3 pb-24">
       <SubmitModal isOpen={showSubmit} onClose={()=>setShowSubmit(false)} onConfirm={markExam} answeredQs={answeredQs} totalQs={totalQs} L={L}/>
       <PrintModal isOpen={showPrint} onClose={()=>setShowPrint(false)} studentName={studentName} onNameChange={setStudentName} printAns={printAns} setPrintAns={setPrintAns} onPrint={()=>{printExam(sections,grade,printAns,studentName,difficulty);setShowPrint(false)}} L={L}/>
-      <SignUpPromptModal isOpen={showSignUpPrompt} onClose={()=>setShowSignUpPrompt(false)} onSignUp={()=>{setShowSignUpPrompt(false);setSkippedLogin(false);}} lang={lang}/>
+      <SignUpPromptModal isOpen={showSignUpPrompt} onClose={()=>setShowSignUpPrompt(false)} onSignUp={()=>{setShowSignUpPrompt(false);setSkippedLogin(false);track('guest_signup_prompt_clicked');}} lang={lang}/>
       <PinModal isOpen={showPinModal} onClose={()=>{setShowPinModal(false);setPendingRevealKey(null);setPendingRevealType(null);}} onSuccess={onPinSuccess} lang={lang}/>
 
       <div className="max-w-xl mx-auto">
@@ -424,7 +426,7 @@ export default function App(){
           );
         })}
 
-        <ExamActions isMarked={isMarked} co={co} resetMarking={resetMarking} generate={generate} onPrint={()=>user?setShowPrint(true):setShowSignUpPrompt(true)} onHome={()=>{setRunning(false);setView('home')}} L={L}/>
+        <ExamActions isMarked={isMarked} co={co} resetMarking={resetMarking} generate={generate} onPrint={()=>{if(user)setShowPrint(true);else{setShowSignUpPrompt(true);track('guest_signup_prompt_shown');}}} onHome={()=>{setRunning(false);setView('home')}} L={L}/>
       </div>
 
       <FloatingSubmit isMarked={isMarked} answeredQs={answeredQs} totalQs={totalQs} onSubmit={()=>{if(soundOn)playSubmit();setShowSubmit(true);}} L={L}/>
