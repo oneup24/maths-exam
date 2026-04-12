@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { identify, reset as phReset } from '../lib/posthog';
+import { track } from '../lib/track';
 
 export function useAuth() {
   const [user, setUser] = useState(null);
@@ -29,6 +30,7 @@ export function useAuth() {
   const signUp = async (email, password) => {
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) throw error;
+    track('signup_complete', { method: 'email' });
     return data;
   };
 
