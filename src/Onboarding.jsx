@@ -255,7 +255,7 @@ export default function Onboarding({onComplete,lang:initialLang,signUp,signIn}){
           )}
 
           {/* ═══ Step 5: Auth Gate ═══ */}
-          {step===5&&!signupDone&&(
+          {step===5&&(
             <motion.div key="auth" variants={slideVariants} initial="enter" animate="center" exit="exit"
               className="flex flex-col items-center text-center w-full pt-8">
 
