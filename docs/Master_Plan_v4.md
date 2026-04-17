@@ -33,14 +33,15 @@ They are SEPARATE. D1 work happens inside Phase 4B. D3 work happens inside Phase
 | D1a | topic_map table with prerequisite chains | ❌ NOT DONE | Phase 4B |
 | D1b | Detect gaps (wrong >= 3/5 per topic) | ❌ NOT DONE | Phase 4B |
 | D1c | knowledge_gaps table | ❌ NOT DONE | Phase 4B |
-| D1d | Gap alert on results screen | ❌ NOT DONE | Phase 4B |
+| D1d | Gap alert on results screen with "Start Topic Quest" entry point (Pro) | ❌ NOT DONE | Phase 4B |
 
 ### D2 — Recommendations
 | Item | Description | Status | Ships In |
 |------|------------|--------|----------|
-| D2a | "Re-practice this topic" button (per-topic, not retryWrong all) | ⚠️ PARTIAL | Phase 4B |
-| D2b | Importance display ("HIGH — affects P4-P6") | ❌ NOT DONE | Phase 4B |
-| D2c | Basic parent report (free tier, parent-oriented) | ⚠️ PARTIAL | Phase 4B |
+| D2a | "Re-practice this topic" button (per-topic, not retryWrong all) — also serves as Quest single-station practice | ⚠️ PARTIAL | Phase 4B |
+| D2b | Importance display ("HIGH — affects P4-P6") — shown on Quest map per station | ❌ NOT DONE | Phase 4B |
+| D2c | Basic parent report (free tier) — includes Topic Quest progress summary | ⚠️ PARTIAL | Phase 4B |
+| D2d | **Topic Quest** — Learning Curve Replay (see Phase 4B for full spec) | ❌ NOT DONE | Phase 4B |
 
 ### D3 — Premium Diagnostics
 | Item | Description | Status | Ships In |
@@ -147,10 +148,13 @@ They are SEPARATE. D1 work happens inside Phase 4B. D3 work happens inside Phase
 - [ ] Separate context pools into `contexts.js` (HK-specific: 蛋撻, 港鐵, 百佳, 八達通, etc.)
 - [ ] Add `gradeRules` validation (max number, decimal/fraction/negative allowed per grade)
 - [ ] Wire contexts.js + gradeRules into existing engine.js generators
-- [ ] Design future tables schema (DO NOT build UI yet, schema only):
-  - `student_profiles` — enables multi-child (id, user_id, child_name, grade, created_at)
-  - `subscriptions` — enables paywall state checking (id, user_id, plan, status, started_at, expires_at, provider, provider_id)
-  - Document schema in `docs/future_tables.md`
+- [x] Design future tables schema (DO NOT build UI yet, schema only):
+  - `student_profiles` — enables multi-child (Phase 4A)
+  - `subscriptions` — enables paywall state checking (Phase 5)
+  - `quest_progress` — Topic Quest session state (Phase 4B)
+  - `topic_map` — prerequisite chains, powers D1 + Quest (Phase 4B)
+  - `knowledge_gaps` — computed gap records per user per topic (Phase 4B)
+  - Schema documented in `docs/future_tables.md` ✅
 
 ### 3D — 🚀 SOFT LAUNCH
 - [ ] Recruit 10 real HK parent-child pairs (WhatsApp, parent groups, personal network)
@@ -181,17 +185,35 @@ They are SEPARATE. D1 work happens inside Phase 4B. D3 work happens inside Phase
 **RULE: Every feature in this phase must generate more exam_sessions (and therefore more topic_breakdown data). If it doesn't produce data, it doesn't belong here.**
 
 ### Smart Features
-- [ ] Smart retry per topic — replace current retryWrong() (retries ALL wrong) with per-topic drill. When parent taps a red topic in 各單元表現, generate a new mini-exam for THAT topic only. This is the natural action after seeing the diagnostic. (D2a completion)
+- [ ] Smart retry per topic — replace current retryWrong() (retries ALL wrong) with per-topic drill. When parent taps a red topic in 各單元表現, generate a new mini-exam for THAT topic only. This is the natural action after seeing the diagnostic. (D2a completion). Also serves as Topic Quest single-station practice.
 - [ ] Smart practice auto-generate — after 3+ sessions, auto-suggest "Your weakest topic is 分數的加減. Practice now?" on the home screen. Uses aggregated topic_breakdown data across sessions. This is the bridge between diagnostic (passive) and remediation (active).
 - [ ] Trap Item Engine v1 — upgrade from basic distractor text to a structured engine that generates trap data points per question type. Track trap_fall_rate per session. This is the #1 differentiator vs every competitor. Must ship BEFORE paywall goes live so Pro tier has clear value.
 
 ### Gap Detection (D1 completion)
-- [ ] Create topic_map table with prerequisite chains (D1a)
-- [ ] Implement gap detection: wrong >= 3/5 per topic triggers gap flag (D1b)
+- [ ] Create topic_map table with prerequisite chains (D1a) ← **Topic Quest route data source**
+- [ ] Implement gap detection: wrong >= 3/5 per topic triggers gap flag (D1b) ← **Topic Quest trigger condition**
 - [ ] Create knowledge_gaps table (D1c)
-- [ ] Gap alert on results screen with actionable text (D1d)
-- [ ] Importance display: "HIGH — affects P4-P6" based on prerequisite chains (D2b)
-- [ ] Parent report: basic free-tier version, parent-oriented language (D2c)
+- [ ] Gap alert on results screen with "Start Topic Quest" entry point — Pro gate (D1d)
+- [ ] Importance display: "HIGH — affects P4-P6" shown per station on Quest map (D2b)
+- [ ] Parent report: basic free-tier version, includes Topic Quest progress summary (D2c)
+
+### Topic Quest — Learning Curve Replay (D2d) 🆕
+**Core insight:** When a student is stuck on a topic (e.g. P4 fraction addition), the problem is rarely "not enough practice" — it's a broken link earlier in the prerequisite chain. Topic Quest traces the chain to its root, then replays the entire learning curve as a forward adventure.
+
+**UX framing (critical):**
+- For students: this is an "adventure", not remediation. They don't know they're doing lower-grade work.
+- For parents: this is a "path to mastery", not "your child is behind".
+- No grade labels shown inside a Quest — only station names and topic names.
+
+**Implementation:**
+- [ ] Quest route generator — given a stuck topic, walk topic_map prerequisite chain to root, return ordered station list (depends on D1a)
+- [ ] Quest mini-exam — 5 questions per station, same topic, generated by Layer 1 engine
+- [ ] Unlock logic — 4/5 correct → unlock next station; <4/5 → retry same station
+- [ ] Quest progress persistence — save to `quest_progress` table (schema in `docs/future_tables.md`)
+- [ ] Quest map UI — visual station-by-station progress, Curlboo emotional companion per station
+- [ ] Quest completion celebration — fanfare animation on full chain cleared
+- [ ] Quest entry point — triggered from D1d gap alert on results screen (Pro users only)
+- [ ] Quest analytics — track quest_start, quest_station_pass, quest_station_fail, quest_complete events
 
 ### Question Bank Learning System
 - [ ] After student answers: update times_served, times_correct, avg_time_spent on question_bank
@@ -238,15 +260,18 @@ They are SEPARATE. D1 work happens inside Phase 4B. D3 work happens inside Phase
 | Tier | Price | Includes |
 |------|-------|----------|
 | Free | $0 | 3 quizzes/day, basic topics, no PDF, no diagnostic breakdown, basic Curlboo |
-| Pro | HKD 48/month (HKD 388/year) | Unlimited quizzes, all topics, trap items, PDF export, full 各單元表現 sorted worst-first, progress history, all Curlboo moods |
+| Pro | HKD 48/month (HKD 388/year) | Unlimited quizzes, all topics, trap items, PDF export, full 各單元表現 sorted worst-first, **Topic Quest (gap detection + learning curve replay)**, progress history, all Curlboo moods |
 | Family | HKD 78/month (HKD 628/year) | Pro + up to 3 children + cross-child comparison |
 
+**Topic Quest is the #1 Pro upgrade hook.** It automates what a tutor charges HKD 300-500/hr to do manually: detect the weak link, trace it to the root, design a personalised learning path. The paywall message: "找出根源，重建基礎 — Curlboo 幫你設計學習路徑 🗺️"
+
 ### Paywall Gates — EXACTLY 3, NO MORE
-1. **Blurred diagnostic:** Free user completes exam → sees blurred 各單元表現 → "Unlock detailed topic analysis 🔒"
+1. **Blurred diagnostic + Quest gate:** Free user completes exam → sees blurred 各單元表現 → "Unlock detailed topic analysis 🔒". If gap detected, also shows locked "Start Topic Quest" CTA → "Pro members get a personalised learning path 🔒". Both are the same gate, same upgrade moment.
 2. **Daily limit:** Free user hits 3 daily quiz limit → "Upgrade for unlimited practice 🔒"
 3. **PDF gate:** Free user taps PDF export → "Pro members can print exams 🔒"
 
 **These are the ONLY 3 conversion moments. Do not add more. Sell the INSIGHT, not the tool.**
+Topic Quest entry folds into gate #1 — it does NOT create a 4th gate. Free users see the gap alert but the Quest CTA is locked. One upgrade prompt, two value props (diagnostic + Quest).
 
 The per-topic diagnostic (各單元表現) is the #1 paywall hook. This is what tutors charge HKD 300-500/hr to tell parents manually. The paywall message must communicate: "See exactly where your child needs help."
 
@@ -319,7 +344,7 @@ The per-topic diagnostic (各單元表現) is the #1 paywall hook. This is what 
 
 ## Appendix B: Strategic Principles
 
-1. **Every feature must produce data.** Prioritize features that generate more exam_sessions (and therefore more topic_breakdown records) over features that are flashy but don't produce data. More data → better recommendations → more engagement → more data.
+1. **Every feature must produce data.** Prioritize features that generate more exam_sessions (and therefore more topic_breakdown records) over features that are flashy but don't produce data. More data → better recommendations → more engagement → more data. Topic Quest is the highest-density data generator: 1 Quest = 4-5 stations × 5 questions = 20-25 exam_sessions worth of topic_breakdown data, each with pass/fail, time_spent, and retry count.
 
 2. **AI-as-Factory, not AI-as-Service.** Generate once, store forever, serve at $0. Competitors who use AI-as-service pay per query forever. We don't.
 
