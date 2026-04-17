@@ -48,7 +48,7 @@ export const grade6={
   },
   /* _addQ Phase 2 — area percentage (line 783) */
   ()=>{
-    var w=ri(10,30),h=ri(10,20),totalArea=w*h;
+    var w=ri(1,3)*10,h=ri(1,2)*10,totalArea=w*h;
     var pct=pk([20,25,30,40]),garden=totalArea*pct/100;
     return{d:3,tp:'work',
       q:'一塊長'+w+'m、闊'+h+'m的空地，其中'+pct+'%建花園。花園面積多少m²？',
@@ -59,8 +59,8 @@ export const grade6={
 ],
 '6N34':[
   ()=>{var w=ri(15,60)*10,p=pk([15,20,25,30]);return{d:1,tp:'calc',q:w+'的'+p+'% = ?',a:String(w*p/100),s:['百分數計算'],sc:2}},
-  ()=>{var orig=ri(200,800),pDec=pk([10,15,20,25]);var newP=orig*(100-pDec)/100;var dStock=ri(50,200);return{d:2,tp:'short',q:pk(CTX.places)+'存貨'+dStock+'件。原價$'+orig+'打'+(10-pDec/10)+'折，售價多少？',a:String(newP),trap:'存貨數量',s:['🔍 存貨無關','售價: '+newP],sc:2}},
-  ()=>{var cost=ri(100,300),markup=pk([20,25,30,40]);var sell=cost*(100+markup)/100;var disc=pk([10,15,20]);var final2=sell*(100-disc)/100;var dRent=ri(8000,20000),dStaff=ri(3,8);return{d:3,tp:'work',q:'店舖月租$'+dRent+'，有'+dStaff+'名員工。貨品成本$'+cost+'，加價'+markup+'%出售，再打'+(10-disc/10)+'折。促銷價多少？賺還是蝕？差額？',a:Math.round(final2)+','+(final2>cost?'賺':'蝕')+','+Math.abs(Math.round(final2-cost)),trap:'月租和員工數',s:['🔍 月租和員工無關','售價: '+Math.round(sell),'促銷: '+Math.round(final2),'比較成本'],sc:3}},
+  ()=>{var orig=ri(10,40)*20,pDec=pk([10,15,20,25]);var newP=orig*(100-pDec)/100;var dStock=ri(50,200);return{d:2,tp:'short',q:pk(CTX.places)+'存貨'+dStock+'件。原價$'+orig+'打'+(10-pDec/10)+'折，售價多少？',a:String(newP),trap:'存貨數量',s:['🔍 存貨無關','售價: '+newP],sc:2}},
+  ()=>{var cost=ri(5,15)*20,markup=pk([20,25,30,40]);var sell=cost*(100+markup)/100;var disc=pk([10,15,20]);var final2=sell*(100-disc)/100;var dRent=ri(8000,20000),dStaff=ri(3,8);return{d:3,tp:'work',q:'店舖月租$'+dRent+'，有'+dStaff+'名員工。貨品成本$'+cost+'，加價'+markup+'%出售，再打'+(10-disc/10)+'折。促銷價多少？賺還是蝕？差額？',a:Math.round(final2)+','+(final2>cost?'賺':'蝕')+','+Math.abs(Math.round(final2-cost)),trap:'月租和員工數',s:['🔍 月租和員工無關','售價: '+Math.round(sell),'促銷: '+Math.round(final2),'比較成本'],sc:3}},
   ()=>{var girls=ri(150,300),boys=ri(120,280);var total=girls+boys;var pG=Math.round(girls/total*100);var dT=ri(20,50),dAge=ri(30,80);return{d:3,tp:'work',q:'學校建校'+dAge+'年，有'+dT+'位老師、男生'+boys+'人、女生'+girls+'人。女生佔學生百分之幾？（四捨五入至整數）',a:pG+'%',trap:'建校年數和老師數',s:['🔍 建校年數和老師無關','總學生: '+total,'女生%: ≈'+pG+'%'],sc:3}},
   /* _addQ Phase 2 — ratio division (line 796) */
   ()=>{
@@ -112,7 +112,7 @@ export const grade6={
 '6A1':[
   ()=>{var x=ri(5,20),a=ri(3,8),b=ri(15,60);return{d:1,tp:'calc',q:a+'x + '+b+' = '+(a*x+b)+'，x = ?',a:String(x),s:['移項求解'],sc:2}},
   ()=>{var x=ri(5,18),a=ri(2,5),b=ri(10,30),c=ri(3,8);return{d:2,tp:'calc',q:a+'x + '+b+' = '+c+'x + '+(a*x+b-c*x)+'，x = ?',a:String(x),s:['移項歸邊'],sc:3}},
-  ()=>{var age=ri(8,14),ratio=ri(3,4),diff=age*(ratio-1);var dSib=ri(5,age-2),dPet=ri(1,3);return{d:3,tp:'work',q:nm()+'有'+dSib+'歲的弟弟和'+dPet+'隻寵物。媽媽年齡是'+CTX.names[0]+'的'+ratio+'倍，比'+CTX.names[0]+'大'+diff+'歲。'+CTX.names[0]+'幾歲？',a:String(age),trap:'弟弟年齡和寵物數',s:['🔍 弟弟和寵物無關','設x歲: '+ratio+'x−x='+diff,'x='+age],sc:3}}
+  ()=>{var age=ri(8,14),ratio=ri(3,4),diff=age*(ratio-1);var dSib=ri(5,age-2),dPet=ri(1,3),n=nm();return{d:3,tp:'work',q:n+'有'+dSib+'歲的弟弟和'+dPet+'隻寵物。媽媽年齡是'+n+'的'+ratio+'倍，比'+n+'大'+diff+'歲。'+n+'幾歲？',a:String(age),trap:'弟弟年齡和寵物數',s:['🔍 弟弟和寵物無關','設x歲: '+ratio+'x−x='+diff,'x='+age],sc:3}}
 ],
 '6M1':[
   ()=>{var a=ri(25,70),b=ri(25,130-a);var c=180-a-b;return{d:1,tp:'short',q:'三角形兩角分別'+a+'°和'+b+'°，求第三角。',a:String(c),s:['180−'+a+'−'+b+'='+c],sc:2}},
@@ -182,7 +182,7 @@ export const grade6={
 ],
 '6D1':[
   ()=>{var n=ri(4,7);var vals=[];for(var i=0;i<n;i++)vals.push(ri(50,98));var sum=vals.reduce((s,v)=>s+v,0);var avg=sum/n;return{d:1,tp:'calc',q:vals.join('、')+'的平均數 = ?',a:avg%1===0?String(avg):avg.toFixed(1),s:['總÷'+n],sc:2}},
-  ()=>{var n=ri(4,6);var vals=[];for(var i=0;i<n;i++)vals.push(ri(60,95));var sum=vals.reduce((s,v)=>s+v,0);var avg=sum/n;var target=Math.ceil(avg)+ri(2,8);var need=target*(n+1)-sum;var dAbsent=ri(1,3);return{d:3,tp:'work',q:'有'+dAbsent+'人缺席。現有'+n+'次成績：'+vals.join('、')+'。要令'+(n+1)+'次平均達'+target+'分，下次最少要多少分？',a:String(need),trap:'缺席人數',s:['🔍 缺席無關','現總: '+sum,'目標總: '+target*(n+1),'需: '+need],sc:3}},
+  ()=>{var n=ri(4,6);var vals=[];for(var i=0;i<n;i++)vals.push(ri(60,95));var sum=vals.reduce((s,v)=>s+v,0);var avg=sum/n;var target=Math.ceil(avg)+ri(2,8);var need=target*(n+1)-sum;while(need>100){target--;need=target*(n+1)-sum;}var dAbsent=ri(1,3);return{d:3,tp:'work',q:'有'+dAbsent+'人缺席。現有'+n+'次成績：'+vals.join('、')+'。要令'+(n+1)+'次平均達'+target+'分，下次最少要多少分？',a:String(need),trap:'缺席人數',s:['🔍 缺席無關','現總: '+sum,'目標總: '+target*(n+1),'需: '+need],sc:3}},
   /* _addQ Phase 2 — find next score for target avg (line 1025) */
   ()=>{
     var n=ri(3,5),vals=[];
@@ -190,6 +190,7 @@ export const grade6={
     var sum=vals.reduce(function(s,v){return s+v},0);
     var targetAvg=Math.ceil(sum/n)+ri(3,8);
     var need=targetAvg*(n+1)-sum;
+    while(need>100){targetAvg--;need=targetAvg*(n+1)-sum;}
     return{d:3,tp:'work',
       q:nm()+'前'+n+'次測驗：'+vals.join('、')+'分。要令'+(n+1)+'次平均達'+targetAvg+'分，下次最少要多少分？',
       a:String(need),
