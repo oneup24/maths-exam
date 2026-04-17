@@ -167,6 +167,7 @@ CREATE TABLE knowledge_gaps (
   total_count   INT NOT NULL DEFAULT 0,
   last_seen     TIMESTAMPTZ DEFAULT now(),
   gap_severity  TEXT CHECK (gap_severity IN ('critical', 'moderate', 'watch')),
+  quest_id      UUID,                    -- link to active/completed quest for this gap
   created_at    TIMESTAMPTZ DEFAULT now(),
   updated_at    TIMESTAMPTZ DEFAULT now(),
   UNIQUE (user_id, topic_id)

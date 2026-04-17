@@ -128,10 +128,11 @@ They are SEPARATE. D1 work happens inside Phase 4B. D3 work happens inside Phase
 - [ ] Lighthouse audit (performance, accessibility, PWA score)
 
 ### 3B — Instrumentation (NEW — required before launch)
-- [ ] Integrate PostHog analytics (free tier, self-hostable, GDPR/PDPO-friendly)
-  - Track events: onboarding_complete, exam_start, exam_complete, results_view, pdf_export, retry_click, grade_selected, lang_switch, parent_pin_set, guest_signup_prompt_shown, guest_signup_prompt_clicked
-  - Set up retention cohort dashboard (Day 1 / Day 3 / Day 7 / Day 30)
-  - Set up funnel: onboarding → first exam → results view → second exam
+- [x] Integrate PostHog analytics (free tier, self-hostable, GDPR/PDPO-friendly) ✅ DONE
+  - Tracking 12 events: onboarding_complete, exam_start, exam_complete, results_view, pdf_export, retry_click, grade_selected, lang_switch, parent_pin_set, guest_signup_prompt_shown, guest_signup_prompt_clicked, signup_complete
+  - VITE_POSTHOG_KEY configured in .env.local — also add to Vercel env vars for production
+  - PostHog + Supabase dual-destination (track.js fires both simultaneously)
+  - Set up retention cohort (D1/D3/D7/D30) + funnel dashboards in PostHog — TODO
 - [ ] Integrate Sentry error monitoring (free tier, 5K events/mo)
   - Capture JS exceptions, unhandled promise rejections
   - Tag errors with: grade, question type, auth status (guest vs logged in)
@@ -188,6 +189,18 @@ They are SEPARATE. D1 work happens inside Phase 4B. D3 work happens inside Phase
 - [ ] Smart retry per topic — replace current retryWrong() (retries ALL wrong) with per-topic drill. When parent taps a red topic in 各單元表現, generate a new mini-exam for THAT topic only. This is the natural action after seeing the diagnostic. (D2a completion). Also serves as Topic Quest single-station practice.
 - [ ] Smart practice auto-generate — after 3+ sessions, auto-suggest "Your weakest topic is 分數的加減. Practice now?" on the home screen. Uses aggregated topic_breakdown data across sessions. This is the bridge between diagnostic (passive) and remediation (active).
 - [ ] Trap Item Engine v1 — upgrade from basic distractor text to a structured engine that generates trap data points per question type. Track trap_fall_rate per session. This is the #1 differentiator vs every competitor. Must ship BEFORE paywall goes live so Pro tier has clear value.
+
+### Gamification (Dark Souls philosophy — Phase 4B) ⭐
+**Rule: NEVER put gamification in core learning experience. Reward overcoming difficulty, not just showing up.**
+
+| Priority | Feature | Description |
+|---|---|---|
+| P0 (must ship) | Daily Challenge 每日挑戰 | 3-5 error-based questions + spaced repetition. Once per day, no redo. Streak counter. |
+| P1 (light v1) | Stardust 星塵 + Curlboo Shop | Correct answer = 1 stardust. Daily challenge = 3×. 10-15 cosmetic items to unlock. NO real-money purchase of stardust. |
+| P1 (light v1) | Curlboo State Reflection | 5 states on Home Screen (瞓覺/正常/興奮/慶祝/溫書) reflecting student's actual activity. Computed from existing exam_sessions — zero extra storage. |
+
+**Build order:** Daily Challenge → Stardust + Shop → Curlboo State (each depends on prior's data)
+**❌ Rejected:** Idle Game, buying stardust with money, excessive gamification, deducting points for wrong answers.
 
 ### Gap Detection (D1 completion)
 - [ ] Create topic_map table with prerequisite chains (D1a) ← **Topic Quest route data source**
@@ -265,15 +278,23 @@ They are SEPARATE. D1 work happens inside Phase 4B. D3 work happens inside Phase
 
 **Topic Quest is the #1 Pro upgrade hook.** It automates what a tutor charges HKD 300-500/hr to do manually: detect the weak link, trace it to the root, design a personalised learning path. The paywall message: "找出根源，重建基礎 — Curlboo 幫你設計學習路徑 🗺️"
 
-### Paywall Gates — EXACTLY 3, NO MORE
-1. **Blurred diagnostic + Quest gate:** Free user completes exam → sees blurred 各單元表現 → "Unlock detailed topic analysis 🔒". If gap detected, also shows locked "Start Topic Quest" CTA → "Pro members get a personalised learning path 🔒". Both are the same gate, same upgrade moment.
-2. **Daily limit:** Free user hits 3 daily quiz limit → "Upgrade for unlimited practice 🔒"
-3. **PDF gate:** Free user taps PDF export → "Pro members can print exams 🔒"
+### Paywall Gates — EXACTLY 4, NO MORE ⭐
 
-**These are the ONLY 3 conversion moments. Do not add more. Sell the INSIGHT, not the tool.**
-Topic Quest entry folds into gate #1 — it does NOT create a 4th gate. Free users see the gap alert but the Quest CTA is locked. One upgrade prompt, two value props (diagnostic + Quest).
+| # | Gate | Trigger | Message |
+|---|---|---|---|
+| 1 | Blurred 各單元表現 | Tap diagnostic | "Unlock detailed topic analysis 🔒" |
+| 2 | Daily limit hit | 4th exam attempt | "Upgrade for unlimited practice 🔒" |
+| 3 | PDF tap | Tap export | "Pro members can print exams 🔒" |
+| 4 | Topic Quest locked ⭐ | Gap detected + Quest available | Curlboo paywall: "找出根源，重建基礎 — Curlboo 幫你設計學習路徑 🗺️" |
 
-The per-topic diagnostic (各單元表現) is the #1 paywall hook. This is what tutors charge HKD 300-500/hr to tell parents manually. The paywall message must communicate: "See exactly where your child needs help."
+**Gate 4 is the HIGHEST-INTENT gate** — it fires at the exact moment a parent discovers their child has a foundation gap. Peak anxiety + peak intent = highest conversion.
+
+**These are the ONLY 4 conversion moments. Do not add more.** Sell the INSIGHT, not the tool. The per-topic diagnostic (各單元表現) is the #1 hook. Topic Quest (gate #4) sells a designed PATH, not more questions.
+
+### Early Retention & Viral (Moved from Phase 6) ⭐
+- [ ] Weekly progress email to parents — automated every Sunday: topics practiced, improvement vs last week, weakest topic + "practice now" deep link, Curlboo encouragement. Supabase Edge Functions + Resend/Postmark.
+- [ ] Viral share image — "Share Result" button generates branded image (Curlboo + topic breakdown + score + QR code) for WhatsApp. Parents share organically.
+- [ ] Topic Quest viral loop — push: "Your child completed Station 3/5 on Fractions Quest!" → parent screenshots → other parents ask → install → conversion.
 
 ### Premium Diagnostics (D3 completion)
 - [ ] Knowledge Health Map — visual topic mastery overview (D3a)
@@ -283,9 +304,9 @@ The per-topic diagnostic (各單元表現) is the #1 paywall hook. This is what 
 
 ## Phase 6: Growth + Advanced AI — NOT STARTED
 
-### Viral & Retention
-- [ ] Viral Loop: "Share Report" button on results screen → generates clean branded image (Curlboo + topic breakdown + score + date + app name + QR code). Parents share to WhatsApp groups organically. This is the highest-ROI growth channel.
-- [ ] Weekly progress email to parents — automated every Sunday: topics practiced, improvement vs last week, weakest topic with "practice now" deep link, Curlboo encouragement. Powered by aggregating topic_breakdown JSONB. Use Supabase Edge Functions + Resend or Postmark. This is the #1 retention mechanism.
+### Viral & Retention (Moved: Weekly email + viral share → Phase 5) ⭐
+- [ ] Weekly progress email to parents (**MOVED to Phase 5**) — automated every Sunday. Supabase Edge Functions + Resend/Postmark. #1 retention mechanism.
+- [ ] Viral Loop: "Share Report" button (**MOVED to Phase 5**) — branded image (Curlboo + topic breakdown + score + QR code) for WhatsApp. Highest-ROI growth channel.
 - [ ] Referral system (invite code, reward: 1 week free Pro)
 - [ ] Push notifications (streak reminders, challenge alerts)
 - [ ] Social sharing (score cards, achievements)
@@ -344,13 +365,13 @@ The per-topic diagnostic (各單元表現) is the #1 paywall hook. This is what 
 
 ## Appendix B: Strategic Principles
 
-1. **Every feature must produce data.** Prioritize features that generate more exam_sessions (and therefore more topic_breakdown records) over features that are flashy but don't produce data. More data → better recommendations → more engagement → more data. Topic Quest is the highest-density data generator: 1 Quest = 4-5 stations × 5 questions = 20-25 exam_sessions worth of topic_breakdown data, each with pass/fail, time_spent, and retry count.
+1. **Every feature must produce data.** Prioritize features that generate more exam_sessions (and therefore more topic_breakdown records) over features that are flashy but don't produce data. More data → better recommendations → more engagement → more data. Topic Quest generates 2-3× data per session: 1 Quest = 4-5 stations × 5 questions = 20-25 topic_breakdown data points.
 
 2. **AI-as-Factory, not AI-as-Service.** Generate once, store forever, serve at $0. Competitors who use AI-as-service pay per query forever. We don't.
 
-3. **Sell the INSIGHT, not the tool.** Parents don't pay for "unlimited quizzes." They pay for "see exactly where your child needs help." The diagnostic is the product. The quizzes are the data collection mechanism.
+3. **Sell the INSIGHT, not the tool.** Parents don't pay for "unlimited quizzes." They pay for "see exactly where your child needs help." Topic Quest sells a designed PATH, not more questions.
 
-4. **3 paywall gates, no more.** Discipline. Every additional gate annoys users and reduces trust. Three is enough.
+4. **4 paywall gates, no more.** ⭐ Discipline. More gates = less trust. (Updated from 3 to 4 with Topic Quest gate.)
 
 5. **Validate before serve. Always.** One wrong math answer shown to a child destroys parent trust permanently. The validation pipeline is not optional.
 
@@ -358,9 +379,74 @@ The per-topic diagnostic (各單元表現) is the #1 paywall hook. This is what 
 
 7. **topic_breakdown JSONB is the moat.** Protect it. Back it up. Never delete it. It becomes the B2B product.
 
+8. **"Would a tutor do this?"** ⭐ Yes → build. No → don't. Every feature decision starts here.
+
+9. **Dark Souls, not Mario.** ⭐ Reward overcoming difficulty, not just showing up. Streak/points gradually fade out (training wheels off). NEVER put gamification in the core learning experience.
+
+10. **Maths Quests first. Everything else frozen.** ⭐ No FoodSwipe, no English app, no STEM app until MRR > HKD 50K.
+
+11. **Ability is a journey, not a state.** ⭐ You can't copy-paste ability. You can only design a path and let them walk it. This is why Topic Quest exists. "能力唔係一個狀態，係一個旅程。"
+
 ---
 
-## Appendix C: Key Dates & Gates
+## Appendix C: Known Generator Bugs — Fix Plan ⭐
+
+**Root Cause:** Question schema lacks `given` vs `unknown` separation.
+
+| # | Bug | Fix |
+|---|---|---|
+| 1 | Diagram leaks answer (labels show unknown) | 3-layer schema: given/unknown/display |
+| 2 | Non-integer division (177 ÷ 16 = 11.06) | gradeRules validation gate |
+| 3 | Question/diagram contradiction | Single source of truth per question |
+| 4 | Answer = given value | Validation: answer ≠ any given value |
+| 5 | Unrealistic shape proportions | Aspect ratio constraints |
+| 6 | Negative/zero answers | Min-value constraints per grade |
+| 7 | Duplicate questions in session | Hash-based dedup |
+| 8 | MC options leak answer | Distractor generation rules |
+
+**Fix Strategy:** 3-layer schema + validation gate + automated audit script. Ships in Phase 3C / 4B.
+
+---
+
+## Appendix D: Claude Code Integration Notes ⭐
+
+**Priority order when working on this repo:**
+1. Fix bugs that affect math correctness FIRST
+2. Fix bugs that affect data integrity SECOND
+3. New features THIRD
+
+**NEVER:**
+- Serve unvalidated AI questions to students
+- Delete or modify topic_breakdown data
+- Add more than 4 paywall gates
+- Add gamification to core learning experience
+- Break guest mode
+
+**Architecture rules:**
+- All quiz generation = engine.js (Layer 1, $0 cost)
+- All user data = Supabase with RLS
+- Every question MUST have topicId + topicName
+- Every exam MUST save topic_breakdown as JSONB
+- Frontend: React + Vite + Tailwind CSS
+- Package manager: pnpm
+
+**Topic Quest build context:**
+- Ability is a JOURNEY, not a state. It's NOT remediation (retry with max gear). It IS learning curve replay (new game from Level 1).
+- Students should NEVER feel "sent back" — they should feel "on a new Quest"
+- Depends on D1a (topic_map) prerequisite chains
+- 5 stations × 5 questions, 4/5 pass gate per station
+- Curlboo accompanies each station with escalating reactions:
+  - Station 1: 開心跳 「你記得平均分！好叻！」
+  - Station 2: 驚訝 「你仲記得分數係咩！」
+  - Station 3: 興奮 「就快到終點啦！」
+  - Final: 戴皇冠 「你掌握咗分數！🏆」
+  - Abandoned: 鼓勵 「下次再嚟，Curlboo 等你！」
+- Pro-only feature (paywall gate #4)
+- See `docs/future_tables.md` for quest_progress + topic_map schemas
+
+---
+
+## Appendix E: Key Dates & Gates
 
 | Milestone | Target | Gate Condition |
 |-----------|--------|----------------|
