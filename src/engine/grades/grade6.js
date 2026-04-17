@@ -111,7 +111,7 @@ export const grade6={
 ],
 '6A1':[
   ()=>{var x=ri(5,20),a=ri(3,8),b=ri(15,60);return{d:1,tp:'calc',q:a+'x + '+b+' = '+(a*x+b)+'，x = ?',a:String(x),s:['移項求解'],sc:2}},
-  ()=>{var x=ri(5,18),a=ri(2,5),b=ri(10,30),c=ri(3,8);return{d:2,tp:'calc',q:a+'x + '+b+' = '+c+'x + '+(a*x+b-c*x)+'，x = ?',a:String(x),s:['移項歸邊'],sc:3}},
+  ()=>{var x=ri(5,18),a=ri(2,5),b=ri(10,30),c=ri(3,8);var rhs=a*x+b-c*x;var rhsStr=rhs>=0?c+'x + '+rhs:c+'x − '+Math.abs(rhs);return{d:2,tp:'calc',q:a+'x + '+b+' = '+rhsStr+'，x = ?',a:String(x),s:['移項歸邊'],sc:3}},
   ()=>{var age=ri(8,14),ratio=ri(3,4),diff=age*(ratio-1);var dSib=ri(5,age-2),dPet=ri(1,3),n=nm();return{d:3,tp:'work',q:n+'有'+dSib+'歲的弟弟和'+dPet+'隻寵物。媽媽年齡是'+n+'的'+ratio+'倍，比'+n+'大'+diff+'歲。'+n+'幾歲？',a:String(age),trap:'弟弟年齡和寵物數',s:['🔍 弟弟和寵物無關','設x歲: '+ratio+'x−x='+diff,'x='+age],sc:3}}
 ],
 '6M1':[
@@ -127,7 +127,7 @@ export const grade6={
   ()=>{var s=pk([40,50,60,80]),t=ri(2,8);return{d:1,tp:'short',q:'車速'+s+'km/h行'+t+'小時，距離？',a:String(s*t),s:[s+'×'+t+'='+s*t],sc:2}},
   ()=>{var s1=pk([40,50,60]),t1=ri(2,4),s2=pk([50,60,80]),t2=ri(1,3);var dFuel=ri(5,12),dPass=ri(2,5);return{d:3,tp:'work',q:'車上'+dPass+'位乘客，每km耗油'+dFuel+'毫升。先以'+s1+'km/h行'+t1+'小時，再以'+s2+'km/h行'+t2+'小時。全程多少km？平均速率？',a:(s1*t1+s2*t2)+','+((s1*t1+s2*t2)/(t1+t2)).toFixed(1),trap:'乘客和耗油量',s:['🔍 乘客和耗油無關','總距: '+(s1*t1+s2*t2),'平均: '+((s1*t1+s2*t2)/(t1+t2)).toFixed(1)],sc:3}},
   /* d:3 — reverse speed */
-  ()=>{var d=pk([120,150,180,200,240]);var s=pk([40,50,60]);var t=d/s;return{d:3,tp:'fill',q:'距離'+d+'km，速率'+s+'km/h。需要____小時。',a:String(t),s:['時間=距離÷速率='+d+'÷'+s+'='+t],sc:2}},
+  ()=>{var d=pk([120,150,180,240]);var s=pk([40,50,60]);var t=d/s;return{d:3,tp:'fill',q:'距離'+d+'km，速率'+s+'km/h。需要____小時。',a:String(t),s:['時間=距離÷速率='+d+'÷'+s+'='+t],sc:2}},
   /* _addQ Phase 2 — reverse: find speed (line 1042) */
   ()=>{
     var s=pk([40,50,60,80]),t=ri(2,5),d=s*t;
