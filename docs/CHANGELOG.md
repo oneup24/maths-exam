@@ -4,6 +4,28 @@ All notable changes to **Maths Quests** (數學特訓).
 
 ---
 
+## [v1.3-beta] — 2026-04-18
+
+### refactor: extract engine.js into modular src/engine/ (Phases 1–9)
+- **Phase 1** (f3293e7): `core.js` — 7 utilities (`ri, pk, gcd, lcm, fOf, fS, shuffle`), `chkAns`, SVG helpers (`SV`×7, `FIG`×9); private: `norm, stripU, parseFrac`
+- **Phase 2** (e385051): `config.js` — `TOPICS, GRADE_INFO, DIFF_INFO, DIFF_ALLOW, EXAM_TARGETS, SECT_*`; CTX pools; 7 helpers (`nm, pl, fd, it, _nm2, _pl, _it`)
+- **Phase 3** (fcd216d): `history.js` — `saveHistory, loadHistory, clearHistory`; `STORAGE_KEY` private
+- **Phase 4** (04cdd0f): `grade1.js` — P1 generators (6 topics, 25 functions)
+- **Phase 5** (14e8946): `grades/grade2.js` — P2 generators (5 topics, 17 functions)
+- **Phase 6** (5df1dfa): `grades/grade3.js` — P3 generators (7 topics, 28 functions)
+- **Phase 7** (0ee2b21): `grades/grade4.js` — P4 generators (11 topics, 65 functions)
+- **Phase 8** (5f00ab4): `grades/grade5.js` — P5 generators (9 topics, 38 functions)
+- **Phase 9** (e6e8e8f): `grades/grade6.js` — P6 generators (11 topics, 42 functions)
+- All `_addQ` calls inlined into topic arrays; ES module named exports throughout
+- `engine.js` still the runtime entry point — grade files not yet wired in
+
+### fix: parameterize hardcoded 5N2[2] fraction question (91bb206)
+- Was always "3/4 + 1/6 − 1/3 = ?" on every run
+- Replaced with 5 denominator triplets + random numerators; safety loop ensures result > 0
+- Produces 44 distinct questions in 50 runs
+
+---
+
 ## [v1.3-beta] — 2026-04-17
 
 ### ecb5083 — docs: three-way sync — v4, v5.1, and future_tables

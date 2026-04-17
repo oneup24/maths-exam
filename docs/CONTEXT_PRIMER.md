@@ -1,6 +1,6 @@
 # Context Primer
 
-Architecture, tech stack, and file map for **Maths Quests** (v1.2-beta, live on Vercel).
+Architecture, tech stack, and file map for **Maths Quests** (v1.3-beta, live on Vercel).
 
 ---
 
@@ -59,13 +59,25 @@ src/
   index.css            — Tailwind imports + global styles
 
   lib/
-    engine.js          — Question engine: generators, exam builder, answer checker (~1000+ lines)
+    engine.js          — Question engine entry point (~1000+ lines); being extracted into src/engine/
     i18n.js            — zh/en translation strings
     sounds.js          — Web Audio sound effects (correct, wrong, tick, fanfare, submit)
     track.js           — Event tracking: dual-destination (PostHog + Supabase), 12 events
     posthog.js         — PostHog wrapper: key-gated init, capture/identify/reset exports
     colors.js          — Grade colors, category colors, difficulty colors
     animations.js      — Shared Framer Motion variants (pageTransition, fadeInUp, stagger)
+
+  engine/                — Modular extraction of engine.js (Phases 1–9 complete)
+    core.js              — Utilities (ri, pk, gcd, lcm, fOf, fS, shuffle), chkAns, FIG SVG helpers
+    config.js            — TOPICS, GRADE_INFO, DIFF_INFO, EXAM_TARGETS, SECT_*, CTX pools, helpers
+    history.js           — saveHistory, loadHistory, clearHistory (localStorage)
+    grade1.js            — P1 generators (6 topics, 25 functions)
+    grades/
+      grade2.js          — P2 generators (5 topics, 17 functions)
+      grade3.js          — P3 generators (7 topics, 28 functions)
+      grade4.js          — P4 generators (11 topics, 65 functions)
+      grade5.js          — P5 generators (9 topics, 38 functions)
+      grade6.js          — P6 generators (11 topics, 42 functions)
 
   hooks/
     useAuth.js         — Supabase auth: session, signUp, signIn, signOut; PostHog identify/reset on auth change
@@ -128,16 +140,29 @@ src/assets/
 
 ---
 
-## Question Engine (engine.js)
+## Question Engine (engine.js → src/engine/)
 
-- **Coverage**: P1-P6, all HK EDB primary maths topics
+`engine.js` is the original monolithic file and current runtime entry point (~1000+ lines). It is being extracted phase-by-phase into ES modules under `src/engine/` — all 9 phases complete.
+
+| Module | Contents |
+|--------|----------|
+| `core.js` | `ri, pk, gcd, lcm, fOf, fS, shuffle`, `chkAns`, `FIG` (9 SVG methods) |
+| `config.js` | `TOPICS`, grade/diff/exam configs, CTX context pools, 7 generator helpers |
+| `history.js` | `saveHistory`, `loadHistory`, `clearHistory` |
+| `grade1.js` | P1 — 6 topics, 25 generators |
+| `grades/grade2.js` | P2 — 5 topics, 17 generators |
+| `grades/grade3.js` | P3 — 7 topics, 28 generators |
+| `grades/grade4.js` | P4 — 11 topics, 65 generators |
+| `grades/grade5.js` | P5 — 9 topics, 38 generators |
+| `grades/grade6.js` | P6 — 11 topics, 42 generators |
+
+- **Coverage**: P1–P6, all HK EDB primary maths topics
 - **Generators**: ~600+ procedural functions, each producing random variations
-- **Topics per grade**: P1 has 6, P2 has 8, ... P6 has 11
-- **Question types**: calc, fill, MC, short answer, show working
-- **Difficulty**: 3 levels (Basic/Standard/Challenge)
+- **Question types**: `calc`, `fill`, `mc`, `short`, `work`
+- **Difficulty**: 3 levels (Basic d:1 / Standard d:2 / Challenge d:3)
 - **Trap items**: Story problems with irrelevant data to train filtering
-- **SVG figures**: Rect, triangle, parallelogram, trapezoid, circle, cuboid, bar chart, line graph
-- **Answer checker** (`chkAns`): normalizes units, fractions, multi-part, +/-0.5% tolerance
+- **SVG figures**: Rect, square, triangle, parallelogram, trapezoid, circle, cuboid, bar chart, line graph
+- **Answer checker** (`chkAns`): normalizes units, fractions, multi-part answers, ±0.5% tolerance
 
 ### Exam builder
 ```
