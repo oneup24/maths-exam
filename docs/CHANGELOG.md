@@ -4,6 +4,55 @@ All notable changes to **Maths Quests** (數學特訓).
 
 ---
 
+## [v1.3-beta] — 2026-04-17
+
+### ecb5083 — docs: three-way sync — v4, v5.1, and future_tables
+- Master_Plan_v4.md updated from v5.1: PostHog ✅, gamification section (Daily Challenge/Stardust/Curlboo State), paywall gates 3→4, weekly email+viral share moved Phase 6→5, 8 known generator bugs appendix, Appendix D Claude Code notes, principles 8-11 added
+- OU_MASTER_PLAN_V5.1.md updated from v4 + future_tables: PostHog marked live, I3 schemas upgraded with full RLS/indexes/JSONB examples/bilingual topic_map
+- future_tables.md: knowledge_gaps gains `quest_id UUID` field (links gap to its Quest)
+
+### fix: remove stale signupDone reference causing blank screen at onboarding step 5
+- Root cause: `{step===5&&!signupDone&&(` still referenced `signupDone` which was removed
+- JavaScript ReferenceError → React tree unmount → blank screen
+- Fix: `{step===5&&(` — removed stale guard entirely
+
+### fix: guard PostHog calls to prevent crash when key not configured
+- Root cause: `posthog.capture()` called on uninitialized instance when `VITE_POSTHOG_KEY` absent
+- Refactored `src/lib/posthog.js`: `enabled` boolean guard + try/catch on all calls
+- Exported named functions `capture/identify/reset` instead of raw posthog object
+- App now works correctly whether or not PostHog key is configured
+
+### feat: PostHog analytics integration (Phase 3B — partial complete)
+- New `src/lib/posthog.js` — key-gated init, `capture/identify/reset` exports
+- `src/lib/track.js` — dual-destination: every `track()` fires PostHog + Supabase simultaneously
+- `src/hooks/useAuth.js` — `identify(userId)` on login, `reset()` on logout, `signup_complete` event
+- 12 events wired across App.jsx, Profile.jsx, Onboarding.jsx, ExportPDFButton.jsx:
+  `onboarding_complete`, `exam_start`, `exam_complete`, `results_view`, `pdf_export`, `retry_click`, `grade_selected`, `lang_switch`, `parent_pin_set`, `guest_signup_prompt_shown`, `guest_signup_prompt_clicked`, `signup_complete`
+- `VITE_POSTHOG_KEY` added to `.env.local` and `.env.local.example`
+
+### feat: remove email verification gate from signup (keep only for PDF export)
+- Signup now completes immediately — no "check your email" screen
+- `src/Onboarding.jsx` — removed `signupDone` state; `finish()` called immediately after signUp
+- `src/components/ExportPDFButton.jsx` — PDF gate checks `user.email_confirmed_at`; unverified users see resend-verification modal (bilingual)
+- `src/services/api.js` — added `resendVerificationEmail(email)`
+- `src/lib/i18n.js` — removed `obCheckEmail*` keys; added `pdfVerifyTitle/pdfVerifyBtn/pdfVerifySent`
+- `src/components/exam/ScoreReport.jsx` — passes `user` prop to `ExportPDFButton`
+
+### chore: asset folder structure
+- `public/mascot/`, `public/icons/`, `public/splash/` — runtime URL-referenced assets
+- `src/assets/brand/`, `src/assets/illustrations/`, `src/assets/animations/`, `src/assets/ui/` — Vite-processed imports
+- All folders created with `.gitkeep`
+- Removed unused Vite boilerplate: `src/assets/hero.png`, `react.svg`, `vite.svg`
+
+### docs: integrate Topic Quest (D2d) into Master_Plan_v4.md
+- D2d added: Topic Quest — Learning Curve Replay (full spec with UX framing, implementation checklist)
+- D1d updated: gap alert now includes "Start Topic Quest" entry point
+- Phase 4B: Topic Quest implementation checklist (8 items)
+- Phase 5 pricing: Topic Quest in Pro tier; paywall message for gate #4
+- future_tables.md created: production SQL schemas for student_profiles, subscriptions, quest_progress, topic_map, knowledge_gaps (with RLS, indexes, JSONB examples, analytics events)
+
+---
+
 ## [v1.2-beta] — 2026-04-04
 
 ### 7b88236 — docs: Master Plan v4.0 complete rewrite

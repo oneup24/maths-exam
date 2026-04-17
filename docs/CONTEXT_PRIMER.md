@@ -16,7 +16,7 @@ Architecture, tech stack, and file map for **Maths Quests** (v1.2-beta, live on 
 | PDF Export | jsPDF + jspdf-autotable (Noto Sans TC for Chinese) |
 | Mobile | Capacitor 8 (iOS/Android) + React Native 0.84 + Expo 55 |
 | Hosting | Vercel (production) |
-| Analytics | Supabase `events` table (custom, no third-party) |
+| Analytics | PostHog (primary) + Supabase `events` table (dual-destination via track.js) |
 | Audio | Web Audio API (custom, no library) |
 | PWA | manifest.json + service worker |
 | Package manager | pnpm |
@@ -62,16 +62,17 @@ src/
     engine.js          — Question engine: generators, exam builder, answer checker (~1000+ lines)
     i18n.js            — zh/en translation strings
     sounds.js          — Web Audio sound effects (correct, wrong, tick, fanfare, submit)
-    track.js           — Event tracking: fire-and-forget insert to Supabase events table
+    track.js           — Event tracking: dual-destination (PostHog + Supabase), 12 events
+    posthog.js         — PostHog wrapper: key-gated init, capture/identify/reset exports
     colors.js          — Grade colors, category colors, difficulty colors
     animations.js      — Shared Framer Motion variants (pageTransition, fadeInUp, stagger)
 
   hooks/
-    useAuth.js         — Supabase auth: session, signUp, signIn, signOut, skip
+    useAuth.js         — Supabase auth: session, signUp, signIn, signOut; PostHog identify/reset on auth change
 
   services/
     supabase.js        — Supabase client init (reads env vars)
-    api.js             — Cloud ops: saveExamResult, loadExamHistory, getUserStats
+    api.js             — Cloud ops: saveExamResult, loadExamHistory, getUserStats, resendVerificationEmail
 
   pages/
     Login.jsx          — Email auth + guest skip (returning users only)
@@ -100,19 +101,29 @@ src/
 vite.config.js         — Vite + React + Tailwind plugins
 capacitor.config.json  — appId: com.oneup24.mathsquest, webDir: dist
 app.json               — Expo config
-.env.local             — VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY
+.env.local             — VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY + VITE_POSTHOG_KEY
 supabase/setup.sql     — Applied RLS policies (documentation only)
 ```
 
-### Assets (public/)
+### Assets
 ```
-mascot.png             — Default Curlboo Bear
-mascot-happy.png       — Score >= 80% or birthday
-mascot-ok.png          — Score 50-79%
-mascot-sad.png         — Score < 50%
-icon.png               — App icon
-manifest.json          — PWA manifest
-sw.js                  — Service worker
+public/
+  mascot.png           — Default Curlboo Bear
+  mascot-happy.png     — Score >= 80% or birthday
+  mascot-ok.png        — Score 50-79%
+  mascot-sad.png       — Score < 50%
+  icon.png             — App icon
+  manifest.json        — PWA manifest
+  sw.js                — Service worker
+  mascot/              — Future: additional mascot states (Curlboo variants)
+  icons/               — Future: app icons, favicons
+  splash/              — Future: iOS/Android splash screens
+
+src/assets/
+  brand/               — Logos, wordmarks (Vite-processed/hashed)
+  illustrations/       — Scene illustrations
+  animations/          — Lottie / APNG animations
+  ui/                  — UI decoration assets
 ```
 
 ---
@@ -140,30 +151,55 @@ buildExam(grade, topics[], examType, difficulty)
 
 ## Supabase Schema
 
+### Live tables
+
 ```sql
+-- exam_sessions (LIVE ✅)
 exam_sessions (
-  id uuid PK,
-  user_id uuid FK -> auth.users,
-  grade text,
-  topic text DEFAULT 'mixed',
-  total_questions int,
-  correct_answers int,
-  score_percent int,
-  time_spent int DEFAULT 0,
-  created_at timestamptz
+  id               uuid PK,
+  user_id          uuid FK → auth.users,
+  level            int,          -- 1-6 = P1-P6
+  topic_code       text,         -- 'mixed' or specific topic
+  total_questions  int,
+  correct_count    int,
+  score_percent    decimal,
+  time_spent       int,          -- seconds
+  topic_breakdown  jsonb,        -- {"3M":{"total":3,"wrong":3},"3N5":{"total":2,"wrong":1}}
+  completed_at     timestamptz,
+  created_at       timestamptz
+)
+-- RLS: auth.uid() = user_id for all operations
+
+-- events (LIVE ✅) — analytics dual-destination
+events (
+  id          uuid PK,
+  device_id   text,
+  event_name  text,
+  props       jsonb,
+  created_at  timestamptz
 )
 ```
 
-**RLS enabled** — users can only SELECT/INSERT/UPDATE/DELETE their own rows (`auth.uid() = user_id`).
+**topic_breakdown** is the company moat — per-topic correct/wrong counts per exam. Never delete or modify.
+
+### Future tables (schemas in `docs/future_tables.md`)
+- `question_bank` — Phase 3C
+- `student_profiles` — Phase 4A (multi-child)
+- `topic_map` — Phase 4B (prerequisite chains, Topic Quest route source)
+- `knowledge_gaps` — Phase 4B (detected weak topics)
+- `quest_progress` — Phase 4B (Topic Quest session state)
+- `subscriptions` — Phase 5 (paywall entitlements)
 
 ---
 
 ## Key Patterns
 
-- **Event tracking** — `track(eventName, props)` in `src/lib/track.js`, fire-and-forget Supabase insert, 9 events (7 onboarding + 2 quiz)
+- **Event tracking** — `track(eventName, props)` in `src/lib/track.js`, dual-destination: fires PostHog AND Supabase `events` table simultaneously. 12 events total. Key-gated — works without PostHog key (Supabase-only fallback).
 - **No React Router** — navigation via `setView('home'|'settings'|'exam'|'profile'|...)`
 - **No Redux/Context** — all state in App.jsx useState
 - **Offline-first** — localStorage always works; Supabase is additive
 - **Bilingual** — `t(lang, key)` for all UI strings
 - **Parent PIN** — 4-digit lock on answer reveal; managed in Profile, session-scoped unlock
 - **Guest mode** — full functionality except cloud sync and print
+- **Email verification** — NOT required for signup. Signup completes immediately. `email_confirmed_at` is only checked for PDF export — unverified users see a resend-verification modal instead of the PDF gate.
+- **PostHog** — key-gated: set `VITE_POSTHOG_KEY` in .env.local + Vercel env vars. App functions normally without the key (Supabase-only analytics fallback).
