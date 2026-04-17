@@ -9,7 +9,7 @@ export const grade5={
 '5N2':[
   ()=>{var d1=pk([3,4,6]),d2=pk([4,6,8]);if(d1===d2)d2=d1*2;var l=lcm(d1,d2);var n1=ri(1,d1-1),n2=ri(1,d2-1);var res=n1*(l/d1)+n2*(l/d2);return{d:1,tp:'calc',q:n1+'/'+d1+' + '+n2+'/'+d2+' = ?',a:fS(res,l),s:['通分母: L.C.M.='+l],sc:2}},
   ()=>{var d1=pk([3,4,6]),d2=pk([4,6,8]);if(d1===d2)d2=d1+2;var l=lcm(d1,d2);var n1=ri(Math.ceil(d1*0.6),d1-1),n2=ri(1,Math.floor(d2*0.4));var v1=n1*(l/d1),v2=n2*(l/d2);if(v1<=v2){n1=d1-1;v1=n1*(l/d1)}return{d:2,tp:'calc',q:n1+'/'+d1+' − '+n2+'/'+d2+' = ?',a:fS(v1-v2,l),s:['通分母後相減'],sc:2}},
-  ()=>{return{d:3,tp:'calc',q:'3/4 + 1/6 − 1/3 = ?',a:fS(9+2-4,12),s:['L.C.M.=12, 9/12+2/12−4/12=7/12'],sc:3}},
+  ()=>{var sets=[{d1:4,d2:6,d3:3,l:12},{d1:3,d2:4,d3:6,l:12},{d1:6,d2:8,d3:4,l:24},{d1:4,d2:5,d3:10,l:20},{d1:3,d2:5,d3:15,l:15}];var s=pk(sets);var n1=ri(1,s.d1-1),n2=ri(1,s.d2-1),n3=ri(1,s.d3-1);var v1=n1*(s.l/s.d1),v2=n2*(s.l/s.d2),v3=n3*(s.l/s.d3);while(v3>=v1+v2){n3=ri(1,s.d3-1);v3=n3*(s.l/s.d3);}return{d:3,tp:'calc',q:n1+'/'+s.d1+' + '+n2+'/'+s.d2+' − '+n3+'/'+s.d3+' = ?',a:fS(v1+v2-v3,s.l),s:['L.C.M.='+s.l],sc:3}},
   ()=>{var d1=pk([3,4,5]),d2=pk([4,6,8]);if(d1===d2)d2=d1+2;var l=lcm(d1,d2);var n1=ri(1,d1-1),n2=ri(1,d2-1);var v1=n1*(l/d1),v2=n2*(l/d2);return{d:3,tp:'mc',q:n1+'/'+d1+' 和 '+n2+'/'+d2+' 哪個較大？',isMC:true,opts:[{l:'A',v:n1+'/'+d1,c:v1>v2},{l:'B',v:n2+'/'+d2,c:v2>v1},{l:'C',v:'一樣大',c:v1===v2}],a:v1>v2?'A':v2>v1?'B':'C',s:['通分母比較: '+v1+'/'+l+' vs '+v2+'/'+l],sc:2}},
   /* _addQ Strategy 3 — comparison (line 582) */
   ()=>{
