@@ -73,11 +73,11 @@ src/
     history.js           — saveHistory, loadHistory, clearHistory (localStorage)
     grade1.js            — P1 generators (6 topics, 25 functions)
     grades/
-      grade2.js          — P2 generators (5 topics, 17 functions)
-      grade3.js          — P3 generators (7 topics, 28 functions)
-      grade4.js          — P4 generators (11 topics, 65 functions)
-      grade5.js          — P5 generators (9 topics, 38 functions)
-      grade6.js          — P6 generators (11 topics, 42 functions)
+      grade2.js          — P2 generators (8 topics, 32 functions)
+      grade3.js          — P3 generators (10 topics, 41 functions)
+      grade4.js          — P4 generators (13 topics, 82 functions)
+      grade5.js          — P5 generators (11 topics, 56 functions)
+      grade6.js          — P6 generators (14 topics, 63 functions)
 
   hooks/
     useAuth.js         — Supabase auth: session, signUp, signIn, signOut; PostHog identify/reset on auth change

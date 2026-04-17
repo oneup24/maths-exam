@@ -1,8 +1,8 @@
 /**
- * grade2.js — P2 question generators (2N1, 2N2, 2N3, 2M, 2S)
+ * grade2.js — P2 question generators (2N1, 2N2, 2N3, 2N5, 2N6, 2M, 2S, 2D1)
  * Extracted from engine.js
  */
-import { ri, pk } from '../core.js';
+import { ri, pk, FIG } from '../core.js';
 import { nm, pl, it, CTX } from '../config.js';
 
 export const grade2={
@@ -34,8 +34,61 @@ export const grade2={
 '2S':[
   ()=>({d:2,tp:'mc',q:'一個四邊形有4個直角，它一定是什麼形狀？',isMC:true,opts:[{l:'A',v:'正方形',c:false},{l:'B',v:'長方形',c:true},{l:'C',v:'平行四邊形',c:false}],a:'B',s:['4個直角→長方形'],sc:2}),
   ()=>({d:3,tp:'mc',q:'以下哪項是正確的？',isMC:true,opts:[{l:'A',v:'所有正方形都是長方形',c:true},{l:'B',v:'所有長方形都是正方形',c:false},{l:'C',v:'三角形有4個角',c:false}],a:'A',s:['正方形是特殊的長方形'],sc:2})
+],
+
+/* ═══════════ 2N5 分數(一) ═══════════ */
+'2N5':[
+  // Unit fraction naming (d:1)
+  ()=>{const d=pk([2,3,4]);return{d:1,tp:'fill',q:'把一個圖形分成'+d+'等份，塗了1份，塗色部分是____。',a:'1/'+d,s:['1/'+d+' 讀作：'+d+'分之一'],sc:1}},
+  // Compare unit fractions (d:1)
+  ()=>{const a=pk([2,3,4,6]),b=pk([2,3,4,6]);let bb=b;while(bb===a)bb=pk([2,3,4,6]);
+    return{d:1,tp:'mc',q:'1/'+a+' 和 1/'+bb+'，哪個較大？',isMC:true,
+      opts:[{l:'A',v:'1/'+a,c:a<bb},{l:'B',v:'1/'+bb,c:bb<a},{l:'C',v:'一樣大',c:false}],
+      a:a<bb?'A':'B',s:['分母越小，分數越大：1/'+Math.min(a,bb)+' > 1/'+Math.max(a,bb)],sc:1}},
+  // Fraction of a group (d:2)
+  ()=>{const frac=pk([2,3,4]);const total=frac*ri(2,5);
+    return{d:2,tp:'calc',q:total+'個橙，'+frac+'分之一是多少個？',a:String(total/frac),s:[total+'÷'+frac+'='+(total/frac)],sc:1}},
+  // Word problem (d:2)
+  ()=>{const frac=pk([2,3,4]);const total=frac*ri(3,6);const ate=total/frac;const n=nm();
+    return{d:2,tp:'work',q:n+'有'+total+'粒糖果，吃了'+frac+'分之一。吃了多少粒？',
+      a:String(ate),s:[total+'÷'+frac+'='+ate+'粒'],sc:2}}
+],
+
+/* ═══════════ 2N6 基本除法 ═══════════ */
+'2N6':[
+  // Basic ÷ fact (d:1)
+  ()=>{const a=ri(2,9),b=ri(2,9);return{d:1,tp:'calc',q:(a*b)+' ÷ '+b+' = ?',a:String(a),s:[a+'×'+b+'='+a*b+'，反過來÷'+b+'='+a],sc:1}},
+  // With remainder (d:1)
+  ()=>{const div=ri(3,8),quot=ri(3,7),rem=ri(1,div-1);return{d:1,tp:'fill',q:(div*quot+rem)+' ÷ '+div+' = ____…____',a:quot+','+rem,s:[(div*quot+rem)+'÷'+div+'='+quot+'餘'+rem],sc:1}},
+  // Word problem: equal sharing (d:2)
+  ()=>{const groups=ri(2,5);const total=groups*ri(3,8);const n=nm();
+    return{d:2,tp:'work',q:n+'有'+total+'個橙，平均分成'+groups+'份，每份有多少個？',
+      a:String(total/groups),s:[total+'÷'+groups+'='+(total/groups)],sc:2}},
+  // d:3 — find number of groups
+  ()=>{const each=ri(3,6);const total=each*ri(4,8);
+    return{d:3,tp:'work',q:'共有'+total+'個蘋果，每盒放'+each+'個，需要多少個盒子？',
+      a:String(total/each),s:[total+'÷'+each+'='+(total/each)+'個盒子'],sc:2}}
+],
+
+/* ═══════════ 2D1 象形圖和棒形圖 ═══════════ */
+'2D1':[
+  // Read bar chart: max value (d:1)
+  ()=>{const labels=['蘋果','橙','香蕉','芒果'];const data=labels.map(l=>({l,v:ri(2,9)}));
+    const mx=data.reduce((m,d)=>d.v>m.v?d:m,data[0]);
+    return{d:1,tp:'fill',q:'棒形圖顯示各種水果數量。最多的是____，共____個。',
+      fig:FIG.bars(data),a:mx.l+','+mx.v,s:['最高的棒 = '+mx.l+': '+mx.v+'個'],sc:2}},
+  // Read bar chart: total (d:2)
+  ()=>{const labels=['一月','二月','三月','四月'];const data=labels.map(l=>({l,v:ri(3,9)}));
+    const total=data.reduce((s,d)=>s+d.v,0);
+    return{d:2,tp:'fill',q:'棒形圖顯示四個月的書本數量。四個月共有多少本？',
+      fig:FIG.bars(data),a:String(total),s:['加總: '+data.map(d=>d.v).join('+')+' = '+total],sc:2}},
+  // Pictograph (d:2)
+  ()=>{const rows=[{name:'小明',count:ri(2,5)},{name:'小芬',count:ri(2,5)},{name:'家俊',count:ri(2,5)}];
+    const sym='★';const total=rows.reduce((s,r)=>s+r.count,0);
+    return{d:2,tp:'work',q:'圖表中每個'+sym+'代表2本書。\n'+rows.map(r=>r.name+': '+sym.repeat(r.count)).join('\n')+'\n三人共有多少本書？',
+      a:String(total*2),s:['每個★=2本','共'+total+'個★='+total+'×2='+total*2],sc:2}}
 ]
 };
 
-// Topics: 2N1, 2N2, 2N3, 2M, 2S
-// Export: grade2 (object with 5 topic keys, 17 generators total)
+// Topics: 2N1, 2N2, 2N3, 2N5, 2N6, 2M, 2S, 2D1
+// Export: grade2 (object with 8 topic keys, 32 generators total)

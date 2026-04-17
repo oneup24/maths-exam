@@ -1,11 +1,33 @@
 /**
- * grade3.js — P3 question generators (3N2–3D1)
+ * grade3.js — P3 question generators (3N1–3D2)
  * Extracted from engine.js
  */
-import { ri, pk, fS, FIG } from '../core.js';
+import { ri, pk, fS, shuffle, FIG } from '../core.js';
 import { nm, pl, fd, CTX, _it, _pl } from '../config.js';
 
 export const grade3={
+
+/* ═══════════ 3N1 大數(一) — 萬以內的數 ═══════════ */
+'3N1':[
+  // Place value to 萬 (d:1)
+  ()=>{const a=ri(10000,99999);return{d:1,tp:'fill',q:a+'的萬位數字是____，千位數字是____。',
+    a:Math.floor(a/10000)+','+Math.floor(a%10000/1000),s:['萬位='+Math.floor(a/10000),'千位='+Math.floor(a%10000/1000)],sc:1}},
+  // Read 5-digit number (d:1)
+  ()=>{const w=ri(1,9),q=ri(0,9),b=ri(0,9),s2=ri(0,9),g=ri(0,9);const n=w*10000+q*1000+b*100+s2*10+g;
+    return{d:1,tp:'fill',q:'用數字寫：'+w+'萬'+q+'千'+b+'百'+s2+'十'+g+'個 = ____',a:String(n),s:['位值相加'],sc:1}},
+  // Round to 1000 (d:2)
+  ()=>{const n=ri(10000,99999);const r=Math.round(n/1000)*1000;
+    return{d:2,tp:'fill',q:'把'+n+'四捨五入至最接近的千：____',
+      a:String(r),s:['看百位 '+(Math.floor(n/100)%10)+'：'+(Math.floor(n/100)%10>=5?'進千':'捨去')],sc:1}},
+  // Compare and order (d:2)
+  ()=>{const arr=[ri(10000,50000),ri(50001,99999),ri(5000,9999)];const sorted=[...arr].sort((a,b)=>a-b);
+    return{d:2,tp:'fill',q:'由小到大：'+shuffle([...arr]).join('、')+' → ____',a:sorted.join(', '),s:[sorted.join(' < ')],sc:2}},
+  // d:3 — reverse place value
+  ()=>{const w=ri(2,8);const diff=ri(1,Math.min(w-1,5));
+    return{d:3,tp:'work',q:'一個五位數，萬位是'+w+'，千位比萬位小'+diff+'，其餘各位是0。這個數是多少？',
+      a:String(w*10000+(w-diff)*1000),s:['千位='+w+'−'+diff+'='+(w-diff),'數字='+w*10000+(w-diff)*1000],sc:2}}
+],
+
 '3N2':[
   ()=>{var a=ri(35,99),b=ri(6,9);return{d:1,tp:'calc',q:a+' × '+b+' = ?',a:String(a*b),s:['兩位×一位'],sc:2}},
   ()=>{var a=ri(100,350),b=ri(3,9);return{d:1,tp:'calc',q:a+' × '+b+' = ?',a:String(a*b),s:['三位×一位'],sc:2}},
@@ -60,6 +82,23 @@ export const grade3={
   /* d:3 — comparison */
   ()=>{var d=pk([6,8,10]);var a=ri(1,d-1),b=ri(1,d-1);while(a===b)b=ri(1,d-1);return{d:3,tp:'mc',q:a+'/'+d+' 和 '+b+'/'+d+' 哪個較大？',isMC:true,opts:[{l:'A',v:a+'/'+d,c:a>b},{l:'B',v:b+'/'+d,c:b>a},{l:'C',v:'一樣大',c:a===b}],a:a>b?'A':'B',s:['同分母比分子'],sc:2}}
 ],
+
+/* ═══════════ 3N6 認識小數（十分位） ═══════════ */
+'3N6':[
+  // Read tenths (d:1)
+  ()=>{const n=ri(1,9);const chars=['一','二','三','四','五','六','七','八','九'];
+    return{d:1,tp:'fill',q:'0.'+n+' 讀作「____」，它等於'+n+'/____。',
+      a:'零點'+chars[n-1]+',10',s:['0.'+n+'='+n+'/10'],sc:1}},
+  // Add tenths (d:1)
+  ()=>{const a=ri(1,5),b=ri(1,4);return{d:1,tp:'calc',q:a+'.0 + 0.'+b+' = ?',a:(a+b/10).toFixed(1),s:['整數+十分位小數'],sc:1}},
+  // Subtract tenths (d:2)
+  ()=>{const a=ri(3,9),b=ri(1,a-1);return{d:2,tp:'calc',q:a+'.0 − '+b+'.0 = ?',a:(a-b).toFixed(1),s:[a+'−'+b+'='+(a-b)],sc:1}},
+  // Order tenths (d:2)
+  ()=>{const nums=[ri(1,4),ri(5,8),ri(9,14)];const arr=nums.map(n=>n/10);const sorted=[...arr].sort((a,b)=>a-b);
+    return{d:2,tp:'fill',q:'由小到大排列：'+arr.map(n=>n.toFixed(1)).join('、')+' → ____',
+      a:sorted.map(n=>n.toFixed(1)).join(','),s:[sorted.map(n=>n.toFixed(1)).join(' < ')],sc:2}}
+],
+
 '3M':[
   ()=>{var km=ri(2,6),m=ri(100,900),km2=ri(1,4),m2=ri(100,800);return{d:1,tp:'calc',q:km+'公里'+m+'米 + '+km2+'公里'+m2+'米 = ____米',a:String(km*1000+m+km2*1000+m2),s:['化成米再加'],sc:2}},
   ()=>{var items=[{n:fd(),w:ri(200,400)},{n:fd(),w:ri(150,300)},{n:fd(),w:ri(100,250)}];var total=items.reduce((s,i)=>s+i.w,0);var dBox=ri(50,100),dBoxC=pk(['紅色','藍色']);return{d:2,tp:'short',q:items.map(i=>i.n+'重'+i.w+'克').join('，')+'。放在'+dBoxC+'盒子(空盒重'+dBox+'克)。水果共重多少克？比1公斤多還是少？差多少克？',a:total+','+(total>=1000?'多':'少')+','+Math.abs(total-1000),trap:'盒子重量和顏色',s:['🔍 盒子無關','水果: '+total+'克','與1000克差: '+Math.abs(total-1000)],sc:3}},
@@ -74,9 +113,29 @@ export const grade3={
 '3D1':[
   ()=>{var items=[{l:'足球',v:ri(15,35)},{l:'籃球',v:ri(10,30)},{l:'排球',v:ri(12,28)},{l:'乒乓球',v:ri(20,40)}];var total=items.reduce((s,i)=>s+i.v,0);var mx=items.reduce((m,i)=>i.v>m.v?i:m,items[0]);var mn=items.reduce((m,i)=>i.v<m.v?i:m,items[0]);return{d:2,tp:'short',q:'根據棒形圖，四種球共有多少個？最多比最少多多少個？',fig:FIG.bars(items),a:total+','+(mx.v-mn.v),s:['總和: '+total,'差: '+(mx.v-mn.v)],sc:3}},
   ()=>{var items=[{l:'一月',v:ri(20,50)},{l:'二月',v:ri(15,45)},{l:'三月',v:ri(25,60)}];var avg=Math.round(items.reduce((s,i)=>s+i.v,0)/items.length);return{d:3,tp:'short',q:'棒形圖顯示三個月銷量。三個月平均銷量是多少？',fig:FIG.bars(items),a:String(avg),s:['總÷3='+avg],sc:3}}
+],
+
+/* ═══════════ 3D2 折線圖(一) ═══════════ */
+'3D2':[
+  // Read line graph: find max (d:1)
+  ()=>{const labels=['一月','二月','三月','四月','五月'];const data=labels.map(l=>({l,v:ri(10,40)}));
+    const mx=data.reduce((m,d)=>d.v>m.v?d:m,data[0]);
+    return{d:1,tp:'fill',q:'折線圖顯示每月借書數量。哪個月份最多？多少本？',
+      fig:FIG.line(data),a:mx.l+','+mx.v,s:['最高點 = '+mx.l+': '+mx.v+'本'],sc:2}},
+  // Total and average from line graph (d:2)
+  ()=>{const labels=['週一','週二','週三','週四','週五'];const data=labels.map(l=>({l,v:ri(15,45)}));
+    const total=data.reduce((s,d)=>s+d.v,0);
+    return{d:2,tp:'work',q:'折線圖顯示五天賣出的麵包數量。五天共賣出多少個？平均每天多少個？',
+      fig:FIG.line(data),a:total+','+(total/5%1===0?String(total/5):(total/5).toFixed(1)),
+      s:['總: '+total,'平均: '+total+'÷5='+(total/5).toFixed(1)],sc:2}},
+  // Difference between two points (d:2)
+  ()=>{const labels=['一月','二月','三月','四月'];const data=labels.map(l=>({l,v:ri(10,40)}));
+    const mx=data.reduce((m,d)=>d.v>m.v?d:m,data[0]);const mn=data.reduce((m,d)=>d.v<m.v?d:m,data[0]);
+    return{d:2,tp:'fill',q:'折線圖顯示四個月銷量。最多比最少多____個。最多在____月。',
+      fig:FIG.line(data),a:(mx.v-mn.v)+','+mx.l,s:['最多: '+mx.l+'='+mx.v,'最少: '+mn.l+'='+mn.v,'差: '+(mx.v-mn.v)],sc:2}}
 ]
 };
 
-// Topics: 3N2, 3N3, 3N4, 3N5, 3M, 3S, 3D1
-// Export: grade3 (object with 7 topic keys)
-// Total generators: 28
+// Topics: 3N1, 3N2, 3N3, 3N4, 3N5, 3N6, 3M, 3S, 3D1, 3D2
+// Export: grade3 (object with 10 topic keys)
+// Total generators: 41

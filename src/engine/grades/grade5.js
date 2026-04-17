@@ -2,10 +2,41 @@
  * grade5.js — P5 question generators
  * Extracted from engine.js
  */
-import { ri, pk, lcm, fS, FIG } from '../core.js';
+import { ri, pk, lcm, fS, shuffle, FIG } from '../core.js';
 import { nm, pl, CTX, _nm2 } from '../config.js';
 
 export const grade5={
+
+/* ═══════════ 5N1 大數（百萬/千萬/億） ═══════════ */
+'5N1':[
+  // 讀大數 (d:1)
+  ()=>{const mil=ri(1,9),hk=ri(0,9),tk=ri(0,9);const n=mil*1000000+hk*100000+tk*10000;
+    return{d:1,tp:'fill',q:'用數字寫出：'+mil+'百萬'+hk+'十萬'+tk+'萬 = ____',
+      a:String(n),s:['位值：百萬/十萬/萬/千/百/十/個'],sc:1}},
+  // 百萬位位值 (d:1)
+  ()=>{const n=ri(1000000,9999999);
+    return{d:1,tp:'fill',q:n+'的百萬位數字是____。',
+      a:String(Math.floor(n/1000000)),s:['百萬位='+Math.floor(n/1000000)],sc:1}},
+  // 四捨五入至萬 (d:1)
+  ()=>{const n=ri(10000,999999);const r=Math.round(n/10000)*10000;
+    return{d:1,tp:'fill',q:'把'+n+'四捨五入至最接近的萬：____',
+      a:String(r),s:['看千位 '+(Math.floor(n/1000)%10)+'：'+(Math.floor(n/1000)%10>=5?'進萬':'捨去')],sc:1}},
+  // 四捨五入至億 (d:2)
+  ()=>{const n=ri(100000000,999999999);
+    return{d:2,tp:'fill',q:'把'+n+'四捨五入至最接近的億，是____億。',
+      a:String(Math.round(n/100000000)),s:['看千萬位決定進退'],sc:1}},
+  // 由小到大排列 (d:2)
+  ()=>{let a=ri(1,9)*1000000+ri(0,9)*100000,b=ri(1,9)*1000000+ri(0,9)*100000,c=ri(1,9)*1000000+ri(0,9)*100000;
+    while(b===a)b=ri(1,9)*1000000+ri(0,9)*100000;while(c===a||c===b)c=ri(1,9)*1000000+ri(0,9)*100000;
+    const sorted=[a,b,c].sort((x,y)=>x-y);
+    return{d:2,tp:'fill',q:'由小到大排列：'+shuffle([a,b,c]).join('、')+' → ____',
+      a:sorted.join(', '),s:[sorted.join(' < ')],sc:2}},
+  // 人口問題 (d:2)
+  ()=>{const pop=ri(7,8)*1000000+ri(0,9)*100000;const n=nm();
+    return{d:2,tp:'fill',q:'香港人口約'+pop+'人。'+n+'說「約____百萬人」。（四捨五入至百萬）',
+      a:String(Math.round(pop/1000000)),s:[pop+'÷1000000≈'+Math.round(pop/1000000)+'百萬'],sc:2}}
+],
+
 '5N2':[
   ()=>{var d1=pk([3,4,6]),d2=pk([4,6,8]);if(d1===d2)d2=d1*2;var l=lcm(d1,d2);var n1=ri(1,d1-1),n2=ri(1,d2-1);var res=n1*(l/d1)+n2*(l/d2);return{d:1,tp:'calc',q:n1+'/'+d1+' + '+n2+'/'+d2+' = ?',a:fS(res,l),s:['通分母: L.C.M.='+l],sc:2}},
   ()=>{var d1=pk([3,4,6]),d2=pk([4,6,8]);if(d1===d2)d2=d1+2;var l=lcm(d1,d2);var n1=ri(Math.ceil(d1*0.6),d1-1),n2=ri(1,Math.floor(d2*0.4));var v1=n1*(l/d1),v2=n2*(l/d2);if(v1<=v2){n1=d1-1;v1=n1*(l/d1)}return{d:2,tp:'calc',q:n1+'/'+d1+' − '+n2+'/'+d2+' = ?',a:fS(v1-v2,l),s:['通分母後相減'],sc:2}},
@@ -85,7 +116,15 @@ export const grade5={
       q:'____ × '+b+' = '+(product/10).toFixed(1),
       a:(a/10).toFixed(1),
       s:[(product/10).toFixed(1)+' ÷ '+b+' = '+(a/10).toFixed(1)]};
-  }
+  },
+  // ×10 小數點移位 (d:1)
+  ()=>{const a=(ri(1,99)/10).toFixed(1);return{d:1,tp:'calc',q:a+' × 10 = ?',a:String(parseFloat(a)*10),s:['小數點右移1位'],sc:1}},
+  // ÷10 小數點移位 (d:1)
+  ()=>{const a=ri(10,999);return{d:1,tp:'calc',q:a+' ÷ 10 = ?',a:(a/10).toFixed(1),s:['小數點左移1位'],sc:1}},
+  // ×100 / ÷100 (d:2)
+  ()=>{const type=ri(0,1);const raw=ri(1,99);const a=(raw/100).toFixed(2);const b=ri(10,999);
+    if(type===0)return{d:2,tp:'calc',q:a+' × 100 = ?',a:String(raw),s:['小數點右移2位'],sc:1};
+    return{d:2,tp:'calc',q:b+' ÷ 100 = ?',a:(b/100).toFixed(2),s:['小數點左移2位'],sc:1}}
 ],
 '5N5':[
   ()=>{var n1=ri(2,6),d1=pk([3,5,7]),n2=ri(2,4),d2=pk([4,6,8]);return{d:1,tp:'calc',q:n1+'/'+d1+' ÷ '+n2+'/'+d2+' = ?',a:fS(n1*d2,d1*n2),s:['×倒數'],sc:2}},
@@ -97,7 +136,13 @@ export const grade5={
   ()=>{var x=ri(3,12),a=ri(2,6),b=ri(5,20);return{d:2,tp:'calc',q:a+'(x + '+b+') = '+(a*(x+b))+'，x = ?',a:String(x),s:['展開或先÷'+a],sc:2}},
   ()=>{var n=ri(15,30),each=ri(3,8),extra=ri(20,50);var dSchool=pk(CTX.school),dClass=pk(['4A','5B','6C']);return{d:3,tp:'work',q:dSchool+dClass+'班老師買了x本簿(每本$'+each+')和'+extra+'枝筆(每枝$3)，共$'+(n*each+extra*3)+'。買了多少本簿？',a:String(n),trap:'學校和班別',s:['🔍 學校班別無關',each+'x+'+extra*3+'='+(n*each+extra*3),'x='+n],sc:3}},
   /* d:3 — forming equation */
-  ()=>{var x=ri(8,20);var a=ri(2,5);var total=x+a*x;return{d:3,tp:'work',q:nm()+'的年齡是弟弟的'+a+'倍。兩人年齡總和是'+total+'歲。弟弟幾歲？',a:String(x),s:['設弟弟x歲','x+'+a+'x='+total,(a+1)+'x='+total,'x='+x],sc:3}}
+  ()=>{var x=ri(8,20);var a=ri(2,5);var total=x+a*x;return{d:3,tp:'work',q:nm()+'的年齡是弟弟的'+a+'倍。兩人年齡總和是'+total+'歲。弟弟幾歲？',a:String(x),s:['設弟弟x歲','x+'+a+'x='+total,(a+1)+'x='+total,'x='+x],sc:3}},
+  // 代入求值 (d:1)
+  ()=>{const a=ri(2,8),x=ri(3,9);return{d:1,tp:'calc',q:'當 x = '+x+' 時，'+a+'x = ?',a:String(a*x),s:[a+'×'+x+'='+a*x],sc:1}},
+  // 建立代數式 (d:2)
+  ()=>{const price=ri(3,8),items=ri(2,5);
+    return{d:2,tp:'fill',q:'每本練習簿 $'+price+'，買 n 本需要 $____（用n表示）。若 n = '+items+'，需要 $____。',
+      a:price+'n,'+price*items,s:[price+'×n = '+price+'n','代入n='+items+': '+price+'×'+items+'='+price*items],sc:2}}
 ],
 '5M1':[
   ()=>{var b=ri(8,20),h=ri(5,15);return{d:1,tp:'short',q:'求三角形面積。',fig:FIG.tri(b,h),a:String(b*h/2),s:[b+'×'+h+'÷2='+b*h/2],sc:2}},
@@ -167,8 +212,40 @@ export const grade5={
     return{d:3,tp:'work',
       q:'長方形面積是'+area+'cm²，長'+w+'cm。闊是多少cm？',
       a:String(h),s:['闊 = '+area+' ÷ '+w+' = '+h+' cm']};
-  }
+  },
+  // 圓的各部分 (d:1)
+  ()=>{const part=pk([{n:'半徑',d:'從圓心到圓周的線段'},{n:'直徑',d:'通過圓心的最長弦'},{n:'圓心',d:'圓內距圓周等距的點'}]);
+    return{d:1,tp:'mc',q:part.d+'叫做？',isMC:true,
+      opts:[{l:'A',v:'半徑',c:part.n==='半徑'},{l:'B',v:'直徑',c:part.n==='直徑'},{l:'C',v:'圓心',c:part.n==='圓心'}],
+      a:part.n==='半徑'?'A':part.n==='直徑'?'B':'C',s:[part.n+': '+part.d],sc:1}},
+  // 直徑=2×半徑 (d:1)
+  ()=>{const r=ri(3,12);const type=ri(0,1);
+    if(type===0)return{d:1,tp:'calc',q:'半徑'+r+'cm，直徑 = ____cm',a:String(r*2),s:['直徑=2×半徑='+r*2],sc:1};
+    return{d:1,tp:'calc',q:'直徑'+r*2+'cm，半徑 = ____cm',a:String(r),s:['半徑=直徑÷2='+r],sc:1}}
 ],
+
+/* ═══════════ 5S2 立體圖形(二) ═══════════ */
+'5S2':[
+  // 面/棱/頂點 (d:1)
+  ()=>{const solids=[{n:'長方體',f:6,e:12,v:8},{n:'正方體',f:6,e:12,v:8},{n:'三角柱',f:5,e:9,v:6},{n:'四角錐',f:5,e:8,v:5}];
+    const s=pk(solids);const prop=pk(['面','棱','頂點']);const ans={面:s.f,棱:s.e,頂點:s.v};
+    return{d:1,tp:'fill',q:s.n+'有____個'+prop+'。',a:String(ans[prop]),s:[s.n+': '+s.f+'面, '+s.e+'棱, '+s.v+'頂點'],sc:1}},
+  // 截面 (d:2)
+  ()=>({d:2,tp:'mc',q:'用平面切割一個正方體，截面可以是什麼形狀？',isMC:true,
+    opts:[{l:'A',v:'只有正方形',c:false},{l:'B',v:'正方形或長方形',c:true},{l:'C',v:'三角形',c:false}],
+    a:'B',s:['平行於面 → 正方形或長方形'],sc:2}),
+  // 展開圖 (d:1)
+  ()=>({d:1,tp:'fill',q:'正方體的展開圖有____個正方形面。',a:'6',s:['正方體6個面 → 展開圖有6個正方形'],sc:1}),
+  // 球體特性 (d:1)
+  ()=>({d:1,tp:'mc',q:'以下關於球體哪項是正確的？',isMC:true,
+    opts:[{l:'A',v:'有頂點',c:false},{l:'B',v:'沒有平的面',c:true},{l:'C',v:'有12條棱',c:false}],
+    a:'B',s:['球體沒有平面、棱或頂點'],sc:1}),
+  // 由展開圖識別立體 (d:3)
+  ()=>({d:3,tp:'mc',q:'一個立體圖形展開後有2個圓形和1個長方形，原本是什麼？',isMC:true,
+    opts:[{l:'A',v:'圓錐體',c:false},{l:'B',v:'圓柱體',c:true},{l:'C',v:'球體',c:false}],
+    a:'B',s:['圓柱展開 = 2個圓形 + 1個長方形（側面）'],sc:2})
+],
+
 '5D1':[
   ()=>{var a1=ri(150,300),a2=ri(100,250),b1=ri(120,280),b2=ri(130,260);var items=[{l:'男A',v:a1},{l:'女A',v:a2},{l:'男B',v:b1},{l:'女B',v:b2}];var totalA=a1+a2,totalB=b1+b2;return{d:2,tp:'short',q:'棒形圖：A校和B校共多少人？哪校較多？多多少？',fig:FIG.bars(items),a:(totalA+totalB)+','+(totalA>totalB?'A校':'B校')+','+Math.abs(totalA-totalB),s:['A: '+totalA,'B: '+totalB],sc:3}},
   ()=>{var items=[{l:'一月',v:ri(100,200)},{l:'二月',v:ri(80,180)},{l:'三月',v:ri(120,250)},{l:'四月',v:ri(90,200)}];var total=items.reduce((s,i)=>s+i.v,0);var avg=Math.round(total/4);return{d:3,tp:'short',q:'棒形圖顯示四個月銷量。平均銷量是多少？哪個月最接近平均值？',fig:FIG.bars(items),a:avg+','+items.reduce((c,i)=>Math.abs(i.v-avg)<Math.abs(c.v-avg)?i:c,items[0]).l,s:['平均: '+avg,'逐一比較差距'],sc:3}}

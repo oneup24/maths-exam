@@ -6,6 +6,37 @@ All notable changes to **Maths Quests** (數學特訓).
 
 ## [v1.3-beta] — 2026-04-18
 
+### feat: full EDB curriculum audit — 10 new topics, ~60 new generators (all grades)
+Audited engine against 4 HK EDB reference PDFs (`docs/reference/`): KS1 2018, KS2 2020, pmc2017, ME_KLACG 2017.
+
+**New topic modules added:**
+- P2: generators for `2N5` (fractions — halves/thirds/quarters), `2N6` (division with remainder), `2D1` (bar charts + pictographs)
+- P3: `3N1` (large numbers to 100,000, rounding to 千/萬), `3N6` (decimals — tenths), `3D2` (line graphs — read, total, trend)
+- P4: `4S2` (shape partition/assembly, tessellation), `4S3` (8 compass directions — N/S/E/W + NE/SE/NW/SW)
+- P5: `5N1` (large numbers — 百萬/億, place value, rounding), `5S2` (3D solids — faces/edges/vertices, cross-sections, nets)
+- P6: `6N2` (fraction↔decimal conversions, mixed ordering), `6M2` (volume II — cuboid formula, water displacement), `6D4` (statistics application — choose graph type, misleading graphs, sample size)
+
+**Enhancements to existing topics:**
+- `4N3`: +3 generators for prime/composite identification (including "1 is neither") and prime listing
+- `4N5`: +2 generators for distributive property expand/factor
+- `4S1`: +2 generators for rhombus properties
+- `5A`: +2 generators for algebraic expression evaluation and formation
+- `5N4`: +3 generators for ×10/÷10/×100/÷100 decimal point shift
+- `5S1`: +2 generators for circle part identification (半徑/直徑/圓心) and diameter↔radius conversion
+- `6A1`: +2 generators for bracket equations `a(x+b)=c` and grouped terms `dx+ex=c`
+- `6D34[0]`: wired `FIG.pie()` figure into the pie chart recognition question
+
+**Updated generator counts:**
+- grade2.js: 5→8 topics, 17→32 generators; `FIG` added to imports
+- grade3.js: 7→10 topics, 28→41 generators; `shuffle`, `FIG` added to imports
+- grade4.js: 11→13 topics, 65→82 generators; `shuffle`, `_nm2` added to imports
+- grade5.js: 9→11 topics, 38→56 generators; `shuffle` added to imports
+- grade6.js: 11→14 topics, 42→63 generators; `gcd`, `shuffle` added to imports
+
+**config.js:** Registered all 10 new topic keys in `TOPICS` (P3–P6 additions)
+
+---
+
 ### refactor: extract engine.js into modular src/engine/ (Phases 1–9)
 - **Phase 1** (f3293e7): `core.js` — 7 utilities (`ri, pk, gcd, lcm, fOf, fS, shuffle`), `chkAns`, SVG helpers (`SV`×7, `FIG`×9); private: `norm, stripU, parseFrac`
 - **Phase 2** (e385051): `config.js` — `TOPICS, GRADE_INFO, DIFF_INFO, DIFF_ALLOW, EXAM_TARGETS, SECT_*`; CTX pools; 7 helpers (`nm, pl, fd, it, _nm2, _pl, _it`)

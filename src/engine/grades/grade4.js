@@ -2,8 +2,8 @@
  * grade4.js — P4 question generators
  * Extracted from engine.js
  */
-import { ri, pk, fOf, lcm, gcd, fS, FIG } from '../core.js';
-import { nm, pl, CTX, _it, _pl } from '../config.js';
+import { ri, pk, fOf, lcm, gcd, fS, shuffle, FIG } from '../core.js';
+import { nm, pl, CTX, _it, _pl, _nm2 } from '../config.js';
 
 export const grade4={
 '4N1':[
@@ -142,7 +142,21 @@ export const grade4={
       a:String(correct),
       s:['先算乘: '+b+'×'+c+' = '+(b*c),
          '再算減: '+a+' − '+(b*c)+' = '+correct]};
-  }
+  },
+  // 質數識別 (d:1)
+  ()=>{const primes=[2,3,5,7,11,13,17,19];const composites=[4,6,8,9,10,12,14,15,16,18];
+    const ip=ri(0,1);const n=ip?pk(primes):pk(composites);
+    return{d:1,tp:'mc',q:n+'是質數（素數）還是合數？',isMC:true,
+      opts:[{l:'A',v:'質數（素數）',c:ip===1},{l:'B',v:'合數',c:ip===0},{l:'C',v:'既非質數也非合數',c:false}],
+      a:ip?'A':'B',s:[n+(ip?'：只有1和本身兩個因數，是質數':'：有多於2個因數，是合數')],sc:1}},
+  // 1的特殊性 (d:1)
+  ()=>({d:1,tp:'mc',q:'1是質數嗎？',isMC:true,
+    opts:[{l:'A',v:'是，1是質數',c:false},{l:'B',v:'不是，1只有一個因數',c:true},{l:'C',v:'1是合數',c:false}],
+    a:'B',s:['1只有一個因數，既不是質數也不是合數'],sc:1}),
+  // 列出質數 (d:2)
+  ()=>{const limit=pk([10,15,20]);const ps=[];for(let i=2;i<=limit;i++){let ok=true;for(let j=2;j*j<=i;j++)if(i%j===0){ok=false;break}if(ok)ps.push(i)}
+    return{d:2,tp:'fill',q:'列出'+limit+'以內（包括'+limit+'）的所有質數：____',
+      a:ps.join(','),s:['質數只有1和本身兩個因數','答案：'+ps.join(', ')],sc:2}}
 ],
 '4N4':[
   ()=>{var a=pk([6,8,9,12]),b=pk([8,10,12,15]);return{d:1,tp:'fill',q:a+'和'+b+'的L.C.M.是____',a:String(lcm(a,b)),s:['列出倍數'],sc:2}},
@@ -155,7 +169,15 @@ export const grade4={
   ()=>{var a=ri(30,80),b=ri(15,40),c=ri(5,12);return{d:1,tp:'calc',q:'('+a+' + '+b+') × '+c+' = ?',a:String((a+b)*c),s:['括號先算'],sc:2}},
   ()=>{for(var i=0;i<50;i++){var a=ri(100,300),b=ri(20,60),c=ri(5,9),d=ri(10,30);if(a-b*c>=0)return{d:2,tp:'calc',q:a+' − '+b+' × '+c+' + '+d+' = ?',a:String(a-b*c+d),s:['先乘後加減'],sc:2}}var fa=300,fb=20,fc=5,fd=10;return{d:2,tp:'calc',q:fa+' − '+fb+' × '+fc+' + '+fd+' = ?',a:String(fa-fb*fc+fd),s:['先乘後加減'],sc:2}},
   ()=>{var small=ri(15,25),big=small+ri(3,8),n=ri(200,350);var dMember=ri(1000,5000),dOpen=ri(8,22);return{d:2,tp:'work',q:'超市有會員'+dMember+'人，每日營業'+dOpen+'小時。細包裝每包$'+small+'，大包裝比細包裝貴$'+(big-small)+'。各買'+n+'包需付多少元？',a:String((small+big)*n),trap:'會員數和營業時間',s:['🔍 會員和營業時間無關','大: '+big,'兩種×'+n+': '+(small+big)*n],sc:3}},
-  ()=>{var girls=ri(20,40),leave=ri(3,10),ratio=ri(10,20);var dArea=ri(100,300);return{d:3,tp:'work',q:'禮堂面積'+dArea+'平方米，有女學生'+girls+'人。'+leave+'人離開後，男學生是餘下女學生的'+ratio+'倍。男學生有多少人？',a:String((girls-leave)*ratio),trap:'禮堂面積',s:['🔍 面積無關','餘下: '+(girls-leave),'男: '+(girls-leave)*ratio],sc:3}}
+  ()=>{var girls=ri(20,40),leave=ri(3,10),ratio=ri(10,20);var dArea=ri(100,300);return{d:3,tp:'work',q:'禮堂面積'+dArea+'平方米，有女學生'+girls+'人。'+leave+'人離開後，男學生是餘下女學生的'+ratio+'倍。男學生有多少人？',a:String((girls-leave)*ratio),trap:'禮堂面積',s:['🔍 面積無關','餘下: '+(girls-leave),'男: '+(girls-leave)*ratio],sc:3}},
+  // 分配律：展開 (d:1)
+  ()=>{const a=ri(3,9),b=ri(10,30),c=ri(5,20);
+    return{d:1,tp:'fill',q:a+' × ('+b+' + '+c+') = '+a+' × ____ + '+a+' × ____',
+      a:b+','+c,s:['分配律: '+a+'×('+b+'+'+c+') = '+a+'×'+b+'+'+a+'×'+c+' = '+(a*(b+c))],sc:1}},
+  // 分配律：提取公因數 (d:2)
+  ()=>{const a=ri(3,8),b=ri(10,25),c=ri(5,15);
+    return{d:2,tp:'fill',q:a+' × '+b+' + '+a+' × '+c+' = '+a+' × (____)',
+      a:b+'+'+c,s:['提取公因數'+a,'= '+a+'×'+(b+c)+' = '+(a*(b+c))],sc:2}}
 ],
 '4N6':[
   ()=>{var n=ri(10,25),den=ri(3,7);var w=Math.floor(n/den),r=n%den;return{d:1,tp:'fill',q:n+'/'+den+' 化為帶分數 = ____',a:r===0?String(w):w+'又'+r+'/'+den,s:['假分數÷分母'],sc:2}},
@@ -346,14 +368,68 @@ export const grade4={
       a:h+','+(w*h),
       s:['闊 = '+peri+'÷2 − '+w+' = '+h+' cm',
          '面積 = '+w+'×'+h+' = '+(w*h)+' cm²']};
-  }
+  },
+  // 菱形特性 (d:1)
+  ()=>({d:1,tp:'mc',q:'菱形的特別之處是什麼？',isMC:true,
+    opts:[{l:'A',v:'四個直角',c:false},{l:'B',v:'四條等長的邊',c:true},{l:'C',v:'只有兩對平行邊',c:false}],
+    a:'B',s:['菱形四條邊等長，兩對對邊平行'],sc:1}),
+  // 菱形與正方形比較 (d:2)
+  ()=>({d:2,tp:'mc',q:'正方形和菱形的共同特點是什麼？',isMC:true,
+    opts:[{l:'A',v:'四個直角',c:false},{l:'B',v:'四條等長的邊',c:true},{l:'C',v:'只有兩條對稱軸',c:false}],
+    a:'B',s:['兩者都有四條等長的邊；正方形有4個直角，菱形不一定'],sc:2})
 ],
+
+/* ═══════════ 4S2 圖形的分割與拼合 ═══════════ */
+'4S2':[
+  // 對角線分割正方形 (d:1)
+  ()=>({d:1,tp:'mc',q:'一個正方形用對角線分割，可以得到兩個什麼形狀？',isMC:true,
+    opts:[{l:'A',v:'兩個三角形',c:true},{l:'B',v:'兩個長方形',c:false},{l:'C',v:'兩個正方形',c:false}],
+    a:'A',s:['對角線把正方形分成2個全等三角形'],sc:1}),
+  // 長方形對角線 (d:1)
+  ()=>({d:1,tp:'fill',q:'把一個長方形沿對角線剪開，可以得到____個三角形。',a:'2',s:['對角線把長方形分成2個全等三角形'],sc:1}),
+  // 拼合三角形 (d:2)
+  ()=>({d:2,tp:'mc',q:'兩個完全一樣的直角三角形可以拼成什麼形狀？',isMC:true,
+    opts:[{l:'A',v:'正方形或長方形',c:true},{l:'B',v:'圓形',c:false},{l:'C',v:'梯形',c:false}],
+    a:'A',s:['兩個全等直角三角形可拼成正方形或長方形'],sc:1}),
+  // 密鋪 (d:2)
+  ()=>({d:2,tp:'mc',q:'以下哪種形狀可以獨立密鋪平面？',isMC:true,
+    opts:[{l:'A',v:'圓形',c:false},{l:'B',v:'正六邊形',c:true},{l:'C',v:'正五邊形',c:false}],
+    a:'B',s:['正三角形、正方形、正六邊形可密鋪；正五邊形和圓形不可'],sc:2}),
+  // 三角形面積（由長方形得） (d:3)
+  ()=>{const w=ri(6,12),h=ri(4,8);const area=w*h;
+    return{d:3,tp:'work',q:'把長'+w+'cm、闊'+h+'cm的長方形沿對角線分成兩個三角形，每個三角形面積是多少cm²？',
+      a:String(area/2),s:['長方形面積='+w+'×'+h+'='+area,'每個三角形='+area+'÷2='+area/2],sc:2}}
+],
+
+/* ═══════════ 4S3 方向和位置(二)——八個方位 ═══════════ */
+'4S3':[
+  // 相反方向 (d:1)
+  ()=>{const dirs=['東','西','南','北'];const d=pk(dirs);const opp={東:'西',西:'東',南:'北',北:'南'};
+    return{d:1,tp:'fill',q:d+'的相反方向是____。',a:opp[d],s:['相反方向: 東↔西, 南↔北'],sc:1}},
+  // 間方位名稱 (d:1)
+  ()=>{const combos=[{q:'東和北之間',a:'東北'},{q:'東和南之間',a:'東南'},{q:'西和北之間',a:'西北'},{q:'西和南之間',a:'西南'}];
+    const c=pk(combos);return{d:1,tp:'fill',q:c.q+'的方向叫____。',a:c.a,s:['八個方位: 東/南/西/北/東北/東南/西北/西南'],sc:1}},
+  // 地圖方向推斷 (d:2)
+  ()=>{const places=['學校','公園','超市','圖書館'];const [p1,p2,p3]=shuffle(places).slice(0,3);
+    return{d:2,tp:'fill',q:p1+'在地圖中央。'+p2+'在'+p1+'的正東，'+p3+'在'+p1+'的正北。'+p3+'在'+p2+'的____方向。',
+      a:'西北',s:[p2+'在東，'+p3+'在北，所以'+p3+'在'+p2+'的西北'],sc:2}},
+  // 方格移動 (d:2)
+  ()=>{const [a,b]=_nm2();const steps=pk([2,3,4]);const dir=pk(['東北','東南','西北','西南']);
+    return{d:2,tp:'fill',q:a+'站在地圖中心，'+b+'在'+a+'的'+dir+'方向'+steps+'格。從'+a+'向'+dir+'走'+steps+'格到達____。',
+      a:b,s:[dir+'方向走'+steps+'格'],sc:1}},
+  // 多步方向 (d:3)
+  ()=>{const n=nm();const d1=pk(['東','西']),d2=pk(['北','南']);const s1=ri(2,5),s2=ri(2,4);
+    const opp={東:'東',西:'西'};const oppv={北:'北',南:'南'};
+    return{d:3,tp:'work',q:n+'從學校出發，先向'+d1+'走'+s1+'格，再向'+d2+'走'+s2+'格。現在在學校的____方向。',
+      a:opp[d1]+oppv[d2],s:['向'+d1+'再向'+d2+'= '+opp[d1]+oppv[d2]+'方向'],sc:2}}
+],
+
 '4D1':[
   ()=>{var items=[{l:'中文',v:ri(40,90)},{l:'英文',v:ri(35,85)},{l:'數學',v:ri(45,95)},{l:'常識',v:ri(30,75)}];var total=items.reduce((s,i)=>s+i.v,0);var mx=items.reduce((m,i)=>i.v>m.v?i:m,items[0]);var dTestTime=ri(30,60);return{d:2,tp:'short',q:'棒形圖（測驗時間'+dTestTime+'分鐘）。四科合共多少分？最高分是哪科？',fig:FIG.bars(items),a:total+','+mx.l,trap:'測驗時間',s:['🔍 測驗時間無關','總: '+total,'最高: '+mx.l],sc:3}},
   ()=>{var items=[{l:'A班',v:ri(30,45)},{l:'B班',v:ri(25,40)},{l:'C班',v:ri(35,50)}];var avg=Math.round(items.reduce((s,i)=>s+i.v,0)/items.length);return{d:3,tp:'short',q:'棒形圖顯示三班成績。平均分是多少？（四捨五入至整數）',fig:FIG.bars(items),a:String(avg),s:['三班總÷3='+avg],sc:3}}
 ]
 };
 
-// Topics: 4N1, 4N2, 4N3, 4N4, 4N5, 4N6, 4N78, 4M1, 4M2, 4S1, 4D1
-// Export: grade4 (object with 11 topic keys)
-// Total generators: 65
+// Topics: 4N1, 4N2, 4N3, 4N4, 4N5, 4N6, 4N78, 4M1, 4M2, 4S1, 4S2, 4S3, 4D1
+// Export: grade4 (object with 13 topic keys)
+// Total generators: 82
