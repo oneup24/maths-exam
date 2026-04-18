@@ -2,7 +2,7 @@ import React from 'react';
 import {motion} from 'framer-motion';
 import {Star} from 'lucide-react';
 import {GC} from '../../lib/colors';
-import {GRADE_INFO,TOPICS} from '../../lib/engine';
+import {GRADE_INFO,TOPICS} from '../../engine/index';
 
 export default function GradeCard({grade,best,onClick,L,delay=0}){
   var stars=best>=80?3:best>=60?2:best>=40?1:0;

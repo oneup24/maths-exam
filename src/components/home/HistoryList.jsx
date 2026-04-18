@@ -3,7 +3,7 @@ import React from 'react';
 import {motion} from 'framer-motion';
 import {History,Trash2} from 'lucide-react';
 import {GCL} from '../../lib/colors';
-import {GRADE_INFO,DIFF_INFO} from '../../lib/engine';
+import {GRADE_INFO,DIFF_INFO} from '../../engine/index';
 
 export default function HistoryList({history,onClear,L}){
   return(

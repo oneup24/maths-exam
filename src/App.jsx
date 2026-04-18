@@ -7,7 +7,7 @@ import Profile from './Profile';
 // eslint-disable-next-line no-unused-vars -- motion is used as <motion.div> in JSX
 import {motion,AnimatePresence} from 'framer-motion';
 import {Eye,ChevronDown,ChevronUp,X,Check,AlertTriangle,Settings,Volume2,VolumeX,Globe} from 'lucide-react';
-import {TOPICS,GRADE_INFO,DIFF_INFO,buildExam,printExam,chkAns,saveHistory,loadHistory,clearHistory} from './lib/engine';
+import {TOPICS,GRADE_INFO,DIFF_INFO,buildExam,printExam,chkAns,saveHistory,loadHistory,clearHistory} from './engine/index';
 import {t} from './lib/i18n';
 import { useAuth } from './hooks/useAuth';
 import { saveExamResult } from './services/api';

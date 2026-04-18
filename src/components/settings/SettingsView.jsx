@@ -3,7 +3,7 @@ import React from 'react';
 import {motion,AnimatePresence,LayoutGroup} from 'framer-motion';
 import {ArrowLeft,BookOpen,Check} from 'lucide-react';
 import {GC,GCL,CAT_COLORS,DIFF_COLORS} from '../../lib/colors';
-import {TOPICS,GRADE_INFO,DIFF_INFO} from '../../lib/engine';
+import {TOPICS,GRADE_INFO,DIFF_INFO} from '../../engine/index';
 import PageShell from '../ui/PageShell';
 
 export default function SettingsView({grade,difficulty,setDifficulty,selTopics,toggleTopic,toggleAll,examType,setExamType,useTimer,setUseTimer,timerMins,setTimerMins,generate,onBack,L}){

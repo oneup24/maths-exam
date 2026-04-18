@@ -1,7 +1,7 @@
 import React from 'react';
 import {ArrowLeft,Play,Pause,AlertTriangle} from 'lucide-react';
 import {GCL,DIFF_BADGE} from '../../lib/colors';
-import {DIFF_INFO} from '../../lib/engine';
+import {DIFF_INFO} from '../../engine/index';
 
 export default function ExamHeader({grade,co,difficulty,totalQs,grandTotal,trapCount,useTimer,isMarked,running,setRunning,timeLeft,fmt,answeredQs,onBack,L,lang}){
   return(
