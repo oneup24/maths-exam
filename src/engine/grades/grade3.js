@@ -48,7 +48,7 @@ export const grade3={
       ()=>_pl()+'有'+b+'排座位，每排'+a+'個。共有多少個座位？',
       ()=>'每盒有'+a+'塊餅乾，'+nm()+'買了'+b+'盒。共有多少塊？'
     ];
-    return{d:1,tp:'work',q:pk(t)(),a:String(ans),s:[a+'×'+b+'='+ans]};
+    return{d:1,tp:'work',q:pk(t)(),a:String(ans),s:[a+'×'+b+'='+ans],sc:2};
   },
   ()=>{
     var a=ri(2,9),b=ri(2,9),ans=a*b;
@@ -57,7 +57,7 @@ export const grade3={
       ()=>_pl()+'每行種了'+a+'棵花，共'+b+'行。一共有多少棵？',
       ()=>'一包有'+a+'粒朱古力，'+nm()+'買了'+b+'包。一共有多少粒？'
     ];
-    return{d:1,tp:'work',q:pk(t)(),a:String(ans),s:[a+'×'+b+'='+ans]};
+    return{d:1,tp:'work',q:pk(t)(),a:String(ans),s:[a+'×'+b+'='+ans],sc:2};
   }
 ],
 '3N4':[
@@ -72,7 +72,7 @@ export const grade3={
     var a=ri(2,9),b=ri(2,9),p=a*b,it=_it();
     return{d:2,tp:'work',
       q:nm()+'共有'+p+it.u+it.n+'，每份'+a+it.u+'。可以分成多少份？',
-      a:String(b),s:[p+'÷'+a+'='+b]};
+      a:String(b),s:[p+'÷'+a+'='+b],sc:3};
   }
 ],
 '3N5':[

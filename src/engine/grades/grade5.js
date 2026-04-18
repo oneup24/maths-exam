@@ -57,7 +57,7 @@ export const grade5={
       a:who+','+diff,
       s:[ns[0]+'班: '+p.nA+'÷'+p.dA+' = '+abA+'人',
          ns[1]+'班: '+p.nB+'÷'+p.dB+' = '+abB+'人',
-         who+'班多'+diff+'人']};
+         who+'班多'+diff+'人'],sc:3};
   },
   /* _addQ Phase 2 — reverse: find missing fraction (line 938) */
   ()=>{
@@ -69,7 +69,7 @@ export const grade5={
     return{d:3,tp:'calc',
       q:fS(sumV,l)+' − '+n1+'/'+d1+' = ?',
       a:fS(n2*(l/d2),l),
-      s:['通分母後相減']};
+      s:['通分母後相減'],sc:2};
   },
   /* _addQ Phase 2 — comparison in context (line 966) */
   ()=>{
@@ -86,7 +86,7 @@ export const grade5={
       a:who,
       s:['通分母 L.C.M.='+l,
          ns[0]+': '+v1+'/'+l,
-         ns[1]+': '+v2+'/'+l]};
+         ns[1]+': '+v2+'/'+l],sc:3};
   }
 ],
 '5N3':[
@@ -102,7 +102,7 @@ export const grade5={
       ()=>'一條繩長'+ad+'m，另一條長'+bd+'m。兩條共長多少m？',
       ()=>nm()+'早上跑了'+ad+'km，下午跑了'+bd+'km。全日共跑多少km？'
     ];
-    return{d:2,tp:'work',q:pk(t)(),a:sd,s:[ad+' + '+bd+' = '+sd]};
+    return{d:2,tp:'work',q:pk(t)(),a:sd,s:[ad+' + '+bd+' = '+sd],sc:3};
   }
 ],
 '5N4':[
@@ -115,7 +115,7 @@ export const grade5={
     return{d:3,tp:'calc',
       q:'____ × '+b+' = '+(product/10).toFixed(1),
       a:(a/10).toFixed(1),
-      s:[(product/10).toFixed(1)+' ÷ '+b+' = '+(a/10).toFixed(1)]};
+      s:[(product/10).toFixed(1)+' ÷ '+b+' = '+(a/10).toFixed(1)],sc:2};
   },
   // ×10 小數點移位 (d:1)
   ()=>{const a=(ri(1,99)/10).toFixed(1);return{d:1,tp:'calc',q:a+' × 10 = ?',a:String(parseFloat(a)*10),s:['小數點右移1位'],sc:1}},
@@ -156,7 +156,7 @@ export const grade5={
       q:nm()+'做兼職，時薪$'+rate+'。由'+start_h+':00工作至'+end_h+':00。共賺多少錢？',
       a:String(rate*hours),
       s:['工時: '+end_h+' − '+start_h+' = '+hours+' 小時',
-         '工資: $'+rate+' × '+hours+' = $'+(rate*hours)]};
+         '工資: $'+rate+' × '+hours+' = $'+(rate*hours)],sc:3};
   },
   /* _addQ Phase 2 — reverse: find triangle height (line 906) */
   ()=>{
@@ -164,7 +164,7 @@ export const grade5={
     return{d:3,tp:'work',
       q:'三角形面積是'+area+'cm²，底是'+b+'cm。高是多少cm？',
       a:String(h),
-      s:['高 = '+area+'×2÷'+b+' = '+h]};
+      s:['高 = '+area+'×2÷'+b+' = '+h],sc:3};
   },
   // 已知梯形面積求高
   ()=>{
@@ -172,7 +172,7 @@ export const grade5={
     return{d:3,tp:'work',
       q:'梯形面積是'+area+'cm²，上底'+a+'cm，下底'+b2+'cm。高是多少cm？',
       a:String(h),
-      s:['高 = '+area+'×2÷('+a+'+'+b2+') = '+h]};
+      s:['高 = '+area+'×2÷('+a+'+'+b2+') = '+h],sc:3};
   },
   /* _addQ Phase 2 — comparison: triangle vs rectangle (line 986) */
   ()=>{
@@ -184,7 +184,7 @@ export const grade5={
       q:'三角形底'+tb+'cm高'+th+'cm，長方形長'+rw+'cm闊'+rh+'cm。哪個面積較大？大多少cm²？',
       a:bigger+','+diff,
       s:['三角形: '+tb+'×'+th+'÷2 = '+tArea,
-         '長方形: '+rw+'×'+rh+' = '+rArea]};
+         '長方形: '+rw+'×'+rh+' = '+rArea],sc:3};
   }
 ],
 '5M2':[
@@ -200,7 +200,7 @@ export const grade5={
       q:'長方體體積'+vol+'cm³，長'+l+'cm、闊'+w+'cm。高是多少cm？表面積呢？',
       a:h+','+sa,
       s:['高 = '+vol+'÷'+l+'÷'+w+' = '+h,
-         '表面積 = 2×('+l*w+'+'+l*h+'+'+w*h+') = '+sa]};
+         '表面積 = 2×('+l*w+'+'+l*h+'+'+w*h+') = '+sa],sc:3};
   }
 ],
 '5S1':[
@@ -211,7 +211,7 @@ export const grade5={
     var w=ri(5,15),h=ri(3,12),area=w*h;
     return{d:3,tp:'work',
       q:'長方形面積是'+area+'cm²，長'+w+'cm。闊是多少cm？',
-      a:String(h),s:['闊 = '+area+' ÷ '+w+' = '+h+' cm']};
+      a:String(h),s:['闊 = '+area+' ÷ '+w+' = '+h+' cm'],sc:3};
   },
   // 圓的各部分 (d:1)
   ()=>{const part=pk([{n:'半徑',d:'從圓心到圓周的線段'},{n:'直徑',d:'通過圓心的最長弦'},{n:'圓心',d:'圓內距圓周等距的點'}]);

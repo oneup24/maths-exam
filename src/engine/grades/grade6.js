@@ -18,7 +18,7 @@ export const grade6={
       ()=>'一批貨物共'+total+'箱，已運走'+pct+'%。運走了多少箱？',
       ()=>nm()+'有$'+total+'，花了'+pct+'%買書。花了多少錢？'
     ];
-    return{d:2,tp:'work',q:pk(t)(),a:String(ans),s:[total+' × '+pct+'% = '+ans]};
+    return{d:2,tp:'work',q:pk(t)(),a:String(ans),s:[total+' × '+pct+'% = '+ans],sc:3};
   },
   /* _addQ Strategy 2 — reverse: find original from discounted (line 548) */
   ()=>{
@@ -28,7 +28,7 @@ export const grade6={
     return{d:3,tp:'work',
       q:'一個書包打'+disc.zh+'後售$'+price+'。原價是多少？',
       a:String(orig),
-      s:['打'+disc.zh+' = ×'+disc.m,'原價 = $'+price+' ÷ '+disc.m+' = $'+orig]};
+      s:['打'+disc.zh+' = ×'+disc.m,'原價 = $'+price+' ÷ '+disc.m+' = $'+orig],sc:3};
   },
   /* _addQ Strategy 3 — comparison: A vs B store discount (line 602) */
   ()=>{
@@ -44,7 +44,7 @@ export const grade6={
       a:cheaper+','+diff,
       s:['A: $'+orig+'×'+disc.m+' = $'+priceA,
          'B: $'+orig+' − $'+reducB+' = $'+priceB,
-         cheaper+'便宜$'+diff]};
+         cheaper+'便宜$'+diff],sc:3};
   },
   /* _addQ Phase 2 — area percentage (line 783) */
   ()=>{
@@ -54,7 +54,7 @@ export const grade6={
       q:'一塊長'+w+'m、闊'+h+'m的空地，其中'+pct+'%建花園。花園面積多少m²？',
       a:String(garden),
       s:['空地 = '+w+'×'+h+' = '+totalArea+' m²',
-         '花園 = '+totalArea+' × '+pct+'% = '+garden+' m²']};
+         '花園 = '+totalArea+' × '+pct+'% = '+garden+' m²'],sc:3};
   }
 ],
 '6N2':[
@@ -97,7 +97,7 @@ export const grade6={
       s:['共 '+(r1+r2)+' 份',
          '每份: $'+total+' ÷ '+(r1+r2)+' = $'+unit,
          ns[0]+': $'+unit+'×'+r1+' = $'+a1,
-         ns[1]+': $'+unit+'×'+r2+' = $'+a2]};
+         ns[1]+': $'+unit+'×'+r2+' = $'+a2],sc:3};
   },
   /* _addQ Phase 2 — reverse: find original from discounted price (line 1003) */
   ()=>{
@@ -107,7 +107,7 @@ export const grade6={
       q:'商品減價'+pct+'%後售$'+sale+'。原價是多少？',
       a:String(orig),
       s:['售價 = 原價 × '+(100-pct)+'%',
-         '原價 = $'+sale+' ÷ '+((100-pct)/100)+' = $'+orig]};
+         '原價 = $'+sale+' ÷ '+((100-pct)/100)+' = $'+orig],sc:3};
   },
   // 已知加價後售價求成本
   ()=>{
@@ -116,7 +116,7 @@ export const grade6={
     return{d:3,tp:'work',
       q:'商品加價'+markup+'%後售$'+sell+'。成本是多少？',
       a:String(orig),
-      s:['成本 = $'+sell+' ÷ '+((100+markup)/100)+' = $'+orig]};
+      s:['成本 = $'+sell+' ÷ '+((100+markup)/100)+' = $'+orig],sc:3};
   },
   /* _addQ Phase 2 — comparison: compare price increases (line 1067) */
   ()=>{
@@ -129,7 +129,7 @@ export const grade6={
       q:'A商品$'+origA+'加價'+upA+'%，B商品$'+origB+'加價'+upB+'%。哪件實際加幅較大？大多少元？',
       a:who+','+diff,
       s:['A加: $'+incA,'B加: $'+incB,
-         who+'大$'+diff]};
+         who+'大$'+diff],sc:3};
   }
 ],
 '6A1':[
@@ -187,7 +187,7 @@ export const grade6={
     return{d:2,tp:'work',
       q:nm()+'開車行了'+d+'km，用了'+t+'小時。平均速率是多少km/h？',
       a:String(s),
-      s:['速率 = '+d+'÷'+t+' = '+s+' km/h']};
+      s:['速率 = '+d+'÷'+t+' = '+s+' km/h'],sc:3};
   },
   /* _addQ Phase 2 — comparison: compare speeds (line 1083) */
   ()=>{
@@ -200,7 +200,7 @@ export const grade6={
       q:ns[0]+'行了'+dA+'km用了'+tA+'小時。'+ns[1]+'行了'+dB+'km用了'+tB+'小時。誰較快？快多少km/h？',
       a:faster+','+diff,
       s:[ns[0]+': '+dA+'÷'+tA+' = '+sA+' km/h',
-         ns[1]+': '+dB+'÷'+tB+' = '+sB+' km/h']};
+         ns[1]+': '+dB+'÷'+tB+' = '+sB+' km/h'],sc:3};
   }
 ],
 '6M5':[
@@ -213,7 +213,7 @@ export const grade6={
       q:'圓的面積是'+area.toFixed(2)+'cm²。半徑是多少cm？(π=3.14)',
       a:String(r),
       s:['r² = '+area.toFixed(2)+' ÷ 3.14 = '+r*r,
-         'r = '+r+' cm']};
+         'r = '+r+' cm'],sc:3};
   },
   /* _addQ Phase 2 — comparison: circle vs square area (line 1099) */
   ()=>{
@@ -225,7 +225,7 @@ export const grade6={
       a:diff.toFixed(2),
       s:['正方形: '+sq+'×'+sq+' = '+sArea,
          '圓: 3.14×'+r+'×'+r+' = '+cArea.toFixed(2),
-         '差: '+diff.toFixed(2)]};
+         '差: '+diff.toFixed(2)],sc:3};
   }
 ],
 '6S1':[
@@ -249,7 +249,7 @@ export const grade6={
       a:String(need),
       s:['現有總分: '+sum,
          '目標總分: '+targetAvg+'×'+(n+1)+' = '+targetAvg*(n+1),
-         '需要: '+need+'分']};
+         '需要: '+need+'分'],sc:3};
   }
 ],
 '6D2':[

@@ -21,7 +21,7 @@ export const grade4={
       ()=>nm()+'每月儲蓄$'+a+'，'+b+'個月後共儲了多少？',
       ()=>'每層有'+a+'級樓梯，大廈共'+b+'層。全部共多少級？'
     ];
-    return{d:2,tp:'work',q:pk(t)(),a:String(ans),s:[a+'×'+b+'='+ans]};
+    return{d:2,tp:'work',q:pk(t)(),a:String(ans),s:[a+'×'+b+'='+ans],sc:3};
   },
   ()=>{
     var b=ri(3,9),q=ri(3,12),a=b*q,it=_it();
@@ -30,7 +30,7 @@ export const grade4={
       ()=>a+'粒糖果，每袋裝'+b+'粒。可裝多少袋？',
       ()=>_pl()+'有'+a+'張椅子，每行放'+b+'張。共有多少行？'
     ];
-    return{d:2,tp:'work',q:pk(t)(),a:String(q),s:[a+'÷'+b+'='+q]};
+    return{d:2,tp:'work',q:pk(t)(),a:String(q),s:[a+'÷'+b+'='+q],sc:3};
   },
   /* _addQ Strategy 2 — reverse / inverse (line 508) */
   ()=>{
@@ -49,7 +49,7 @@ export const grade4={
     case 8: return '有'+total+'個學生，平均分成'+qty+'組。每組有多少人？';
   }
 })(),
-      a:String(price),s:['$'+total+'÷'+qty+' = $'+price]};
+      a:String(price),s:['$'+total+'÷'+qty+' = $'+price],sc:3};
   },
   ()=>{
     var spent=ri(15,40),gained=ri(10,25),current=ri(25,50);
@@ -57,7 +57,7 @@ export const grade4={
     return{d:3,tp:'work',
       q:nm()+'先用了$'+spent+'買文具，再收到$'+gained+'利是錢。現在有$'+current+'。他原來有多少錢？',
       a:String(original),
-      s:['原來 = $'+current+' + $'+spent+' − $'+gained+' = $'+original]};
+      s:['原來 = $'+current+' + $'+spent+' − $'+gained+' = $'+original],sc:3};
   },
   /* _addQ Strategy 4 — fencepost / boundary (line 626) */
   ()=>{
@@ -66,7 +66,7 @@ export const grade4={
       q:'一條'+dist+'米長的路，每隔'+gap+'米種一棵樹（頭尾都種）。共需多少棵樹？',
       a:String(count),
       s:[dist+'÷'+gap+' = '+(count-1),'頭尾都種: '+(count-1)+' + 1 = '+count],
-      trap:{wrong:dist/gap,msg:'忘記 +1！頭尾都種要 +1'}};
+      trap:{wrong:dist/gap,msg:'忘記 +1！頭尾都種要 +1'},sc:3};
   },
   // 鋸木問題
   ()=>{
@@ -75,7 +75,7 @@ export const grade4={
       q:nm()+'把一條木頭鋸成'+pieces+'段，每鋸一刀用'+time+'分鐘。共需多少分鐘？',
       a:String(total),
       s:[pieces+'段需要'+cuts+'刀',cuts+'×'+time+' = '+total+'分鐘'],
-      trap:{wrong:pieces*time,msg:pieces+'段只需'+cuts+'刀！'}};
+      trap:{wrong:pieces*time,msg:pieces+'段只需'+cuts+'刀！'},sc:3};
   },
   // 兩邊插旗
   ()=>{
@@ -84,7 +84,7 @@ export const grade4={
       q:'一條'+dist+'米的路，兩邊每隔'+gap+'米插一面旗（頭尾都插）。共需多少面旗？',
       a:String(both),
       s:['一邊: '+dist+'÷'+gap+' + 1 = '+oneS,
-         '兩邊: '+oneS+'×2 = '+both]};
+         '兩邊: '+oneS+'×2 = '+both],sc:3};
   }
 ],
 '4N2':[
@@ -108,7 +108,7 @@ export const grade4={
       a:cheaper,
       s:['A每個: $'+totalA+'÷'+qA+' = $'+pA,
          'B每個: $'+totalB+'÷'+qB+' = $'+pB,
-         cheaper+'店較便宜']};
+         cheaper+'店較便宜'],sc:3};
   },
   /* _addQ Strategy 5 — multi-constraint (line 661) */
   ()=>{
@@ -120,7 +120,7 @@ export const grade4={
     return{d:3,tp:'fill',
       q:lo+'至'+hi+'之間，同時是'+d1+'和'+d2+'的倍數的數有哪些？（用逗號分隔）',
       a:results.join(','),
-      s:['找'+d1+'和'+d2+'的公倍數: '+results.join(', ')]};
+      s:['找'+d1+'和'+d2+'的公倍數: '+results.join(', ')],sc:3};
   },
   /* _addQ Strategy 6 — error-finding (line 698) */
   ()=>{
@@ -131,7 +131,7 @@ export const grade4={
       a:String(correct),
       s:['❌ 先乘除後加減',
          '✅ '+b+'×'+c+' = '+(b*c),
-         '✅ '+a+' + '+(b*c)+' = '+correct]};
+         '✅ '+a+' + '+(b*c)+' = '+correct],sc:2};
   },
   // 減 vs 乘
   ()=>{
@@ -141,7 +141,7 @@ export const grade4={
       q:nm()+'計算 '+a+' − '+b+' × '+c+' = '+wrong+'。正確答案是多少？',
       a:String(correct),
       s:['先算乘: '+b+'×'+c+' = '+(b*c),
-         '再算減: '+a+' − '+(b*c)+' = '+correct]};
+         '再算減: '+a+' − '+(b*c)+' = '+correct],sc:2};
   },
   // 質數識別 (d:1)
   ()=>{const primes=[2,3,5,7,11,13,17,19];const composites=[4,6,8,9,10,12,14,15,16,18];
@@ -197,12 +197,12 @@ export const grade4={
       a:bigger,
       s:['通分母: L.C.M.='+l,
          n1+'/'+d1+' = '+v1+'/'+l,
-         n2+'/'+d2+' = '+v2+'/'+l]};
+         n2+'/'+d2+' = '+v2+'/'+l],sc:3};
   }
 ],
 '4N78':[
   ()=>{var a=ri(30,95),b=ri(20,85);return{d:1,tp:'calc',q:(a/10).toFixed(1)+' + '+(b/10).toFixed(1)+' = ?',a:((a+b)/10).toFixed(1),s:['小數加法'],sc:2}},
-  ()=>{var a=ri(20,80),b=ri(10,50),c=ri(10,40);return{d:2,tp:'calc',q:(a/10).toFixed(1)+' + '+(b/10).toFixed(1)+' − '+(c/10).toFixed(1)+' = ?',a:((a+b-c)/10).toFixed(1),s:['先加後減'],sc:2}},
+  ()=>{var a=ri(20,80),b=ri(10,50),c=ri(10,Math.min(40,a+b-5));return{d:2,tp:'calc',q:(a/10).toFixed(1)+' + '+(b/10).toFixed(1)+' − '+(c/10).toFixed(1)+' = ?',a:((a+b-c)/10).toFixed(1),s:['先加後減'],sc:2}},
   ()=>{var a=ri(10,50),b=ri(10,50);return{d:3,tp:'fill',q:'____+ '+(b/10).toFixed(1)+' = '+((a+b)/10).toFixed(1),a:(a/10).toFixed(1),s:['逆向: '+((a+b)/10).toFixed(1)+'−'+(b/10).toFixed(1)+'='+(a/10).toFixed(1)],sc:2}},
   /* _addQ — reverse / find missing decimal (line 849) */
   ()=>{
@@ -210,14 +210,14 @@ export const grade4={
     return{d:3,tp:'fill',
       q:(a/10).toFixed(1)+' + ____ = '+(sum/10).toFixed(1),
       a:(b/10).toFixed(1),
-      s:[(sum/10).toFixed(1)+' − '+(a/10).toFixed(1)+' = '+(b/10).toFixed(1)]};
+      s:[(sum/10).toFixed(1)+' − '+(a/10).toFixed(1)+' = '+(b/10).toFixed(1)],sc:2};
   },
   ()=>{
     var a=ri(30,80),b=ri(10,a-10),diff=a-b;
     return{d:3,tp:'fill',
       q:'____ − '+(b/10).toFixed(1)+' = '+(diff/10).toFixed(1),
       a:(a/10).toFixed(1),
-      s:[(diff/10).toFixed(1)+' + '+(b/10).toFixed(1)+' = '+(a/10).toFixed(1)]};
+      s:[(diff/10).toFixed(1)+' + '+(b/10).toFixed(1)+' = '+(a/10).toFixed(1)],sc:2};
   }
 ],
 '4M1':[
@@ -230,14 +230,14 @@ export const grade4={
     return{d:3,tp:'work',
       q:'長方形周界是'+peri+'cm，長是'+w+'cm。闊是多少cm？',
       a:String(h),
-      s:['闊 = '+peri+'÷2 − '+w+' = '+h]};
+      s:['闊 = '+peri+'÷2 − '+w+' = '+h],sc:3};
   },
   ()=>{
     var s=ri(5,18),peri=s*4;
     return{d:2,tp:'work',
       q:'正方形周界是'+peri+'cm。邊長是多少cm？面積呢？',
       a:s+','+(s*s),
-      s:[peri+'÷4 = '+s,'面積 = '+s+'×'+s+' = '+s*s]};
+      s:[peri+'÷4 = '+s,'面積 = '+s+'×'+s+' = '+s*s],sc:3};
   },
   /* _addQ — image-based questions (line 1118) */
   // Rectangle perimeter (varied text to bypass dedup)
@@ -307,7 +307,7 @@ export const grade4={
       q:'長方形面積是'+area+'cm²，長是'+w+'cm。闊是多少cm？周界是多少cm？',
       a:h+','+(w+h)*2,
       s:['闊 = '+area+'÷'+w+' = '+h,
-         '周界 = ('+w+'+'+h+')×2 = '+(w+h)*2]};
+         '周界 = ('+w+'+'+h+')×2 = '+(w+h)*2],sc:3};
   },
   /* _addQ Phase 2 — comparison (line 869) */
   ()=>{
@@ -320,7 +320,7 @@ export const grade4={
       a:bigger+','+diff,
       s:['長方形: '+wA+'×'+hA+' = '+areaA,
          '正方形: '+sB+'×'+sB+' = '+areaB,
-         bigger+'大'+diff+'cm²']};
+         bigger+'大'+diff+'cm²'],sc:3};
   },
   /* _addQ — image-based questions (line 1177) */
   ()=>{
@@ -367,7 +367,7 @@ export const grade4={
       q:'長方形周界'+peri+'cm，長'+w+'cm。求闊和面積。（用逗號分隔）',
       a:h+','+(w*h),
       s:['闊 = '+peri+'÷2 − '+w+' = '+h+' cm',
-         '面積 = '+w+'×'+h+' = '+(w*h)+' cm²']};
+         '面積 = '+w+'×'+h+' = '+(w*h)+' cm²'],sc:3};
   },
   // 菱形特性 (d:1)
   ()=>({d:1,tp:'mc',q:'菱形的特別之處是什麼？',isMC:true,
