@@ -256,7 +256,7 @@ export const grade6={
   ()=>{var labels=['一月','二月','三月','四月','五月'];var n=ri(4,5);var data=[];for(var i=0;i<n;i++)data.push({l:labels[i],v:ri(15,55)});var mx=data.reduce((m,d)=>d.v>m.v?d:m,data[0]);var mn=data.reduce((m,d)=>d.v<m.v?d:m,data[0]);return{d:2,tp:'short',q:'折線圖：最高與最低相差多少？最高是哪月？',fig:FIG.line(data),a:(mx.v-mn.v)+','+mx.l,s:['最高: '+mx.l,'差: '+(mx.v-mn.v)],sc:3}},
   ()=>{var labels=['週一','週二','週三','週四','週五'];var data=labels.map(l=>({l:l,v:ri(15,50)}));var total=data.reduce((s,d)=>s+d.v,0);var dRain=ri(1,3);return{d:3,tp:'work',q:'折線圖，該週有'+dRain+'天下雨。五天總和及平均數？',fig:FIG.line(data),a:total+','+(total/5%1===0?String(total/5):(total/5).toFixed(1)),trap:'下雨天數',s:['🔍 下雨天數無關','總: '+total,'平均: '+(total/5).toFixed(1)],sc:3}}
 ],
-'6D34':[
+'6D3':[
   ()=>{const slices=[{l:'語文',pct:35},{l:'數學',pct:30},{l:'常識',pct:25},{l:'音樂',pct:10}];
     return{d:1,tp:'mc',q:'哪種統計圖最能顯示各部分佔整體比例？',isMC:true,fig:FIG.pie(slices),
       opts:[{l:'A',v:'折線圖',c:false},{l:'B',v:'棒形圖',c:false},{l:'C',v:'圓形圖',c:true}],
@@ -292,6 +292,6 @@ export const grade6={
 ]
 };
 
-// Topics: 6N1, 6N2, 6N34, 6A1, 6M1, 6M2, 6M3, 6M4, 6M5, 6S1, 6D1, 6D2, 6D34, 6D4
+// Topics: 6N1, 6N2, 6N34, 6A1, 6M1, 6M2, 6M3, 6M4, 6M5, 6S1, 6D1, 6D2, 6D3, 6D4
 // Export: grade6 (object with 14 topic keys)
 // Total generators: 63

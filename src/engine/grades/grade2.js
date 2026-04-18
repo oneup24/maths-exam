@@ -1,5 +1,5 @@
 /**
- * grade2.js — P2 question generators (2N1, 2N2, 2N3, 2N5, 2N6, 2M, 2S, 2D1)
+ * grade2.js — P2 question generators (2N1, 2N2, 2N3, 2N4, 2N5, 2N6, 2M, 2S, 2D1)
  * Extracted from engine.js
  */
 import { ri, pk, FIG } from '../core.js';
@@ -34,6 +34,34 @@ export const grade2={
 '2S':[
   ()=>({d:2,tp:'mc',q:'一個四邊形有4個直角，它一定是什麼形狀？',isMC:true,opts:[{l:'A',v:'正方形',c:false},{l:'B',v:'長方形',c:true},{l:'C',v:'平行四邊形',c:false}],a:'B',s:['4個直角→長方形'],sc:2}),
   ()=>({d:3,tp:'mc',q:'以下哪項是正確的？',isMC:true,opts:[{l:'A',v:'所有正方形都是長方形',c:true},{l:'B',v:'所有長方形都是正方形',c:false},{l:'C',v:'三角形有4個角',c:false}],a:'A',s:['正方形是特殊的長方形'],sc:2})
+],
+
+/* ═══════════ 2N4 四位數 ═══════════ */
+'2N4':[
+  // 讀寫四位數：位值 (d:1)
+  ()=>{const th=ri(1,9),h=ri(0,9),t=ri(0,9),u=ri(0,9);const n=th*1000+h*100+t*10+u;
+    return{d:1,tp:'fill',q:'用數字寫：'+th+'千'+h+'百'+t+'十'+u+'個 = ____',
+      a:String(n),s:['千位='+th+'，百位='+h+'，十位='+t+'，個位='+u],sc:1}},
+  // 識別千位數字 (d:1)
+  ()=>{const n=ri(1000,9999);
+    return{d:1,tp:'fill',q:n+'的千位數字是____，百位數字是____。',
+      a:Math.floor(n/1000)+','+Math.floor(n%1000/100),
+      s:['千位='+Math.floor(n/1000)+'，百位='+Math.floor(n%1000/100)],sc:1}},
+  // 比較兩個四位數 (d:2)
+  ()=>{const a=ri(1000,9999),b=ri(1000,9999);while(a===b)b=ri(1000,9999);
+    const big=Math.max(a,b),small=Math.min(a,b);
+    return{d:2,tp:'fill',q:'比較'+a+'和'+b+'：較大的是____，較小的是____。',
+      a:big+','+small,s:[big+' > '+small],sc:2}},
+  // 由小到大排列四位數 (d:2)
+  ()=>{const arr=[ri(1000,4999),ri(5000,7999),ri(8000,9999)];
+    const shuffled=[arr[1],arr[0],arr[2]];const sorted=[...arr].sort((a,b)=>a-b);
+    return{d:2,tp:'fill',q:'由小到大排列：'+shuffled.join('、')+' → ____',
+      a:sorted.join(','),s:[sorted.join(' < ')],sc:2}},
+  // 情境題：四位數加減 (d:3)
+  ()=>{const stock=ri(1000,5000),sell=ri(200,800),buy=ri(100,500);
+    return{d:3,tp:'work',q:'超市有'+stock+'件貨品，賣出'+sell+'件後，又入貨'+buy+'件。現在有多少件？',
+      a:String(stock-sell+buy),
+      s:[stock+'−'+sell+'='+(stock-sell),(stock-sell)+'+'+buy+'='+(stock-sell+buy)],sc:2}}
 ],
 
 /* ═══════════ 2N5 分數(一) ═══════════ */
@@ -90,5 +118,5 @@ export const grade2={
 ]
 };
 
-// Topics: 2N1, 2N2, 2N3, 2N5, 2N6, 2M, 2S, 2D1
-// Export: grade2 (object with 8 topic keys, 32 generators total)
+// Topics: 2N1, 2N2, 2N3, 2N4, 2N5, 2N6, 2M, 2S, 2D1
+// Export: grade2 (object with 9 topic keys, 37 generators total)
