@@ -1,9 +1,10 @@
-import React,{useState,useEffect,useCallback,useRef} from 'react';
+import React,{useState,useEffect,useCallback,useRef,lazy,Suspense} from 'react';
 import confetti from 'canvas-confetti';
 import {playCorrect,playWrong,playTick,playFanfare,playSubmit} from './lib/sounds';
-import Onboarding from './Onboarding';
-import PrivacyPolicy from './PrivacyPolicy';
-import Profile from './Profile';
+const Onboarding   = lazy(() => import('./Onboarding'));
+const PrivacyPolicy= lazy(() => import('./PrivacyPolicy'));
+const Profile      = lazy(() => import('./Profile'));
+const Login        = lazy(() => import('./pages/Login'));
 // eslint-disable-next-line no-unused-vars -- motion is used as <motion.div> in JSX
 import {motion,AnimatePresence} from 'framer-motion';
 import {Eye,ChevronDown,ChevronUp,X,Check,AlertTriangle,Settings,Volume2,VolumeX,Globe} from 'lucide-react';
@@ -11,10 +12,10 @@ import {TOPICS,GRADE_INFO,DIFF_INFO,buildExam,printExam,chkAns,saveHistory,loadH
 import {t} from './lib/i18n';
 import { useAuth } from './hooks/useAuth';
 import { saveExamResult } from './services/api';
-import Login from './pages/Login';
 import {GC} from './lib/colors';
 import {track} from './lib/track';
 import {pageTransition} from './lib/animations';
+import { setSentryUser, setSentryContext } from './lib/sentry';
 import SubmitModal from './components/modals/SubmitModal';
 import PrintModal from './components/modals/PrintModal';
 import SignUpPromptModal from './components/modals/SignUpPromptModal';
@@ -80,7 +81,7 @@ export default function App(){
   const timerRef=useRef(null);
   const[onboarded,setOnboarded]=useState(()=>!!localStorage.getItem('onboarding_done'));
   const[skippedLogin,setSkippedLogin]=useState(false);
-  const { user, loading: authLoading, signUp, signIn, signOut } = useAuth();
+  const { user, loading: authLoading, signUp, signIn, signOut, isRecovery, resetPassword, updatePassword } = useAuth();
   const[streak,setStreak]=useState(()=>+(localStorage.getItem('streak_count')||0));
   const[soundOn,setSoundOn]=useState(()=>localStorage.getItem('sound_on')!=='0');
   const[showPrivacy,setShowPrivacy]=useState(false);
@@ -91,6 +92,8 @@ export default function App(){
 
   useEffect(()=>{var ts=TOPICS[grade];if(ts)setSelTopics(new Set(ts.map(t=>t.id)))},[grade]);
   useEffect(()=>{setHistory(loadHistory())},[]);
+  useEffect(()=>{setSentryUser(user?.id??null)},[user]);
+  useEffect(()=>{setSentryContext(grade,user?'auth':'guest')},[grade,user]);
   useEffect(()=>{if(running&&timeLeft>0){timerRef.current=setInterval(()=>{setTimeLeft(t=>{if(t<=1){setRunning(false);return 0}if(t<=60&&soundOn)playTick();return t-1})},1000);return()=>clearInterval(timerRef.current)}if(running&&timeLeft<=0)setRunning(false)},[running,timeLeft,soundOn]);
 
   var tryReveal=(key,type)=>{
@@ -239,15 +242,15 @@ export default function App(){
   );
 
   /* ════════ ONBOARDING (before auth — hook before ask) ════════ */
-  if(!onboarded)return <Onboarding onComplete={completeOnboarding} lang={lang} signUp={signUp} signIn={signIn}/>;
+  if(!onboarded)return <Suspense fallback={null}><Onboarding onComplete={completeOnboarding} lang={lang} signUp={signUp} signIn={signIn}/></Suspense>;
 
   /* ════════ LOGIN (returning users only) ════════ */
   if(!user && !skippedLogin) return (
-    <Login onAuth={{ signUp, signIn, skip: () => setSkippedLogin(true) }} />
+    <Suspense fallback={null}><Login onAuth={{ signUp, signIn, skip: () => setSkippedLogin(true), isRecovery, resetPassword, updatePassword }} lang={lang} /></Suspense>
   );
 
   /* ════════ PROFILE ════════ */
-  if(view==='profile')return <Profile onBack={()=>setView('home')} lang={lang} studentName={studentName} setStudentName={setStudentName} streak={streak} user={user} signOut={async()=>{await signOut();setSkippedLogin(false);}} goToLogin={()=>setSkippedLogin(false)}/>;
+  if(view==='profile')return <Suspense fallback={null}><Profile onBack={()=>setView('home')} lang={lang} studentName={studentName} setStudentName={setStudentName} streak={streak} user={user} signOut={async()=>{await signOut();setSkippedLogin(false);}} goToLogin={()=>setSkippedLogin(false)}/></Suspense>;
 
   /* ════════ VIEWS ════════ */
   if(view==='home')return(
@@ -267,7 +270,7 @@ export default function App(){
         </button>
       </div>
       <motion.div initial={{opacity:0,y:15}} animate={{opacity:1,y:0}} className="text-center mb-4 pt-4">
-        <img src={isBirthday?'/mascot-happy.png':'/mascot.png'} alt="mascot" className="w-48 h-48 object-cover rounded-3xl mx-auto mb-3 shadow-lg"/>
+        <img src={isBirthday?'/mascot-happy.png':'/mascot.png'} alt="Curlboo Bear mascot" className="w-48 h-48 object-cover rounded-3xl mx-auto mb-3 shadow-lg"/>
         {isBirthday&&<motion.div initial={{scale:0}} animate={{scale:1}} transition={{type:'spring',stiffness:200}} className="inline-flex items-center gap-1.5 bg-pink-100 border border-pink-200 text-pink-600 font-bold text-sm px-3 py-1.5 rounded-full mb-2">🎂 {lang==='zh'?'生日快樂！':'Happy Birthday!'}</motion.div>}
         <div className="flex items-center justify-center gap-3 mb-1">
           {studentName?<p className="text-base font-bold text-indigo-600">{L('greeting',studentName)}</p>:null}
@@ -291,7 +294,7 @@ export default function App(){
       <p className="text-center text-xs text-gray-300 mt-6">
         <button onClick={()=>setShowPrivacy(true)} className="underline hover:text-gray-400">{L('privacy')}</button>
       </p>
-      <AnimatePresence>{showPrivacy&&<PrivacyPolicy onClose={()=>setShowPrivacy(false)}/>}</AnimatePresence>
+      <AnimatePresence>{showPrivacy&&<Suspense fallback={null}><PrivacyPolicy onClose={()=>setShowPrivacy(false)}/></Suspense>}</AnimatePresence>
     </PageShell></motion.div>
   );
 

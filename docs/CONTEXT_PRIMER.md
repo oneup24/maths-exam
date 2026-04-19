@@ -18,6 +18,8 @@ Architecture, tech stack, and file map for **Maths Quests** (v1.3-beta, live on 
 | Hosting | Vercel (production) |
 | Analytics | PostHog (primary) + Supabase `events` table (dual-destination via track.js) |
 | Audio | Web Audio API (custom, no library) |
+| Error monitoring | Sentry (`@sentry/react` v10, key-gated) |
+| Testing | Vitest ^4.1 (node env, 409 tests) |
 | PWA | manifest.json + service worker |
 | Package manager | pnpm |
 
@@ -64,6 +66,7 @@ src/
     sounds.js          — Web Audio sound effects (correct, wrong, tick, fanfare, submit)
     track.js           — Event tracking: dual-destination (PostHog + Supabase), 12 events
     posthog.js         — PostHog wrapper: key-gated init, capture/identify/reset exports
+    sentry.js          — Sentry wrapper: key-gated initSentry(), setSentryUser/Context, SentryErrorBoundary; strips email PII
     colors.js          — Grade colors, category colors, difficulty colors
     animations.js      — Shared Framer Motion variants (pageTransition, fadeInUp, stagger)
 
@@ -79,15 +82,21 @@ src/
       grade5.js          — P5 generators (11 topics, 56 functions)
       grade6.js          — P6 generators (14 topics, 63 functions) — 6D34→6D3
 
+  engine/
+    __tests__/
+      chkAns.test.js     — 39 unit tests for chkAns (units, fractions, multi-part, fullwidth, MC)
+      generators.test.js — all P1–P6 generators run 3×; shape + validity assertions
+      buildExam.test.js  — exam builder: structure, count targets ±3, no duplicates, edge cases
+
   hooks/
-    useAuth.js         — Supabase auth: session, signUp, signIn, signOut; PostHog identify/reset on auth change
+    useAuth.js         — Supabase auth: session, signUp, signIn, signOut, resetPassword, updatePassword, isRecovery; PostHog identify/reset on auth change
 
   services/
     supabase.js        — Supabase client init (reads env vars)
     api.js             — Cloud ops: saveExamResult, loadExamHistory, getUserStats, resendVerificationEmail
 
   pages/
-    Login.jsx          — Email auth + guest skip (returning users only)
+    Login.jsx          — Email auth + guest skip (returning users only); forgot/update modes for password reset
 
   Onboarding.jsx       — 6-step "hook before ask" wizard (lang→value→grade→question→result→auth)
   Profile.jsx          — Settings, stats, PIN, streak, cloud history
@@ -113,7 +122,7 @@ src/
 vite.config.js         — Vite + React + Tailwind plugins
 capacitor.config.json  — appId: com.oneup24.mathsquest, webDir: dist
 app.json               — Expo config
-.env.local             — VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY + VITE_POSTHOG_KEY
+.env.local             — VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY + VITE_POSTHOG_KEY + VITE_SENTRY_DSN
 supabase/setup.sql     — Applied RLS policies (documentation only)
 ```
 
@@ -228,3 +237,6 @@ events (
 - **Guest mode** — full functionality except cloud sync and print
 - **Email verification** — NOT required for signup. Signup completes immediately. `email_confirmed_at` is only checked for PDF export — unverified users see a resend-verification modal instead of the PDF gate.
 - **PostHog** — key-gated: set `VITE_POSTHOG_KEY` in .env.local + Vercel env vars. App functions normally without the key (Supabase-only analytics fallback).
+- **Sentry** — key-gated: set `VITE_SENTRY_DSN` in .env.local + Vercel env vars. `initSentry()` no-ops when DSN is absent. `SentryErrorBoundary` wraps `<App>` in main.jsx. Grade + auth status tagged via `setSentryContext`; email stripped from events (`beforeSend`).
+- **Password reset** — `useAuth` exposes `resetPassword(email)` (sends Supabase link) and `updatePassword(pwd)` (called after `PASSWORD_RECOVERY` event sets `isRecovery=true`). Login.jsx handles all modes: `login | signup | forgot | update`.
+- **Tests** — `pnpm test` runs 409 Vitest unit tests (node env, no DOM). Three files: `chkAns.test.js`, `generators.test.js`, `buildExam.test.js`.

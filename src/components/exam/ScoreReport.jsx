@@ -16,7 +16,7 @@ export default function ScoreReport({isMarked,animScore,animPct,pct,grandTotal,f
           </div>
           <span className="text-sm font-bold text-gray-500 mt-1 inline-block">{animPct}%</span>
           <div className="mt-2">
-            <motion.img src={pct>=80?'/mascot-happy.png':pct>=50?'/mascot-ok.png':'/mascot-sad.png'} alt="mascot"
+            <motion.img src={pct>=80?'/mascot-happy.png':pct>=50?'/mascot-ok.png':'/mascot-sad.png'} alt={pct>=80?'Curlboo Bear celebrating':'Curlboo Bear encouraging'}
               initial={{scale:0.7,opacity:0}} animate={{scale:1,opacity:1}} transition={{type:'spring',stiffness:200}}
               className="w-44 h-44 object-cover rounded-3xl mx-auto shadow-md"/>
             <p className={"text-sm font-extrabold mt-1 "+fb.c}>{fb.m}</p>

@@ -6,6 +6,29 @@ All notable changes to **Maths Quests** (數學特訓).
 
 ## [v1.3-beta] — 2026-04-19
 
+### feat: Phase 3A hardening — Vitest suite, password reset, Sentry
+
+**Vitest unit tests (409 tests, 0 failures)**
+- `src/engine/__tests__/chkAns.test.js` — 39 cases: exact match, unit stripping, fraction/tolerance, multi-part, fullwidth normalisation, MC, edge cases
+- `src/engine/__tests__/generators.test.js` — every P1–P6 generator run 3×; asserts `{tp,q,a,sc}` shape, valid types/difficulty, MC opts correctness
+- `src/engine/__tests__/buildExam.test.js` — all grades × practice/test/exam; asserts section structure, question count within ±3 of target, no duplicate q+a; edge cases (empty topics, invalid topics, difficulty 1/3)
+- `vite.config.js` — `test: { environment: 'node', globals: true }` added
+
+**Password reset flow**
+- `useAuth.js` — added `resetPassword(email)`, `updatePassword(newPassword)`, `isRecovery` state (set on `PASSWORD_RECOVERY` Supabase event)
+- `Login.jsx` — new `'forgot'` mode (email → send link → success screen) and `'update'` mode (shown when `isRecovery`); "Forgot password?" link in login mode; fully bilingual
+- `i18n.js` — 8 new keys: `forgotPassword`, `resetPasswordTitle`, `resetEmailSent`, `resetPasswordBtn`, `newPasswordPH`, `setPasswordBtn`, `passwordUpdated`, `backToLogin` (zh + en)
+- `App.jsx` — passes `isRecovery`, `resetPassword`, `updatePassword` through `onAuth` prop to Login
+
+**Sentry error monitoring**
+- `pnpm add @sentry/react` (v10.49.0)
+- `src/lib/sentry.js` (new) — key-gated `initSentry()`, `setSentryUser(id)`, `setSentryContext(grade, authStatus)`, `SentryErrorBoundary` export; `beforeSend` strips email (PII)
+- `main.jsx` — calls `initSentry()` before render; wraps `<App>` in `<SentryErrorBoundary>` with bilingual-free crash fallback + reload button
+- `App.jsx` — `setSentryUser` effect on auth change; `setSentryContext` effect on grade/user change
+- `.env.local` — `VITE_SENTRY_DSN=` placeholder added (paste DSN from sentry.io project settings)
+
+---
+
 ### fix: D6 generator bugs — diagram leak, proportions, negatives, cross-session dedup
 
 **Bug #1/#3 — Diagram leaks answer (parent-visible, critical)**

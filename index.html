@@ -2,16 +2,34 @@
 <html lang="zh-HK">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/icon.png" />
-    <link rel="manifest" href="/manifest.json" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Primary meta -->
+    <title>Curlboo & Fluffy's Maths Quests</title>
+    <meta name="description" content="香港小學數學模擬試卷 P1–P6，依據教育局課程，含干擾項訓練。HK primary maths practice P1-P6 by EDB curriculum." />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#F97316" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- iOS PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="數學練習" />
     <link rel="apple-touch-icon" href="/icon.png" />
-    <meta name="theme-color" content="#F97316" />
-    <meta name="description" content="香港小學數學模擬試卷 P1–P6，Curlboo & Fluffy's Maths Quests" />
-    <title>Curlboo & Fluffy's Maths Quests</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/icon.png" />
+
+    <!-- Performance: preconnect to Supabase -->
+    <link rel="preconnect" href="https://wfpoixbauxswurxkavjz.supabase.co" />
+
+    <!-- Open Graph (WhatsApp / social share) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Curlboo's Maths Quests 數學特訓" />
+    <meta property="og:description" content="香港小學數學模擬試卷 P1–P6，含干擾項訓練" />
+    <meta property="og:image" content="/mascot-happy.png" />
   </head>
   <body>
     <div id="root"></div>
@@ -24,8 +42,8 @@
     </script>
     <script type="module" src="/src/main.jsx"></script>
     <script>
-      if('serviceWorker' in navigator){
-        window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'));
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
       }
     </script>
   </body>

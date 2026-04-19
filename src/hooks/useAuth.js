@@ -6,6 +6,7 @@ import { track } from '../lib/track';
 export function useAuth() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(!!supabase);
+  const [isRecovery, setIsRecovery] = useState(false);
 
   useEffect(() => {
     if (!supabase) { return; }
@@ -19,6 +20,11 @@ export function useAuth() {
       (_event, session) => {
         const u = session?.user ?? null;
         setUser(u);
+        if (_event === 'PASSWORD_RECOVERY') {
+          setIsRecovery(true);
+        } else if (_event === 'SIGNED_IN' && !isRecovery) {
+          setIsRecovery(false);
+        }
         if (u) identify(u.id, { email: u.email });
         else phReset();
       }
@@ -46,5 +52,18 @@ export function useAuth() {
     setUser(null);
   };
 
-  return { user, loading, signUp, signIn, signOut };
+  const resetPassword = async (email) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin,
+    });
+    if (error) throw error;
+  };
+
+  const updatePassword = async (newPassword) => {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) throw error;
+    setIsRecovery(false);
+  };
+
+  return { user, loading, isRecovery, signUp, signIn, signOut, resetPassword, updatePassword };
 }
