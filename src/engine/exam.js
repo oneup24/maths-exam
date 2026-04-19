@@ -44,12 +44,12 @@ export function buildExam(grade,topics,examType,difficulty){
   });
   var gSeen={},gSeenT={};
   /* pre-seed from session to avoid cross-exam repeats */
-  try{var _sk='mq_seen_'+grade;JSON.parse(sessionStorage.getItem(_sk)||'[]').forEach(k=>{gSeen[k]=true;var qt=k.split('|')[0];gSeenT[qt]=(gSeenT[qt]||0)+1});}catch{}
+  try{var _sk='mq_seen_'+grade;JSON.parse(sessionStorage.getItem(_sk)||'[]').forEach(k=>{gSeen[k]=true;var qt=k.split('|')[0];gSeenT[qt]=(gSeenT[qt]||0)+1});}catch(_e1){/* sessionStorage unavailable */}
   types.forEach(t=>(generated[t]||[]).forEach(q=>{gSeen[q.q+'|'+q.a]=true;gSeenT[q.q]=(gSeenT[q.q]||0)+1}));
   var safety=0;
   while(count<totalTarget&&safety<500){
     safety++;var t=pk(types);var gens=allGens[t];if(!gens.length)continue;if(!generated[t])generated[t]=[];
-    try{var item=pk(gens);if(storyTypes.has(t)&&usedGens.has(item.fn))continue;var q=item.fn();if(!q||!q.q)continue;if(!allowed.includes(q.d||2))continue;if(!validateQuestion(grade,q).ok)continue;var k=q.q+'|'+q.a;if(gSeen[k])continue;if((gSeenT[q.q]||0)>=1)continue;gSeen[k]=true;gSeenT[q.q]=(gSeenT[q.q]||0)+1;if(storyTypes.has(t))usedGens.add(item.fn);q.topicId=item.tid;q.topicName=item.tnm;generated[t].push(q);count++}catch{/* intentionally empty — skip broken generators */}
+    try{var item=pk(gens);if(storyTypes.has(t)&&usedGens.has(item.fn))continue;var q=item.fn();if(!q||!q.q)continue;if(!allowed.includes(q.d||2))continue;if(!validateQuestion(grade,q).ok)continue;var k=q.q+'|'+q.a;if(gSeen[k])continue;if((gSeenT[q.q]||0)>=1)continue;gSeen[k]=true;gSeenT[q.q]=(gSeenT[q.q]||0)+1;if(storyTypes.has(t))usedGens.add(item.fn);q.topicId=item.tid;q.topicName=item.tnm;generated[t].push(q);count++}catch(_e2){/* skip broken generators */}
   }
   while(count>totalTarget){
     var longest=types.filter(t=>(generated[t]||[]).length>1).sort((a,b)=>(generated[b]||[]).length-(generated[a]||[]).length);
@@ -59,7 +59,7 @@ export function buildExam(grade,topics,examType,difficulty){
   var defSc={mc:2,fill:2,calc:2,short:3,work:4};
   ['mc','fill','calc','short','work'].forEach(t=>{var qs=generated[t];if(!qs||!qs.length)return;var total=qs.reduce((s,q)=>s+(q.sc||defSc[t]||2),0);secs.push({id:t,label:SECT_LBL[secs.length],nm:SECT_CONF[t].nm,nt:SECT_CONF[t].nt,total,qs})});
   /* persist question hashes for cross-exam dedup */
-  try{var _sk='mq_seen_'+grade;var _prev=JSON.parse(sessionStorage.getItem(_sk)||'[]');var _new=secs.flatMap(s=>s.qs).map(q=>q.q+'|'+q.a);var _merged=[...new Set([..._prev,..._new])].slice(-200);sessionStorage.setItem(_sk,JSON.stringify(_merged));}catch{}
+  try{var _sk2='mq_seen_'+grade;var _prev=JSON.parse(sessionStorage.getItem(_sk2)||'[]');var _new=secs.flatMap(s=>s.qs).map(q=>q.q+'|'+q.a);var _merged=[...new Set([..._prev,..._new])].slice(-200);sessionStorage.setItem(_sk2,JSON.stringify(_merged));}catch(_e3){/* sessionStorage unavailable */}
   return secs;
 }
 
