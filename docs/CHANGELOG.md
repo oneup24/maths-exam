@@ -6,6 +6,27 @@ All notable changes to **Maths Quests** (數學特訓).
 
 ## [v1.3-beta] — 2026-04-20
 
+### feat: core.js — smart answer checker + 3 new exam figures
+
+**`chkAns` improvements (tolerant HK-exam grading):**
+- `stripU` now strips `%` and `,` — `75%`/`75` and `1,000`/`1000` both accepted
+- Added `...` as multi-part separator (e.g. `5...2` = 5 remainder 2, matched part-by-part)
+- Tolerance tightened 0.005 → 0.001 (reduces false positives on close decimals)
+- `parseFrac` renamed to `parseNum` (clearer intent)
+
+**`SV.arc` — new SVG arc primitive** (supports semi-circles and sector angles)
+
+**`FIG.semiCirc(r)` — new figure** for P6 半圓周界 trap questions
+- Draws arc + base diameter line + radius label; reminds students diameter must be added
+
+**`FIG.waterTank(l,w,h,rise)` — new figure** for P5/P6 排水法 volume questions
+- 3D cuboid tank with base water (light blue), risen water (dark blue), stone, and red rise annotation
+
+**`FIG.clock(hr)` — new figure** for P2 time + P6 clock-angle questions
+- Full clock face with numbers, minute hand at 12, red hour hand at `hr` (whole hours)
+
+---
+
 ### feat: contexts.js enrichment — modern HK names, cultural venues, expanded classifiers
 
 **`names`** — Replaced with 20 modern HK primary school names (`梓軒`, `允行`, `凱晴`, `子穎`…); removed cliché `小明`/`小華`/`小芬`
