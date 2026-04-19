@@ -34,7 +34,9 @@ export const grade5={
   // 人口問題 (d:2)
   ()=>{const pop=ri(7,8)*1000000+ri(0,9)*100000;const n=nm();
     return{d:2,tp:'fill',q:'香港人口約'+pop+'人。'+n+'說「約____百萬人」。（四捨五入至百萬）',
-      a:String(Math.round(pop/1000000)),s:[pop+'÷1000000≈'+Math.round(pop/1000000)+'百萬'],sc:2}}
+      a:String(Math.round(pop/1000000)),s:[pop+'÷1000000≈'+Math.round(pop/1000000)+'百萬'],sc:2}},
+  // 四捨五入連鎖反應 (d:3)
+  ()=>{const n=ri(1,5)*100000000+99600000+ri(1,9)*10000;return{d:3,tp:'fill',q:'把 '+n+' 四捨五入至最接近的千萬，是____。',a:String(Math.round(n/10000000)*10000000),s:['看百萬位：如果是 5 或以上就要進位。','99 進位會引起連鎖反應，變成下一個億。'],sc:2}}
 ],
 
 '5N2':[
@@ -59,6 +61,10 @@ export const grade5={
          ns[1]+'班: '+p.nB+'÷'+p.dB+' = '+abB+'人',
          who+'班多'+diff+'人'],sc:3};
   },
+  // 概念陷阱：分母相加的常犯錯誤 (d:2)
+  ()=>({d:2,tp:'mc',q:'小明計算 1/3 + 1/4 時，得出的答案是 2/7。他錯在哪裏？',isMC:true,opts:[{l:'A',v:'他把分子和分母分別相加了',c:true},{l:'B',v:'他沒有把答案化為最簡分數',c:false},{l:'C',v:'他通分母時找錯了 L.C.M.',c:false}],a:'A',s:['異分母分數加減必須先通分母，絕不能直接把分母相加！'],sc:2}),
+  // 應用題陷阱：全長的分數 vs 實際米數 (d:3)
+  ()=>{var part=pk([4,5]);var length=part*ri(4,7);return{d:3,tp:'work',q:nm()+'有一條長 '+length+' 米的絲帶。他包裝禮物用去了全長的 1/'+part+'，又剪去了 1/'+part+' 米。他共用去了多少米的絲帶？',a:String(length/part+1/part),trap:'分數單位（全長的分數 vs 實際米數）',s:['🔍 陷阱！「全長的 1/'+part+'」和「1/'+part+' 米」是完全不同的概念！','包裝用去：'+length+' × 1/'+part+' = '+(length/part)+' 米','總共用去：'+(length/part)+' + 1/'+part+' = '+(length/part+1/part)+' 米'],sc:3}},
   /* _addQ Phase 2 — reverse: find missing fraction (line 938) */
   ()=>{
     var d1=pk([3,4,6]),d2=pk([4,6,8]);
@@ -93,6 +99,8 @@ export const grade5={
   ()=>{var n1=ri(2,5),d1=pk([3,5,7]),n2=ri(2,4),d2=pk([4,6,8]);return{d:1,tp:'calc',q:n1+'/'+d1+' × '+n2+'/'+d2+' = ?',a:fS(n1*n2,d1*d2),s:['分子×分子，分母×分母'],sc:2}},
   ()=>{var w=ri(2,4),n=ri(1,3),den=pk([4,5,6]),m=ri(3,8);var imp=w*den+n;return{d:2,tp:'calc',q:w+'又'+n+'/'+den+' × '+m+' = ?',a:fS(imp*m,den),s:['先化假分數再乘'],sc:2}},
   ()=>{var recL=ri(6,14),fN=ri(2,3),fD=pk([4,5]);var dThick=pk([2,3,5]),dColor=pk(['白色','黃色']);var width=recL*fN/fD;return{d:3,tp:'work',q:'一塊'+dColor+'紙板厚'+dThick+'mm，長'+recL+'cm，闊是長的'+fN+'/'+fD+'。面積？',a:String(recL*width),trap:'顏色和厚度',s:['🔍 顏色和厚度無關','闊='+width,'面積='+recL*width],sc:3}},
+  // 呈分試Killer題：「餘下的」分數 (d:3)
+  ()=>{var total=4*ri(10,20);return{d:3,tp:'work',q:nm()+'有 '+total+' 粒波子。他把其中的 1/4 送給弟弟，再把**餘下**的 1/3 送給妹妹。妹妹得到多少粒波子？',a:String(total*3/4/3),trap:'「餘下的」字眼',s:['🔍 陷阱！妹妹得到的不是總數的 1/3，而是「餘下的」1/3。','弟弟拿走後餘下：'+total+' × (1 − 1/4) = '+(total*3/4)+' 粒','妹妹得到：'+(total*3/4)+' × 1/3 = '+(total*3/4/3)+' 粒'],sc:3}},
   /* _addQ Strategy 1 — template rotation (line 466) */
   ()=>{
     var a=ri(11,99),b=ri(11,99),sum=a+b;
@@ -109,6 +117,8 @@ export const grade5={
   ()=>{var a=ri(15,40),b=ri(12,35);return{d:1,tp:'calc',q:(a/10).toFixed(1)+' × '+(b/10).toFixed(1)+' = ?',a:((a*b)/100).toFixed(2),s:['小數×小數'],sc:2}},
   ()=>{var a=ri(20,50),b=ri(20,50),c=ri(10,30);return{d:2,tp:'calc',q:'('+(a/10).toFixed(1)+' + '+(b/10).toFixed(1)+') × '+(c/10).toFixed(1)+' = ?',a:(((a+b)*c)/100).toFixed(2),s:['先算括號'],sc:2}},
   ()=>{var price=ri(20,60),qty=ri(8,20);var disc=0.8;var dM=ri(500,2000),dA=ri(200,500);return{d:3,tp:'work',q:pl()+'面積'+dA+'平方米，有會員'+dM+'人。原價每件$'+(price/10).toFixed(1)+'0，打八折後每件多少？買'+qty+'件共多少？',a:(price/10*disc).toFixed(2)+','+(price/10*disc*qty).toFixed(2),trap:'面積和會員數',s:['🔍 面積和會員數無關','折扣價×'+qty],sc:3}},
+  // 克 vs 公斤單位換算陷阱 (d:3)
+  ()=>{var weight=ri(12,25);var pricePerKg=ri(25,45);return{d:3,tp:'work',q:'超級市場裏，車厘子每公斤售 $'+(pricePerKg/10).toFixed(1)+'。媽媽買了 '+(weight*100)+' 克的車厘子，需付多少元？',a:((pricePerKg/10)*(weight/10)).toFixed(2),trap:'單位不統一（克 vs 公斤）',s:['🔍 陷阱！必須先將克化為公斤。',(weight*100)+' 克 = '+(weight/10).toFixed(1)+' 公斤','需付：'+(pricePerKg/10).toFixed(1)+' × '+(weight/10).toFixed(1)+' = $'+((pricePerKg/10)*(weight/10)).toFixed(2)],sc:3}},
   /* _addQ Phase 2 — reverse: find missing decimal (line 953) */
   ()=>{
     var a=ri(15,50),b=ri(3,9),product=a*b;
@@ -148,6 +158,8 @@ export const grade5={
   ()=>{var b=ri(8,20),h=ri(5,15);return{d:1,tp:'short',q:'求三角形面積。',fig:FIG.tri(b,h),a:String(b*h/2),s:[b+'×'+h+'÷2='+b*h/2],sc:2}},
   ()=>{var a=ri(6,14),b2=ri(12,22),h=ri(5,12);return{d:2,tp:'short',q:'求梯形面積。',fig:FIG.trap(a,b2,h),a:String((a+b2)*h/2),s:['('+a+'+'+b2+')×'+h+'÷2='+(a+b2)*h/2],sc:2}},
   ()=>{var rb=ri(10,20),rh=ri(6,14),tb=ri(8,Math.min(16,rb)),th=ri(5,Math.min(12,rh));var dFP=ri(50,100);return{d:3,tp:'work',q:'長方形土地長'+rb+'m闊'+rh+'m，圍欄每米$'+dFP+'。中間三角形花圃(底'+tb+'m高'+th+'m)。花圃外面積？',a:String(rb*rh-tb*th/2),trap:'圍欄造價',s:['🔍 造價無關','長方: '+rb*rh,'三角: '+tb*th/2,'差: '+(rb*rh-tb*th/2)],sc:3}},
+  // 梯形面積陷阱：斜邊非高 (d:3)
+  ()=>{var a=ri(6,12),b2=ri(12,20),h=ri(4,10)*2,slant=ri(8,15);return{d:3,tp:'work',q:'一個梯形的上底是 '+a+' cm，下底是 '+b2+' cm，高是 '+h+' cm，斜邊長 '+slant+' cm。求它的面積。',a:String((a+b2)*h/2),trap:'斜邊長度（'+slant+' cm）',s:['🔍 陷阱！計算梯形面積不需要斜邊，那是用來算周界的。','面積 = (上底 + 下底) × 高 ÷ 2','面積 = ('+a+' + '+b2+') × '+h+' ÷ 2 = '+((a+b2)*h/2)+' cm²'],sc:3}},
   /* _addQ Strategy 7 — cross-topic: time + money (line 757) */
   ()=>{
     var rate=ri(5,15)*10,hours=ri(3,8);
@@ -192,6 +204,8 @@ export const grade5={
   ()=>{var l=ri(6,12),w=ri(4,8),h=ri(3,6),water=ri(50,80);var dMat=pk(['玻璃','塑膠']),dWt=ri(500,2000);return{d:2,tp:'work',q:dMat+'長方體水箱重'+dWt+'克，長'+l+'cm闊'+w+'cm高'+h+'cm。水位'+water+'%滿。水的體積？',a:String(Math.round(l*w*h*water/100)),trap:'材質和重量',s:['🔍 材質和重量無關','容積: '+l*w*h,'水: '+Math.round(l*w*h*water/100)],sc:3}},
   /* d:3 — reverse */
   ()=>{var l=ri(5,10),w=ri(3,7);var vol=l*w*ri(3,6);var h=vol/(l*w);return{d:3,tp:'work',q:'長方體體積'+vol+'cm³，長'+l+'cm闊'+w+'cm。高多少cm？',a:String(h),s:[vol+'÷'+l+'÷'+w+'='+h],sc:2}},
+  // 呈分試Killer題：排水法 Water Displacement (d:3)
+  ()=>{var l=ri(10,20),w=ri(10,15),rise=ri(2,5);var dWater=ri(6,10);return{d:3,tp:'work',q:'一個長 '+l+' cm、闊 '+w+' cm 的長方體玻璃水箱內，裝有 '+dWater+' cm 深的水。把一塊不規則的石頭完全沉入水中後，水位上升了 '+rise+' cm。這塊石頭的體積是多少 cm³？',a:String(l*w*rise),trap:'原本的水深（'+dWater+' cm）',s:['🔍 陷阱！求石頭體積，只需要看「上升了的水的體積」，原本的水深是多餘資訊。','石頭體積 = 水箱長 × 水箱闊 × 上升的水位','體積 = '+l+' × '+w+' × '+rise+' = '+(l*w*rise)+' cm³'],sc:3}},
   /* _addQ Phase 2 — reverse: find height + surface area (line 925) */
   ()=>{
     var l=ri(5,12),w=ri(3,8),h=ri(3,7),vol=l*w*h;
@@ -221,7 +235,9 @@ export const grade5={
   // 直徑=2×半徑 (d:1)
   ()=>{const r=ri(3,12);const type=ri(0,1);
     if(type===0)return{d:1,tp:'calc',q:'半徑'+r+'cm，直徑 = ____cm',a:String(r*2),s:['直徑=2×半徑='+r*2],sc:1};
-    return{d:1,tp:'calc',q:'直徑'+r*2+'cm，半徑 = ____cm',a:String(r),s:['半徑=直徑÷2='+r],sc:1}}
+    return{d:1,tp:'calc',q:'直徑'+r*2+'cm，半徑 = ____cm',a:String(r),s:['半徑=直徑÷2='+r],sc:1}},
+  // 正方形內接圓：直徑=邊長 (d:3)
+  ()=>{var sq=ri(10,20);return{d:3,tp:'mc',q:'在一個邊長為 '+sq+' cm 的正方形內，畫一個最大的圓形。這個圓形的直徑是多少？',isMC:true,opts:[{l:'A',v:String(sq/2)+' cm',c:false},{l:'B',v:String(sq)+' cm',c:true},{l:'C',v:String(sq*2)+' cm',c:false}],a:'B',s:['在正方形內畫最大的圓，圓的直徑剛好等於正方形的邊長。'],sc:2}}
 ],
 
 /* ═══════════ 5S2 立體圖形(二) ═══════════ */
@@ -243,12 +259,16 @@ export const grade5={
   // 由展開圖識別立體 (d:3)
   ()=>({d:3,tp:'mc',q:'一個立體圖形展開後有2個圓形和1個長方形，原本是什麼？',isMC:true,
     opts:[{l:'A',v:'圓錐體',c:false},{l:'B',v:'圓柱體',c:true},{l:'C',v:'球體',c:false}],
-    a:'B',s:['圓柱展開 = 2個圓形 + 1個長方形（側面）'],sc:2})
+    a:'B',s:['圓柱展開 = 2個圓形 + 1個長方形（側面）'],sc:2}),
+  // 圓柱垂直截面是長方形 (d:2)
+  ()=>({d:2,tp:'mc',q:'把一個圓柱體沿著**垂直於底面**的方向切開，它的截面會是什麼形狀？',isMC:true,opts:[{l:'A',v:'圓形',c:false},{l:'B',v:'橢圓形',c:false},{l:'C',v:'長方形或正方形',c:true}],a:'C',s:['平行於底面切開是圓形；垂直於底面（從上切到下）切開，截面是長方形或正方形。'],sc:2})
 ],
 
 '5D1':[
   ()=>{var a1=ri(150,300),a2=ri(100,250),b1=ri(120,280),b2=ri(130,260);var items=[{l:'男A',v:a1},{l:'女A',v:a2},{l:'男B',v:b1},{l:'女B',v:b2}];var totalA=a1+a2,totalB=b1+b2;return{d:2,tp:'short',q:'棒形圖：A校和B校共多少人？哪校較多？多多少？',fig:FIG.bars(items),a:(totalA+totalB)+','+(totalA>totalB?'A校':'B校')+','+Math.abs(totalA-totalB),s:['A: '+totalA,'B: '+totalB],sc:3}},
-  ()=>{var items=[{l:'一月',v:ri(100,200)},{l:'二月',v:ri(80,180)},{l:'三月',v:ri(120,250)},{l:'四月',v:ri(90,200)}];var total=items.reduce((s,i)=>s+i.v,0);var avg=Math.round(total/4);return{d:3,tp:'short',q:'棒形圖顯示四個月銷量。平均銷量是多少？哪個月最接近平均值？',fig:FIG.bars(items),a:avg+','+items.reduce((c,i)=>Math.abs(i.v-avg)<Math.abs(c.v-avg)?i:c,items[0]).l,s:['平均: '+avg,'逐一比較差距'],sc:3}}
+  ()=>{var items=[{l:'一月',v:ri(100,200)},{l:'二月',v:ri(80,180)},{l:'三月',v:ri(120,250)},{l:'四月',v:ri(90,200)}];var total=items.reduce((s,i)=>s+i.v,0);var avg=Math.round(total/4);return{d:3,tp:'short',q:'棒形圖顯示四個月銷量。平均銷量是多少？哪個月最接近平均值？',fig:FIG.bars(items),a:avg+','+items.reduce((c,i)=>Math.abs(i.v-avg)<Math.abs(c.v-avg)?i:c,items[0]).l,s:['平均: '+avg,'逐一比較差距'],sc:3}},
+  // 兩校男女生總數比較 (d:3)
+  ()=>{var a1=ri(150,300),a2=ri(100,250),b1=ri(120,280),b2=ri(130,260);var items=[{l:'男A',v:a1},{l:'女A',v:a2},{l:'男B',v:b1},{l:'女B',v:b2}];return{d:3,tp:'short',q:'複合棒形圖顯示 A 校和 B 校的男女生人數。兩校的男生總數比女生總數相差多少人？',fig:FIG.bars(items),a:String(Math.abs((a1+b1)-(a2+b2))),s:['男生總數：'+a1+' + '+b1+' = '+(a1+b1),'女生總數：'+a2+' + '+b2+' = '+(a2+b2),'相差：|'+(a1+b1)+' − '+(a2+b2)+'| = '+Math.abs((a1+b1)-(a2+b2))],sc:3}}
 ]
 };
 
