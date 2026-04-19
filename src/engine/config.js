@@ -3,8 +3,6 @@
  * Extracted from engine.js
  */
 
-import { pk } from './core.js';
-
 /* ─── Topic Tree ─── */
 export const TOPICS={
   1:[
@@ -39,28 +37,10 @@ export const SECT_RATIOS={calc:.28,fill:.18,mc:.12,short:.22,work:.20};
 export const SECT_CONF={calc:{nm:'計算題',nt:'每題2分'},fill:{nm:'填充題',nt:'分數見各題'},mc:{nm:'選擇題',nt:'每題1-2分'},short:{nm:'短答題',nt:'每題2-3分'},work:{nm:'列式題',nt:'每題2-3分'}};
 export const SECT_LBL=['甲','乙','丙','丁','戊'];
 
-/* ─── Context Pools ─── */
-export const CTX={
-  names:['小明','小華','小芬','志強','嘉欣','家俊','詠琪','浩然','子晴','俊熙'],
-  places:['超級市場','文具店','書店','玩具店','水果店','運動用品店','家品店','麵包店'],
-  food:['蘋果','橙','香蕉','芒果','草莓','西瓜','葡萄','桃'],
-  item:['鉛筆','橡皮擦','尺子','練習簿','顏色筆','剪刀','膠水','筆袋'],
-  sport:['足球','籃球','排球','乒乓球','羽毛球','游泳','跑步','跳繩'],
-  vehicle:['巴士','小巴','的士','港鐵','渡輪','電車','校車','旅遊巴'],
-  school:['培正小學','聖保祿','拔萃','喇沙','聖若瑟','瑪利諾','聖方濟','聖公會']
-};
+/* ─── Context Pools + Helpers (re-exported from contexts.js) ─── */
+export { CTX, nm, pl, fd, it, _nm2, _pl, _it, _price } from './contexts.js';
 
-/* ─── Context Helpers ─── */
-export const nm=()=>pk(CTX.names);export const pl=()=>pk(CTX.places);export const fd=()=>pk(CTX.food);export const it=()=>pk(CTX.item);
-
-export function _nm2(){var a=nm(),b=nm();while(b===a)b=nm();return[a,b];}
-export function _pl(){return pk(['圖書館','超市','文具店','書店','玩具店','果園','農場','運動場','禮堂','飯堂','課室','公園']);}
-export function _it(){return pk([
-  {n:'蘋果',u:'個'},{n:'鉛筆',u:'枝'},{n:'故事書',u:'本'},{n:'糖果',u:'粒'},
-  {n:'貼紙',u:'張'},{n:'雞蛋',u:'隻'},{n:'曲奇餅',u:'塊'},{n:'練習簿',u:'本'}
-]);}
-
-// Exports: TOPICS, GRADE_INFO, DIFF_INFO, DIFF_ALLOW, EXAM_TARGETS, SECT_RATIOS, SECT_CONF, SECT_LBL, CTX, nm, pl, fd, it, _nm2, _pl, _it
+// Exports: TOPICS, GRADE_INFO, DIFF_INFO, DIFF_ALLOW, EXAM_TARGETS, SECT_RATIOS, SECT_CONF, SECT_LBL, CTX, nm, pl, fd, it, _nm2, _pl, _it, _price
 // P2: 2N5(fractions), 2N6(division), 2D1(pictographs) — generators in grade2.js
 // P3 added: 3N1(large numbers), 3N6(decimals), 3D2(line graphs)
 // P4 added: 4S2(shape partition), 4S3(8 directions)

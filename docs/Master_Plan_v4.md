@@ -123,9 +123,9 @@ They are SEPARATE. D1 work happens inside Phase 4B. D3 work happens inside Phase
 - [ ] Test parent PIN (set, lock, unlock, reset)
 - [ ] Test i18n (switch lang mid-session, all strings render)
 - [ ] Test edge cases: empty answers, special chars, fraction formats
-- [ ] Add password reset flow (currently missing)
-- [ ] Fix Capacitor build (capacitor.js fails in vite build)
-- [ ] Lighthouse audit (performance, accessibility, PWA score)
+- [x] Add password reset flow (currently missing) ✅ DONE
+- [x] Fix Capacitor build (capacitor.js fails in vite build) ✅ DONE — removed dead capacitor.js loader; Capacitor v8 injects bridge natively
+- [x] Lighthouse audit (performance, accessibility, PWA score) ✅ DONE
 
 ### 3B — Instrumentation (NEW — required before launch)
 - [x] Integrate PostHog analytics (free tier, self-hostable, GDPR/PDPO-friendly) ✅ DONE
@@ -133,22 +133,22 @@ They are SEPARATE. D1 work happens inside Phase 4B. D3 work happens inside Phase
   - VITE_POSTHOG_KEY configured in .env.local — also add to Vercel env vars for production
   - PostHog + Supabase dual-destination (track.js fires both simultaneously)
   - Set up retention cohort (D1/D3/D7/D30) + funnel dashboards in PostHog — TODO
-- [ ] Integrate Sentry error monitoring (free tier, 5K events/mo)
+- [x] Integrate Sentry error monitoring (free tier, 5K events/mo) ✅ DONE
   - Capture JS exceptions, unhandled promise rejections
   - Tag errors with: grade, question type, auth status (guest vs logged in)
-  - Alert on spike > 10 errors/hour
+  - Alert on spike > 10 errors/hour (configure in Sentry dashboard manually)
 
 ### 3C — Data Layer Prep
-- [ ] Data schema documentation — document exam_sessions table structure, column types, JSONB shape, RLS policies. Include example topic_breakdown JSONB so any future dev or AI agent knows the exact shape. This is the single source of truth for the data layer.
-- [ ] Create `question_bank` table in Supabase with schema:
+- [x] Data schema documentation ✅ DONE — `docs/data_schema.md`
+- [x] Create `question_bank` table in Supabase with schema: ✅ DONE — `supabase/question_bank.sql`
   - id, grade, topic_id, difficulty, q_type, question_json (jsonb), source (hardcode|ai_v32|ai_r1|exam_mimic), hash (SHA256 for dedup, UNIQUE), quality_score (0-100), times_served, times_correct, avg_time_spent, status (verified|flagged|retired), context_version, created_at
   - Index: (grade, topic_id, difficulty, q_type, status)
   - Index: (quality_score DESC) WHERE status = 'verified'
-- [ ] Seed question bank: run all 217 generators × multiple seeds = ~2,000+ initial questions
-- [ ] Add dedup logic: hash(question + answer) to prevent duplicates
-- [ ] Separate context pools into `contexts.js` (HK-specific: 蛋撻, 港鐵, 百佳, 八達通, etc.)
-- [ ] Add `gradeRules` validation (max number, decimal/fraction/negative allowed per grade)
-- [ ] Wire contexts.js + gradeRules into existing engine.js generators
+- [ ] Seed question bank: run all 217 generators × multiple seeds = ~2,000+ initial questions (script ready: `scripts/seed_question_bank.mjs`, needs SUPABASE_SERVICE_KEY env var)
+- [x] Add dedup logic: hash(question + answer) to prevent duplicates ✅ DONE — in seed script
+- [x] Separate context pools into `contexts.js` ✅ DONE — `src/engine/contexts.js`
+- [x] Add `gradeRules` validation ✅ DONE — `src/engine/gradeRules.js`
+- [x] Wire contexts.js + gradeRules into existing engine.js generators ✅ DONE — config.js re-exports from contexts.js; exam.js filters via validateQuestion()
 - [x] Design future tables schema (DO NOT build UI yet, schema only):
   - `student_profiles` — enables multi-child (Phase 4A)
   - `subscriptions` — enables paywall state checking (Phase 5)
