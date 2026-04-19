@@ -13,6 +13,7 @@ export default defineConfig({
     strictPort: true,
   },
   build: {
+    target: ['es2020', 'chrome89', 'safari14', 'firefox89'],
     rollupOptions: {
       output: {
         manualChunks(id) {

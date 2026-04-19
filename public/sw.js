@@ -1,6 +1,6 @@
 const CACHE = 'maths-quests-v2';
 const SHELL = ['/', '/index.html', '/manifest.json', '/icon.png',
-  '/mascot.png', '/mascot-happy.png', '/mascot-ok.png', '/mascot-sad.png'];
+  '/mascot.webp', '/mascot-happy.webp', '/mascot-ok.webp', '/mascot-sad.webp'];
 
 /* Install: pre-cache shell assets */
 self.addEventListener('install', e => {

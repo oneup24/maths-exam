@@ -84,7 +84,7 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
 
         {/* Mascot + birthday banner */}
         <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} className="text-center mb-4">
-          <img src={isToday?'/mascot-happy.png':'/mascot.png'} alt="Curlboo Bear mascot"
+          <img src={isToday?'/mascot-happy.webp':'/mascot.webp'} alt="Curlboo Bear mascot"
             className="w-32 h-32 object-cover rounded-3xl mx-auto shadow-md"/>
           {isToday&&(
             <motion.div initial={{scale:0}} animate={{scale:1}} transition={{type:'spring',stiffness:200}}

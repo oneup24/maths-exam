@@ -270,7 +270,7 @@ export default function App(){
         </button>
       </div>
       <motion.div initial={{opacity:0,y:15}} animate={{opacity:1,y:0}} className="text-center mb-4 pt-4">
-        <img src={isBirthday?'/mascot-happy.png':'/mascot.png'} alt="Curlboo Bear mascot" className="w-48 h-48 object-cover rounded-3xl mx-auto mb-3 shadow-lg"/>
+        <img src={isBirthday?'/mascot-happy.webp':'/mascot.webp'} alt="Curlboo Bear mascot" className="w-48 h-48 object-cover rounded-3xl mx-auto mb-3 shadow-lg"/>
         {isBirthday&&<motion.div initial={{scale:0}} animate={{scale:1}} transition={{type:'spring',stiffness:200}} className="inline-flex items-center gap-1.5 bg-pink-100 border border-pink-200 text-pink-600 font-bold text-sm px-3 py-1.5 rounded-full mb-2">🎂 {lang==='zh'?'生日快樂！':'Happy Birthday!'}</motion.div>}
         <div className="flex items-center justify-center gap-3 mb-1">
           {studentName?<p className="text-base font-bold text-indigo-600">{L('greeting',studentName)}</p>:null}

@@ -14,7 +14,7 @@ export default function HistoryList({history,onClear,L}){
       </div>
       {history.length===0?(
         <div className="text-center py-6">
-          <img src="/mascot.png" alt="mascot" className="w-16 h-16 object-cover rounded-2xl mx-auto mb-2 opacity-40"/>
+          <img src="/mascot.webp" alt="mascot" className="w-16 h-16 object-cover rounded-2xl mx-auto mb-2 opacity-40"/>
           <p className="text-sm font-bold text-gray-400">{L('noHistory')}</p>
           <p className="text-xs text-gray-300 mt-0.5">{L('noHistoryDesc')}</p>
         </div>
