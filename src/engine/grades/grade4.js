@@ -13,6 +13,8 @@ export const grade4={
   ()=>{var cn=ri(12,20),en=ri(10,16),ma=ri(5,10),sets=ri(200,400);var dPrice=ri(50,120);return{d:3,tp:'work',q:'一套圖書有'+cn+'本中文、'+en+'本英文和'+ma+'本數學，每套售$'+dPrice+'。'+pl()+'有'+sets+'套，共有中英文書多少本？',a:String((cn+en)*sets),trap:'售價和數學書數量',s:['🔍 售價和數學書無關','中英: '+(cn+en),'×'+sets+' = '+(cn+en)*sets],sc:3}},
   /* d:3 — simplification strategy */
   ()=>{var a=ri(10,25);return{d:3,tp:'calc',q:'用簡便方法計算：'+a+' × 101',a:String(a*101),s:[a+'×100 + '+a+'×1 = '+a*100+' + '+a+' = '+a*101],sc:2}},
+  // 分配律：a × 99 + a = a × 100
+  ()=>{var a=ri(25,75);return{d:3,tp:'calc',q:'用簡便方法計算：'+a+' × 99 + '+a,a:String(a*100),s:['分配律：'+a+' × 99 + '+a+' × 1','= '+a+' × (99 + 1)','= '+a+' × 100 = '+a*100],sc:3}},
   /* _addQ Strategy 1 — template rotation (line 444) */
   ()=>{
     var a=ri(12,45),b=ri(3,9),ans=a*b;
@@ -161,6 +163,10 @@ export const grade4={
 '4N4':[
   ()=>{var a=pk([6,8,9,12]),b=pk([8,10,12,15]);return{d:1,tp:'fill',q:a+'和'+b+'的L.C.M.是____',a:String(lcm(a,b)),s:['列出倍數'],sc:2}},
   ()=>{var a=pk([18,24,30,36]),b=pk([12,16,20,24]);return{d:1,tp:'fill',q:a+'和'+b+'的H.C.F.是____',a:String(gcd(a,b)),s:['列出因數'],sc:2}},
+  // HCF 實際應用：剪正方形
+  ()=>{var w=pk([24,36,48]),h=pk([16,20,32]);var g=gcd(w,h);return{d:3,tp:'work',q:'一塊長方形手工紙長 '+w+' cm，闊 '+h+' cm。要把這張紙剪成數個大小相同的正方形，而沒有剩餘。剪出的正方形最大邊長是多少 cm？',a:String(g),s:['要剪出最大的正方形且沒有剩餘，邊長必須是長和闊的「最大公因數 (H.C.F.)」。','H.C.F.('+w+', '+h+') = '+g],sc:3}},
+  // LCM 實際應用：巴士同時開出
+  ()=>{var a=pk([8,10,12]),b=pk([12,15,20]);var l=lcm(a,b);return{d:3,tp:'work',q:'巴士總站有兩條路線，紅線每 '+a+' 分鐘開出一班，綠線每 '+b+' 分鐘開出一班。如果兩線在上午 9 時同時開出，最少要多少分鐘後才會再次同時開出？',a:String(l),s:['求再次同時開出的時間，即是求兩者的「最小公倍數 (L.C.M.)」。','L.C.M.('+a+', '+b+') = '+l],sc:3}},
   ()=>{var a=pk([4,6,8]),b=pk([6,8,12]);var l=lcm(a,b);var dPool=pk(['室內泳池','室外泳池']),dHours=ri(2,4);return{d:2,tp:'work',q:nm()+'每'+a+'天去'+dPool+'游泳'+dHours+'小時，'+nm()+'每'+b+'天去。若今天同時去，至少多少天後再同時去？',a:String(l),trap:'泳池類型和時數',s:['🔍 泳池和時數無關','L.C.M.('+a+','+b+')='+l],sc:3}},
   /* d:3 — application */
   ()=>{var a=pk([6,8,10,12]),b=pk([8,10,12,15]);var l=lcm(a,b);var n=ri(2,4);return{d:3,tp:'work',q:'紅燈每'+a+'秒亮一次，綠燈每'+b+'秒亮一次。同時亮後，第'+n+'次同時亮是多少秒後？',a:String(l*n),s:['L.C.M.='+l,'第'+n+'次: '+l+'×'+n+'='+l*n],sc:3}}
@@ -223,6 +229,8 @@ export const grade4={
 '4M1':[
   ()=>{var w,h;do{w=ri(8,20);h=ri(5,14);}while(w/h>2.5||h/w>2.5);return{d:1,tp:'short',q:'求長方形周界。',fig:FIG.rect(w,h),a:String((w+h)*2),s:['('+w+'+'+h+')×2='+(w+h)*2],sc:2}},
   ()=>{var s1,s2;do{s1=ri(5,12);s2=ri(8,18);}while(s1===s2);var dH=ri(60,80);return{d:2,tp:'work',q:'桌面高'+dH+'cm。桌上正方形紙板邊長'+s1+'cm和長方形(長'+s2+'cm闊'+s1+'cm)。周界相差多少cm？',a:String(Math.abs(s1*4-(s2+s1)*2)),trap:'桌面高度',s:['🔍 桌面高度無關','正方: '+s1*4,'長方: '+(s2+s1)*2,'差: '+Math.abs(s1*4-(s2+s1)*2)],sc:3}},
+  // 拔尖陷阱：剪去角落的小正方形（周界不變！）
+  ()=>{var w=ri(15,25),h=ri(10,18),cut=ri(3,6);return{d:3,tp:'work',q:'一張長方形手工紙長 '+w+' cm，闊 '+h+' cm。如果在它的一個角落剪去一個邊長 '+cut+' cm 的小正方形，新圖形的周界是多少 cm？',a:String((w+h)*2),trap:'剪去角落正方形',s:['🔍 陷阱！剪去角落的正方形，凹進去的兩條邊長度剛好等於原來的兩邊，所以周界不變！','周界依然是：('+w+' + '+h+') × 2 = '+(w+h)*2],sc:3}},
   ()=>{var w=ri(8,15),h=ri(5,12);var peri=(w+h)*2;return{d:3,tp:'work',q:'長方形周界是'+peri+'cm，長是'+w+'cm。闊是多少cm？面積是多少cm²？',a:h+','+w*h,s:['闊: ('+peri+'÷2)−'+w+'='+h,'面積: '+w+'×'+h+'='+w*h],sc:3}},
   /* _addQ Phase 2 — reverse (line 819) */
   ()=>{
@@ -394,6 +402,8 @@ export const grade4={
   ()=>({d:2,tp:'mc',q:'兩個完全一樣的直角三角形可以拼成什麼形狀？',isMC:true,
     opts:[{l:'A',v:'正方形或長方形',c:true},{l:'B',v:'圓形',c:false},{l:'C',v:'梯形',c:false}],
     a:'A',s:['兩個全等直角三角形可拼成正方形或長方形'],sc:1}),
+  // 長方形剪開不可能得到圓形 (d:1)
+  ()=>({d:1,tp:'mc',q:'把一個長方形沿著一條直線剪開，不可能得到以下哪一組圖形？',isMC:true,opts:[{l:'A',v:'兩個直角三角形',c:false},{l:'B',v:'兩個長方形',c:false},{l:'C',v:'兩個圓形',c:true}],a:'C',s:['長方形全由直線組成，沿直線剪開不可能出現由曲線圍成的圓形。'],sc:1}),
   // 密鋪 (d:2)
   ()=>({d:2,tp:'mc',q:'以下哪種形狀可以獨立密鋪平面？',isMC:true,
     opts:[{l:'A',v:'圓形',c:false},{l:'B',v:'正六邊形',c:true},{l:'C',v:'正五邊形',c:false}],
@@ -424,7 +434,12 @@ export const grade4={
   ()=>{const n=nm();const d1=pk(['東','西']),d2=pk(['北','南']);const s1=ri(2,5),s2=ri(2,4);
     const opp={東:'東',西:'西'};const oppv={北:'北',南:'南'};
     return{d:3,tp:'work',q:n+'從學校出發，先向'+d1+'走'+s1+'格，再向'+d2+'走'+s2+'格。現在在學校的____方向。',
-      a:opp[d1]+oppv[d2],s:['向'+d1+'再向'+d2+'= '+opp[d1]+oppv[d2]+'方向'],sc:2}}
+      a:opp[d1]+oppv[d2],s:['向'+d1+'再向'+d2+'= '+opp[d1]+oppv[d2]+'方向'],sc:2}},
+  // 右轉+後轉 方向推理 (d:3)
+  ()=>{const dirs=['東','南','西','北'];const d1=pk(dirs);const turns={東:'南',南:'西',西:'北',北:'東'};
+    const afterRight=turns[d1];const afterAbout=turns[turns[afterRight]];
+    return{d:3,tp:'work',q:nm()+'面向'+d1+'方，他向右轉一個直角後，再向後轉。他現在面向什麼方向？',
+      a:afterAbout,s:['向右轉一個直角：面向'+afterRight,'再向後轉（180°）：面向'+afterAbout],sc:3}}
 ],
 
 '4D1':[
