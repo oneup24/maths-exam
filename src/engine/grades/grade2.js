@@ -23,12 +23,16 @@ export const grade2={
   ()=>{var a=ri(2,9),b=ri(2,9),c=ri(1,9);return{d:1,tp:'calc',q:a+' × '+b+' + '+c+' = ?',a:String(a*b+c),s:['先乘後加'],sc:2}},
   ()=>{var price=ri(3,8),n=ri(4,8),extra=ri(5,15);var dItem=it(),dPrice=ri(1,3);return{d:2,tp:'work',q:'每個蛋糕'+price+'元，每枝'+dItem+' '+dPrice+'元。'+nm()+'買了'+n+'個蛋糕，另付包裝費'+extra+'元。買蛋糕共需多少元？',a:String(price*n+extra),trap:dItem+'價錢（'+dPrice+'元）',s:['🔍 '+dItem+'價錢無關',price+'×'+n+'='+price*n,price*n+'+'+extra+'='+(price*n+extra)],sc:2}},
   ()=>{var a=ri(3,8),b=ri(3,6),add=ri(5,15);var dBirds=ri(10,25);return{d:2,tp:'work',q:'果園每行有'+a+'棵樹，共'+b+'行。果園裏還有'+dBirds+'隻'+pk(['小鳥','蝴蝶','蜜蜂'])+'。如果再種'+add+'棵，共有多少棵樹？',a:String(a*b+add),trap:'動物數目',s:['🔍 動物數無關',a+'×'+b+'='+a*b,a*b+'+'+add+'='+(a*b+add)],sc:2}},
+  /* d:2 — short: multiplication with 2 questions */
+  ()=>{var rows=ri(3,6),cols=ri(3,6),add=ri(2,5);var total=rows*cols;return{d:2,tp:'short',q:nm()+'的書架有'+rows+'層，每層放'+cols+'本書。書架共有多少本書？再放'+add+'本後，共有多少本？',a:total+','+(total+add),s:[rows+'×'+cols+'='+total+'本',total+'+'+add+'='+(total+add)+'本'],sc:2}},
   /* d:3 — inverse multiplication */
   ()=>{var ans=ri(3,9),b=ri(4,8);return{d:3,tp:'work',q:nm()+'把一些糖果平均分成'+b+'份，每份有'+ans+'顆。原來共有多少顆糖果？',a:String(ans*b),s:['反向思考: '+ans+'×'+b+'='+ans*b],sc:2}}
 ],
 '2M':[
   ()=>{var m=ri(2,5),cm=ri(10,90),m2=ri(1,3),cm2=ri(10,80);return{d:1,tp:'calc',q:m+'米'+cm+'厘米 + '+m2+'米'+cm2+'厘米 = ____厘米',a:String(m*100+cm+m2*100+cm2),s:['化成厘米再加'],sc:2}},
   ()=>{var total,part;do{total=ri(200,500);part=ri(80,110);}while(2*part-30>=total);var dWidth=ri(2,5);return{d:2,tp:'short',q:'繩子長'+total+'厘米、闊'+dWidth+'厘米。用去'+part+'厘米後再用去'+(part-30)+'厘米，還剩多長？',a:String(total-part-(part-30)),trap:'繩子闊度（'+dWidth+'厘米）',s:['🔍 闊度無關',total+'−'+part+'='+(total-part),(total-part)+'−'+(part-30)+'='+(total-part-(part-30))],sc:2}},
+  ()=>{var price=ri(3,8),n=ri(3,6);var cost=price*n;var pay=pk([20,50,100].filter(p=>p>cost));if(!pay)pay=50+cost;return{d:2,tp:'short',q:nm()+'在'+pk(CTX.places)+'買了'+n+'個'+pk(CTX.food)+'，每個'+price+'元。她付了'+pay+'元，應找回多少元？用了幾成錢？',a:String(pay-cost)+','+(cost/pay*10).toFixed(0)+'成',s:[price+'×'+n+'='+cost+'元','找回: '+pay+'−'+cost+'='+(pay-cost)+'元'],sc:2}},
+  ()=>{var w1=ri(2,5),w2=ri(1,4);var dColor=pk(['紅','藍','綠']);return{d:2,tp:'short',q:dColor+'色袋重'+w1+'公斤，白色袋重'+w2+'公斤。兩袋共重多少公斤？哪袋較重？重多少？',a:(w1+w2)+','+(w1>w2?dColor+'色':'白色')+','+Math.abs(w1-w2),trap:'袋的顏色（'+dColor+'）',s:['共: '+w1+'+'+w2+'='+(w1+w2)+'公斤','差: '+Math.abs(w1-w2)+'公斤'],sc:3}},
   ()=>{var kg=ri(1,3),g=ri(100,800);return{d:3,tp:'fill',q:kg+'公斤'+g+'克 = ____克',a:String(kg*1000+g),s:[kg+'×1000+'+g+'='+(kg*1000+g)],sc:2}}
 ],
 '2S':[
@@ -92,6 +96,8 @@ export const grade2={
   ()=>{const groups=ri(2,5);const total=groups*ri(3,8);const n=nm();
     return{d:2,tp:'work',q:n+'有'+total+'個橙，平均分成'+groups+'份，每份有多少個？',
       a:String(total/groups),s:[total+'÷'+groups+'='+(total/groups)],sc:2}},
+  /* d:2 — short: division with remainder, two questions */
+  ()=>{const div=ri(3,7);const total=div*ri(4,7)+ri(1,div-1);const q=Math.floor(total/div);const r=total%div;return{d:2,tp:'short',q:'有'+total+'個'+pk(CTX.food)+'，每'+div+'個裝一袋。可以裝幾袋？還剩多少個？',a:q+','+r,s:[total+'÷'+div+'='+q+'餘'+r,'裝'+q+'袋，剩'+r+'個'],sc:2}},
   // d:3 — find number of groups
   ()=>{const each=ri(3,6);const total=each*ri(4,8);
     return{d:3,tp:'work',q:'共有'+total+'個蘋果，每盒放'+each+'個，需要多少個盒子？',

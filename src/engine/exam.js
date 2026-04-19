@@ -32,10 +32,13 @@ export function buildExam(grade,topics,examType,difficulty){
   var sumR=0;types.forEach(t=>{sumR+=SECT_RATIOS[t]||.1});
   var dist={};types.forEach(t=>{dist[t]=Math.max(1,Math.round(totalTarget*(SECT_RATIOS[t]||.1)/sumR))});
   var generated={};var count=0;
+  /* prevent same story-template generator appearing twice — only for short/work where template repetition is jarring */
+  var usedGens=new Set();
+  var storyTypes=new Set(['short','work']);
   types.forEach(t=>{
     var need=dist[t]||0,gens=allGens[t],qs=[],seen={},seenT={};
     for(var i=0;i<need*80&&qs.length<need;i++){
-      try{var item=pk(gens);var q=item.fn();if(!q||!q.q)continue;if(!allowed.includes(q.d||2))continue;if(!validateQuestion(grade,q).ok)continue;var k=q.q+'|'+q.a;if(seen[k])continue;var tc=seenT[q.q]||0;if(tc>=1)continue;seen[k]=true;seenT[q.q]=tc+1;q.topicId=item.tid;q.topicName=item.tnm;qs.push(q)}catch{/* intentionally empty — skip broken generators */}
+      try{var item=pk(gens);if(storyTypes.has(t)&&usedGens.has(item.fn))continue;var q=item.fn();if(!q||!q.q)continue;if(!allowed.includes(q.d||2))continue;if(!validateQuestion(grade,q).ok)continue;var k=q.q+'|'+q.a;if(seen[k])continue;var tc=seenT[q.q]||0;if(tc>=1)continue;seen[k]=true;seenT[q.q]=tc+1;if(storyTypes.has(t))usedGens.add(item.fn);q.topicId=item.tid;q.topicName=item.tnm;qs.push(q)}catch{/* intentionally empty — skip broken generators */}
     }
     if(qs.length>0){generated[t]=qs;count+=qs.length}
   });
@@ -46,7 +49,7 @@ export function buildExam(grade,topics,examType,difficulty){
   var safety=0;
   while(count<totalTarget&&safety<500){
     safety++;var t=pk(types);var gens=allGens[t];if(!gens.length)continue;if(!generated[t])generated[t]=[];
-    try{var item=pk(gens);var q=item.fn();if(!q||!q.q)continue;if(!allowed.includes(q.d||2))continue;if(!validateQuestion(grade,q).ok)continue;var k=q.q+'|'+q.a;if(gSeen[k])continue;if((gSeenT[q.q]||0)>=1)continue;gSeen[k]=true;gSeenT[q.q]=(gSeenT[q.q]||0)+1;q.topicId=item.tid;q.topicName=item.tnm;generated[t].push(q);count++}catch{/* intentionally empty — skip broken generators */}
+    try{var item=pk(gens);if(storyTypes.has(t)&&usedGens.has(item.fn))continue;var q=item.fn();if(!q||!q.q)continue;if(!allowed.includes(q.d||2))continue;if(!validateQuestion(grade,q).ok)continue;var k=q.q+'|'+q.a;if(gSeen[k])continue;if((gSeenT[q.q]||0)>=1)continue;gSeen[k]=true;gSeenT[q.q]=(gSeenT[q.q]||0)+1;if(storyTypes.has(t))usedGens.add(item.fn);q.topicId=item.tid;q.topicName=item.tnm;generated[t].push(q);count++}catch{/* intentionally empty — skip broken generators */}
   }
   while(count>totalTarget){
     var longest=types.filter(t=>(generated[t]||[]).length>1).sort((a,b)=>(generated[b]||[]).length-(generated[a]||[]).length);
