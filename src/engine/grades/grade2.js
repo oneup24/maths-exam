@@ -28,7 +28,7 @@ export const grade2={
 ],
 '2M':[
   ()=>{var m=ri(2,5),cm=ri(10,90),m2=ri(1,3),cm2=ri(10,80);return{d:1,tp:'calc',q:m+'米'+cm+'厘米 + '+m2+'米'+cm2+'厘米 = ____厘米',a:String(m*100+cm+m2*100+cm2),s:['化成厘米再加'],sc:2}},
-  ()=>{var total=ri(200,500),part=ri(80,150);var dWidth=ri(2,5);return{d:2,tp:'short',q:'繩子長'+total+'厘米、闊'+dWidth+'厘米。用去'+part+'厘米後再用去'+(part-30)+'厘米，還剩多長？',a:String(total-part-(part-30)),trap:'繩子闊度（'+dWidth+'厘米）',s:['🔍 闊度無關',total+'−'+part+'='+(total-part),(total-part)+'−'+(part-30)+'='+(total-part-(part-30))],sc:2}},
+  ()=>{var total,part;do{total=ri(200,500);part=ri(80,110);}while(2*part-30>=total);var dWidth=ri(2,5);return{d:2,tp:'short',q:'繩子長'+total+'厘米、闊'+dWidth+'厘米。用去'+part+'厘米後再用去'+(part-30)+'厘米，還剩多長？',a:String(total-part-(part-30)),trap:'繩子闊度（'+dWidth+'厘米）',s:['🔍 闊度無關',total+'−'+part+'='+(total-part),(total-part)+'−'+(part-30)+'='+(total-part-(part-30))],sc:2}},
   ()=>{var kg=ri(1,3),g=ri(100,800);return{d:3,tp:'fill',q:kg+'公斤'+g+'克 = ____克',a:String(kg*1000+g),s:[kg+'×1000+'+g+'='+(kg*1000+g)],sc:2}}
 ],
 '2S':[
@@ -48,7 +48,7 @@ export const grade2={
       a:Math.floor(n/1000)+','+Math.floor(n%1000/100),
       s:['千位='+Math.floor(n/1000)+'，百位='+Math.floor(n%1000/100)],sc:1}},
   // 比較兩個四位數 (d:2)
-  ()=>{const a=ri(1000,9999),b=ri(1000,9999);while(a===b)b=ri(1000,9999);
+  ()=>{var a=ri(1000,9999),b=ri(1000,9999);while(a===b)b=ri(1000,9999);
     const big=Math.max(a,b),small=Math.min(a,b);
     return{d:2,tp:'fill',q:'比較'+a+'和'+b+'：較大的是____，較小的是____。',
       a:big+','+small,s:[big+' > '+small],sc:2}},

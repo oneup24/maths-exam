@@ -221,8 +221,8 @@ export const grade4={
   }
 ],
 '4M1':[
-  ()=>{var w=ri(8,25),h=ri(5,18);return{d:1,tp:'short',q:'求長方形周界。',fig:FIG.rect(w,h),a:String((w+h)*2),s:['('+w+'+'+h+')×2='+(w+h)*2],sc:2}},
-  ()=>{var s1=ri(5,12),s2=ri(8,18);var dH=ri(60,80);return{d:2,tp:'work',q:'桌面高'+dH+'cm。桌上正方形紙板邊長'+s1+'cm和長方形(長'+s2+'cm闊'+s1+'cm)。周界相差多少cm？',a:String(Math.abs(s1*4-(s2+s1)*2)),trap:'桌面高度',s:['🔍 桌面高度無關','正方: '+s1*4,'長方: '+(s2+s1)*2,'差: '+Math.abs(s1*4-(s2+s1)*2)],sc:3}},
+  ()=>{var w,h;do{w=ri(8,20);h=ri(5,14);}while(w/h>2.5||h/w>2.5);return{d:1,tp:'short',q:'求長方形周界。',fig:FIG.rect(w,h),a:String((w+h)*2),s:['('+w+'+'+h+')×2='+(w+h)*2],sc:2}},
+  ()=>{var s1,s2;do{s1=ri(5,12);s2=ri(8,18);}while(s1===s2);var dH=ri(60,80);return{d:2,tp:'work',q:'桌面高'+dH+'cm。桌上正方形紙板邊長'+s1+'cm和長方形(長'+s2+'cm闊'+s1+'cm)。周界相差多少cm？',a:String(Math.abs(s1*4-(s2+s1)*2)),trap:'桌面高度',s:['🔍 桌面高度無關','正方: '+s1*4,'長方: '+(s2+s1)*2,'差: '+Math.abs(s1*4-(s2+s1)*2)],sc:3}},
   ()=>{var w=ri(8,15),h=ri(5,12);var peri=(w+h)*2;return{d:3,tp:'work',q:'長方形周界是'+peri+'cm，長是'+w+'cm。闊是多少cm？面積是多少cm²？',a:h+','+w*h,s:['闊: ('+peri+'÷2)−'+w+'='+h,'面積: '+w+'×'+h+'='+w*h],sc:3}},
   /* _addQ Phase 2 — reverse (line 819) */
   ()=>{
@@ -242,7 +242,7 @@ export const grade4={
   /* _addQ — image-based questions (line 1118) */
   // Rectangle perimeter (varied text to bypass dedup)
   ()=>{
-    var w=ri(8,25),h=ri(5,18);
+    var w,h;do{w=ri(8,20);h=ri(5,14);}while(w/h>2.5||h/w>2.5);
     return{d:1,tp:'short',
       q:'下圖長方形，長'+w+'cm，闊'+h+'cm。求周界。',
       fig:FIG.rect(w,h),
@@ -260,17 +260,18 @@ export const grade4={
   },
   // Find missing side from perimeter + image
   ()=>{
-    var w=ri(8,20),h=ri(5,15),peri=(w+h)*2;
+    var w,h,peri;
+    do{w=ri(8,20);h=ri(5,15);peri=(w+h)*2;}while(h===w||h===peri||w/h>2.5||h/w>2.5);
     return{d:2,tp:'short',
       q:'下圖長方形周界是'+peri+'cm，長是'+w+'cm。闊是多少cm？',
-      fig:FIG.rect(w,h),
+      fig:FIG.rect(w,h,'h'),
       a:String(h),
       s:['闊 = '+peri+'÷2−'+w+' = '+h],sc:2};
   },
   // Two shapes comparison with image
   ()=>{
-    var w=ri(8,16),h=ri(5,12),rectP=(w+h)*2;
-    var s=ri(6,14),sqP=s*4;
+    var w,h,s,rectP,sqP;
+    do{w=ri(8,16);h=ri(5,12);s=ri(6,14);rectP=(w+h)*2;sqP=s*4;}while(w/h>2.5||h/w>2.5||rectP===sqP);
     return{d:2,tp:'short',
       q:'長方形(長'+w+'cm，闊'+h+'cm)和正方形(邊長'+s+'cm)，周界相差多少cm？',
       fig:FIG.rect(w,h),
@@ -279,7 +280,7 @@ export const grade4={
   },
   // Half perimeter
   ()=>{
-    var w=ri(10,22),h=ri(6,16),_peri=(w+h)*2;
+    var w,h;do{w=ri(10,22);h=ri(6,16);}while(w/h>2.5||h/w>2.5);var _peri=(w+h)*2;
     return{d:2,tp:'short',
       q:'下圖長方形的周界的一半是多少cm？',
       fig:FIG.rect(w,h),
@@ -288,16 +289,17 @@ export const grade4={
   },
   // Given perimeter find area (with image)
   ()=>{
-    var w=ri(8,18),h=ri(5,14),peri=(w+h)*2;
+    var w,h,peri;
+    do{w=ri(8,18);h=ri(5,14);peri=(w+h)*2;}while(h===w||h===peri||w/h>2.5||h/w>2.5);
     return{d:3,tp:'short',
       q:'下圖長方形周界'+peri+'cm，長'+w+'cm。求面積。',
-      fig:FIG.rect(w,h),
+      fig:FIG.rect(w,h,'h'),
       a:String(w*h),
       s:['闊='+h,'面積='+w+'×'+h+'='+w*h],sc:3};
   }
 ],
 '4M2':[
-  ()=>{var w=ri(6,18),h=ri(4,14);return{d:1,tp:'short',q:'求長方形面積。',fig:FIG.rect(w,h),a:String(w*h),s:[w+'×'+h+'='+w*h],sc:2}},
+  ()=>{var w,h;do{w=ri(6,16);h=ri(4,12);}while(w/h>2.5||h/w>2.5);return{d:1,tp:'short',q:'求長方形面積。',fig:FIG.rect(w,h),a:String(w*h),s:[w+'×'+h+'='+w*h],sc:2}},
   ()=>{var w=ri(8,15),h=ri(5,10),cut=ri(2,4);var dPW=ri(80,150);return{d:2,tp:'work',q:'長方形紙板長'+w+'cm闊'+h+'cm，每cm²重'+dPW+'毫克。剪去邊長'+cut+'cm正方形，剩餘面積？',a:String(w*h-cut*cut),trap:'紙板重量',s:['🔍 重量無關','長方: '+w*h,'正方: '+cut*cut,'剩: '+(w*h-cut*cut)],sc:3}},
   ()=>{var area=ri(40,100),w=ri(4,8);var h=area/w;if(h!==Math.floor(h)){area=w*ri(5,12);h=area/w}return{d:3,tp:'work',q:'長方形面積'+area+'cm²，闊'+w+'cm。求長和周界。',a:h+','+(w+h)*2,s:['長: '+area+'÷'+w+'='+h,'周界: ('+w+'+'+h+')×2='+(w+h)*2],sc:3}},
   /* _addQ Phase 2 — reverse (line 837) */
@@ -324,7 +326,7 @@ export const grade4={
   },
   /* _addQ — image-based questions (line 1177) */
   ()=>{
-    var w=ri(6,18),h=ri(4,14);
+    var w,h;do{w=ri(6,16);h=ri(4,12);}while(w/h>2.5||h/w>2.5);
     return{d:1,tp:'short',
       q:'下圖長方形，長'+w+'cm，闊'+h+'cm。求面積。',
       fig:FIG.rect(w,h),
@@ -340,15 +342,16 @@ export const grade4={
       s:[s+'×'+s+'='+s*s],sc:2};
   },
   ()=>{
-    var w=ri(8,16),h=ri(5,12),area=w*h;
+    var w,h,area;
+    do{w=ri(8,16);h=ri(5,12);area=w*h;}while(h===w||h===area||w/h>2.5||h/w>2.5);
     return{d:2,tp:'short',
       q:'下圖長方形面積是'+area+'cm²，長是'+w+'cm。闊是多少cm？',
-      fig:FIG.rect(w,h),
+      fig:FIG.rect(w,h,'h'),
       a:String(h),
       s:['闊='+area+'÷'+w+'='+h],sc:2};
   },
   ()=>{
-    var w=ri(8,15),h=ri(5,12);
+    var w,h;do{w=ri(8,15);h=ri(5,12);}while(w/h>2.5||h/w>2.5);
     return{d:2,tp:'short',
       q:'下圖長方形的面積和周界各是多少？(用逗號分隔)',
       fig:FIG.rect(w,h),

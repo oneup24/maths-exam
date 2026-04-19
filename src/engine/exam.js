@@ -39,6 +39,8 @@ export function buildExam(grade,topics,examType,difficulty){
     if(qs.length>0){generated[t]=qs;count+=qs.length}
   });
   var gSeen={},gSeenT={};
+  /* pre-seed from session to avoid cross-exam repeats */
+  try{var _sk='mq_seen_'+grade;JSON.parse(sessionStorage.getItem(_sk)||'[]').forEach(k=>{gSeen[k]=true;var qt=k.split('|')[0];gSeenT[qt]=(gSeenT[qt]||0)+1});}catch{}
   types.forEach(t=>(generated[t]||[]).forEach(q=>{gSeen[q.q+'|'+q.a]=true;gSeenT[q.q]=(gSeenT[q.q]||0)+1}));
   var safety=0;
   while(count<totalTarget&&safety<500){
@@ -51,6 +53,8 @@ export function buildExam(grade,topics,examType,difficulty){
   }
   var secs=[];
   ['calc','fill','mc','short','work'].forEach(t=>{var qs=generated[t];if(!qs||!qs.length)return;var total=qs.reduce((s,q)=>s+(q.sc||2),0);secs.push({id:t,label:SECT_LBL[secs.length],nm:SECT_CONF[t].nm,nt:SECT_CONF[t].nt,total,qs})});
+  /* persist question hashes for cross-exam dedup */
+  try{var _sk='mq_seen_'+grade;var _prev=JSON.parse(sessionStorage.getItem(_sk)||'[]');var _new=secs.flatMap(s=>s.qs).map(q=>q.q+'|'+q.a);var _merged=[...new Set([..._prev,..._new])].slice(-200);sessionStorage.setItem(_sk,JSON.stringify(_merged));}catch{}
   return secs;
 }
 
