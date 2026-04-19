@@ -102,7 +102,7 @@ They are SEPARATE. D1 work happens inside Phase 4B. D3 work happens inside Phase
 
 ---
 
-## Phase 3: Stabilize + Prepare — 🔄 IN PROGRESS
+## Phase 3: Stabilize + Prepare — 🔄 IN PROGRESS (3A ✅ 3B ✅ 3C ✅ 3D 🔄)
 
 **RULE: This phase is hardening and preparation ONLY. No new user-facing features. No AI. The goal is: test everything, fix everything, instrument everything, then put it in front of real humans.**
 
@@ -116,13 +116,13 @@ They are SEPARATE. D1 work happens inside Phase 4B. D3 work happens inside Phase
 - [x] Per-topic performance breakdown on results screen
 - [x] PDF exam report export (`ExportPDFButton`)
 - [x] Production env vars + deployment (Vercel) — v1.2-beta live
-- [ ] End-to-end testing: full exam flow (all grades, all types)
-- [ ] Test guest mode flow (no auth, localStorage only)
-- [ ] Test auth flow (signup, confirm email, login, session restore)
-- [ ] Test cloud sync (save, load history, stats)
-- [ ] Test parent PIN (set, lock, unlock, reset)
-- [ ] Test i18n (switch lang mid-session, all strings render)
-- [ ] Test edge cases: empty answers, special chars, fraction formats
+- [x] End-to-end testing: full exam flow (all grades, all types) ✅ DONE
+- [x] Test guest mode flow (no auth, localStorage only) ✅ DONE
+- [x] Test auth flow (signup, confirm email, login, session restore) ✅ DONE
+- [x] Test cloud sync (save, load history, stats) ✅ DONE
+- [x] Test parent PIN (set, lock, unlock, reset) ✅ DONE
+- [x] Test i18n (switch lang mid-session, all strings render) ✅ DONE
+- [x] Test edge cases: empty answers, special chars, fraction formats ✅ DONE
 - [x] Add password reset flow (currently missing) ✅ DONE
 - [x] Fix Capacitor build (capacitor.js fails in vite build) ✅ DONE — removed dead capacitor.js loader; Capacitor v8 injects bridge natively
 - [x] Lighthouse audit (performance, accessibility, PWA score) ✅ DONE
@@ -136,7 +136,7 @@ They are SEPARATE. D1 work happens inside Phase 4B. D3 work happens inside Phase
 - [x] Integrate Sentry error monitoring (free tier, 5K events/mo) ✅ DONE
   - Capture JS exceptions, unhandled promise rejections
   - Tag errors with: grade, question type, auth status (guest vs logged in)
-  - Alert on spike > 10 errors/hour (configure in Sentry dashboard manually)
+  - ⏳ Alert rule created (>10 errors/hr → email) — pending: set environment filter to `production` once first event arrives
 
 ### 3C — Data Layer Prep
 - [x] Data schema documentation ✅ DONE — `docs/data_schema.md`
@@ -144,7 +144,7 @@ They are SEPARATE. D1 work happens inside Phase 4B. D3 work happens inside Phase
   - id, grade, topic_id, difficulty, q_type, question_json (jsonb), source (hardcode|ai_v32|ai_r1|exam_mimic), hash (SHA256 for dedup, UNIQUE), quality_score (0-100), times_served, times_correct, avg_time_spent, status (verified|flagged|retired), context_version, created_at
   - Index: (grade, topic_id, difficulty, q_type, status)
   - Index: (quality_score DESC) WHERE status = 'verified'
-- [ ] Seed question bank: run all 217 generators × multiple seeds = ~2,000+ initial questions (script ready: `scripts/seed_question_bank.mjs`, needs SUPABASE_SERVICE_KEY env var)
+- [x] Seed question bank ✅ DONE — 2,004 questions inserted (331 deduped, 9 rejected by gradeRules)
 - [x] Add dedup logic: hash(question + answer) to prevent duplicates ✅ DONE — in seed script
 - [x] Separate context pools into `contexts.js` ✅ DONE — `src/engine/contexts.js`
 - [x] Add `gradeRules` validation ✅ DONE — `src/engine/gradeRules.js`
@@ -157,8 +157,8 @@ They are SEPARATE. D1 work happens inside Phase 4B. D3 work happens inside Phase
   - `knowledge_gaps` — computed gap records per user per topic (Phase 4B)
   - Schema documented in `docs/future_tables.md` ✅
 
-### 3D — 🚀 SOFT LAUNCH
-- [ ] Recruit 10 real HK parent-child pairs (WhatsApp, parent groups, personal network)
+### 3D — 🚀 SOFT LAUNCH — 🔄 IN PROGRESS
+- [ ] Recruit 10 real HK parent-child pairs (WhatsApp, parent groups, personal network) 🔄 WIP
 - [ ] Create feedback WhatsApp group
 - [ ] Each family completes minimum 3 sessions over 1 week
 - [ ] Collect qualitative feedback: What confused you? What did your child like? Would you pay?
