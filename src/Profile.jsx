@@ -1,7 +1,7 @@
 import React,{useState,useEffect} from 'react';
 // eslint-disable-next-line no-unused-vars -- motion is used as <motion.div> in JSX
 import {motion} from 'framer-motion';
-import {ArrowLeft,Save,User,Cake,Zap,Lock,Check} from 'lucide-react';
+import {ArrowLeft,Save,User,Cake,Zap,Lock,Check,Globe,Volume2,VolumeX,Settings} from 'lucide-react';
 import { getUserStats, loadExamHistory } from './services/api';
 import {track} from './lib/track';
 
@@ -28,7 +28,7 @@ function daysUntilBirthday(birthday){
   return Math.ceil((next-now)/(1000*60*60*24));
 }
 
-export default function Profile({onBack,lang='zh',studentName,setStudentName,streak,user,signOut,goToLogin}){
+export default function Profile({onBack,lang='zh',setLang,soundOn,setSoundOn,studentName,setStudentName,grade,setGrade,streak,user,signOut,goToLogin}){
   const isZh=lang==='zh';
   const[name,setName]=useState(studentName||'');
   const[birthday,setBirthday]=useState(()=>localStorage.getItem('student_birthday')||'');
@@ -60,7 +60,7 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
   var isToday=isTodayBirthday(birthday);
 
   return(
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-stone-50 to-orange-50 p-4 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-stone-50 to-orange-50 p-4 pb-24">
       <div className="max-w-lg mx-auto">
 
         {/* Header */}
@@ -119,6 +119,19 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
             </p>
           )}
 
+          {/* Grade */}
+          <label className="text-xs font-bold text-gray-500 mb-1 flex items-center gap-1 mt-2">
+            📚 {isZh?'年級':'Grade'}
+          </label>
+          <div className="flex gap-1.5 flex-wrap mb-4">
+            {[1,2,3,4,5,6].map(g=>(
+              <button key={g} onClick={()=>{if(setGrade){setGrade(g);localStorage.setItem('selected_grade',String(g));}}}
+                className={"px-3 py-1.5 rounded-xl text-sm font-bold border-2 transition-all duration-200 active:scale-[0.97] "+(grade===g?'bg-orange-500 border-orange-500 text-white':'bg-gray-50 border-gray-200 text-gray-400')}>
+                P{g}
+              </button>
+            ))}
+          </div>
+
           {/* Save */}
           <motion.button whileTap={{scale:0.97}} onClick={save}
             className={"w-full py-3.5 rounded-2xl font-extrabold text-base text-white flex items-center justify-center gap-2 transition-all shadow-md "+(saved?'bg-emerald-500':'bg-gradient-to-r from-indigo-500 to-purple-500')}>
@@ -160,6 +173,28 @@ export default function Profile({onBack,lang='zh',studentName,setStudentName,str
               </div>
             </div>
           )}
+        </div>
+
+        {/* App Settings */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-5 shadow-sm border border-white/50 mb-3">
+          <h3 className="font-bold text-gray-700 flex items-center gap-2 mb-3">
+            <Settings size={16} className="text-gray-500"/>
+            {isZh?'應用設定':'App Settings'}
+          </h3>
+          <div className="flex items-center justify-between py-2.5 border-b border-gray-100">
+            <span className="text-sm font-bold text-gray-700 flex items-center gap-2"><Globe size={14}/>{isZh?'語言':'Language'}</span>
+            <button onClick={()=>{if(setLang){const v=lang==='zh'?'en':'zh';setLang(v);localStorage.setItem('lang',v);}}}
+              className="px-3 py-1 rounded-lg bg-orange-100 text-orange-600 text-xs font-bold active:bg-orange-200 transition-all duration-200">
+              {lang==='zh'?'中文 → EN':'EN → 中文'}
+            </button>
+          </div>
+          <div className="flex items-center justify-between py-2.5">
+            <span className="text-sm font-bold text-gray-700 flex items-center gap-2">{soundOn?<Volume2 size={14}/>:<VolumeX size={14}/>}{isZh?'音效':'Sound'}</span>
+            <button onClick={()=>{if(setSoundOn){const v=!soundOn;setSoundOn(v);localStorage.setItem('sound_on',v?'1':'0');}}}
+              className={"w-12 h-6 rounded-full transition-all "+(soundOn?'bg-orange-500':'bg-gray-300')}>
+              <div className={"w-5 h-5 bg-white rounded-full shadow transition-transform "+(soundOn?'translate-x-6':'translate-x-0.5')}/>
+            </button>
+          </div>
         </div>
 
         {/* Streak */}

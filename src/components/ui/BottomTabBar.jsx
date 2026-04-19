@@ -1,10 +1,10 @@
-import { Home, BookOpen, BarChart2, User } from 'lucide-react';
+import { Home, Compass, BarChart2, User } from 'lucide-react';
 
 const TABS = [
-  { id: 'home',     Icon: Home,      zh: '主頁',  en: 'Home'     },
-  { id: 'practice', Icon: BookOpen,  zh: '練習',  en: 'Practice' },
-  { id: 'history',  Icon: BarChart2, zh: '記錄',  en: 'History'  },
-  { id: 'profile',  Icon: User,      zh: '我的',  en: 'Profile'  },
+  { id: 'home',    Icon: Home,     zh: '主頁', en: 'Home'    },
+  { id: 'quests',  Icon: Compass,  zh: '任務', en: 'Quests'  },
+  { id: 'history', Icon: BarChart2,zh: '記錄', en: 'History' },
+  { id: 'profile', Icon: User,     zh: '我的', en: 'Profile' },
 ];
 
 export default function BottomTabBar({ activeTab, onTab, lang = 'zh' }) {

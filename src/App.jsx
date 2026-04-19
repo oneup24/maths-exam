@@ -7,7 +7,7 @@ const Profile      = lazy(() => import('./Profile'));
 const Login        = lazy(() => import('./pages/Login'));
 // eslint-disable-next-line no-unused-vars -- motion is used as <motion.div> in JSX
 import {motion,AnimatePresence} from 'framer-motion';
-import {Eye,ChevronDown,ChevronUp,X,Check,AlertTriangle,Settings,Volume2,VolumeX,Globe} from 'lucide-react';
+import {Eye,ChevronDown,ChevronUp,X,Check,AlertTriangle} from 'lucide-react';
 import {TOPICS,GRADE_INFO,DIFF_INFO,buildExam,printExam,chkAns,saveHistory,loadHistory,clearHistory} from './engine/index';
 import {t} from './lib/i18n';
 import { useAuth } from './hooks/useAuth';
@@ -16,6 +16,7 @@ import {GC} from './lib/colors';
 import {track} from './lib/track';
 import {pageTransition} from './lib/animations';
 import { setSentryUser, setSentryContext } from './lib/sentry';
+import QuestsModal from './components/modals/QuestsModal';
 import SubmitModal from './components/modals/SubmitModal';
 import PrintModal from './components/modals/PrintModal';
 import SignUpPromptModal from './components/modals/SignUpPromptModal';
@@ -23,6 +24,7 @@ import PinModal from './components/modals/PinModal';
 import PageShell from './components/ui/PageShell';
 import GradeGrid from './components/home/GradeGrid';
 import HistoryList from './components/home/HistoryList';
+import RecordTab from './components/home/RecordTab';
 import GuestBanner from './components/home/GuestBanner';
 import TrapInfoBox from './components/home/TrapInfoBox';
 import SplashScreen from './components/SplashScreen';
@@ -94,9 +96,10 @@ export default function App(){
   var isBirthday=(()=>{var bd=localStorage.getItem('student_birthday');if(!bd)return false;var b=new Date(bd),n=new Date();return b.getMonth()===n.getMonth()&&b.getDate()===n.getDate();})();
   const[showSplash,setShowSplash]=useState(()=>!sessionStorage.getItem('mq_splash_shown'));
   const[activeTab,setActiveTab]=useState('home');
-  var handleTab=tab=>{setActiveTab(tab);if(tab==='profile')setView('profile');else if(view!=='home')setView('home');};
+  const[showQuests,setShowQuests]=useState(false);
+  var handleTab=tab=>{if(tab==='quests'){setShowQuests(true);return;}setActiveTab(tab);if(tab==='profile')setView('profile');else if(view!=='home')setView('home');};
 
-  useEffect(()=>{var ts=TOPICS[grade];if(ts)setSelTopics(new Set(ts.map(t=>t.id)))},[grade]);
+  useEffect(()=>{setSelTopics(new Set())},[grade]);
   useEffect(()=>{setHistory(loadHistory())},[]);
   useEffect(()=>{setSentryUser(user?.id??null)},[user]);
   useEffect(()=>{setSentryContext(grade,user?'auth':'guest')},[grade,user]);
@@ -247,6 +250,9 @@ export default function App(){
     </div>
   );
 
+  /* ════════ SPLASH (all users, once per session) ════════ */
+  if(showSplash)return <SplashScreen onDone={()=>{sessionStorage.setItem('mq_splash_shown','1');setShowSplash(false);}}/>;
+
   /* ════════ ONBOARDING (before auth — hook before ask) ════════ */
   if(!onboarded)return <Suspense fallback={null}><Onboarding onComplete={completeOnboarding} lang={lang} signUp={signUp} signIn={signIn}/></Suspense>;
 
@@ -255,30 +261,13 @@ export default function App(){
     <Suspense fallback={null}><Login onAuth={{ signUp, signIn, skip: () => setSkippedLogin(true), isRecovery, resetPassword, updatePassword }} lang={lang} /></Suspense>
   );
 
-  /* ════════ SPLASH ════════ */
-  if(showSplash)return <SplashScreen onDone={()=>{sessionStorage.setItem('mq_splash_shown','1');setShowSplash(false);}}/>;
-
   /* ════════ PROFILE ════════ */
-  if(view==='profile')return(<><Suspense fallback={null}><Profile onBack={()=>{setView('home');setActiveTab('home');}} lang={lang} studentName={studentName} setStudentName={setStudentName} streak={streak} user={user} signOut={async()=>{await signOut();setSkippedLogin(false);}} goToLogin={()=>setSkippedLogin(false)}/></Suspense><BottomTabBar activeTab="profile" onTab={handleTab} lang={lang}/></>);
+  if(view==='profile')return(<><Suspense fallback={null}><Profile onBack={()=>{setView('home');setActiveTab('home');}} lang={lang} setLang={v=>{setLang(v);localStorage.setItem('lang',v);}} soundOn={soundOn} setSoundOn={v=>{setSoundOn(v);localStorage.setItem('sound_on',v?'1':'0');}} studentName={studentName} setStudentName={setStudentName} grade={grade} setGrade={setGrade} streak={streak} user={user} signOut={async()=>{await signOut();setSkippedLogin(false);}} goToLogin={()=>setSkippedLogin(false)}/></Suspense><BottomTabBar activeTab="profile" onTab={handleTab} lang={lang}/></>);
 
   /* ════════ VIEWS ════════ */
   if(view==='home')return(
     <><motion.div key="home" {...pageTransition}><PageShell>
-      <div className="flex justify-between items-center mb-3">
-        <button onClick={()=>{const v=lang==='zh'?'en':'zh';setLang(v);localStorage.setItem('lang',v);track('lang_switch',{lang:v});}} aria-label={lang==='zh'?'Switch to English':'切換至中文'}
-          className="p-2.5 min-w-[44px] min-h-[44px] rounded-xl bg-white/60 active:bg-white active:scale-[0.97] border border-stone-200 shadow-sm text-gray-500 transition-all duration-200 hover:shadow-md flex items-center justify-center">
-          <Globe size={18}/>
-        </button>
-        <button onClick={()=>{setView('profile');setActiveTab('profile');}} aria-label={lang==='zh'?'設定':'Settings'}
-          className="p-2.5 min-w-[44px] min-h-[44px] rounded-xl bg-white/60 active:bg-white active:scale-[0.97] border border-stone-200 shadow-sm text-gray-500 transition-all duration-200 hover:shadow-md flex items-center justify-center">
-          <Settings size={18}/>
-        </button>
-        <button onClick={()=>{const v=!soundOn;setSoundOn(v);localStorage.setItem('sound_on',v?'1':'0');}} aria-label={soundOn?(lang==='zh'?'關閉聲音':'Mute'):(lang==='zh'?'開啟聲音':'Unmute')}
-          className="p-2.5 min-w-[44px] min-h-[44px] rounded-xl bg-white/60 active:bg-white active:scale-[0.97] border border-stone-200 shadow-sm text-gray-500 transition-all duration-200 hover:shadow-md flex items-center justify-center">
-          {soundOn?<Volume2 size={18}/>:<VolumeX size={18}/>}
-        </button>
-      </div>
-      {(activeTab==='home'||activeTab==='practice')&&(
+      {(activeTab==='home'||activeTab==='quests')&&(
         <>
           <CurlbooHero name={studentName} streak={streak} isBirthday={isBirthday} lang={lang}/>
           {!user&&<GuestBanner onSignUp={()=>setSkippedLogin(false)} lang={lang}/>}
@@ -286,10 +275,11 @@ export default function App(){
         </>
       )}
       {activeTab==='history'&&(
-        <HistoryList history={history} onClear={()=>{clearHistory();setHistory([])}} L={L}/>
+        <RecordTab streak={streak} gradeBest={gradeBest} history={history} onClear={()=>{clearHistory();setHistory([])}} lang={lang} L={L} user={user}/>
       )}
       <AnimatePresence>{showPrivacy&&<Suspense fallback={null}><PrivacyPolicy onClose={()=>setShowPrivacy(false)}/></Suspense>}</AnimatePresence>
     </PageShell></motion.div>
+    <QuestsModal isOpen={showQuests} onClose={()=>setShowQuests(false)} lang={lang}/>
     <BottomTabBar activeTab={activeTab} onTab={handleTab} lang={lang}/></>
   );
 

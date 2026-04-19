@@ -43,7 +43,7 @@ export default function Login({ onAuth, lang = 'zh' }) {
 
   if (signupDone) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-stone-50 to-purple-50 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-stone-50 to-orange-50 p-4">
         <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
           className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-sm text-center">
           <span className="text-5xl">📧</span>
@@ -52,7 +52,7 @@ export default function Login({ onAuth, lang = 'zh' }) {
             We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account.
           </p>
           <button onClick={() => { setSignupDone(false); setMode('login'); }}
-            className="mt-6 text-indigo-600 font-semibold text-sm hover:underline transition-all duration-200">
+            className="mt-6 text-orange-600 font-semibold text-sm hover:underline transition-all duration-200">
             {zh ? '返回登入' : 'Back to Login'}
           </button>
         </motion.div>
@@ -62,7 +62,7 @@ export default function Login({ onAuth, lang = 'zh' }) {
 
   if (resetSent) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-stone-50 to-purple-50 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-stone-50 to-orange-50 p-4">
         <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
           className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-sm text-center">
           <span className="text-5xl">📬</span>
@@ -74,7 +74,7 @@ export default function Login({ onAuth, lang = 'zh' }) {
             {zh ? `，請查看電郵。` : ` for the reset link.`}
           </p>
           <button onClick={() => { setResetSent(false); setMode('login'); }}
-            className="mt-6 text-indigo-600 font-semibold text-sm hover:underline transition-all duration-200">
+            className="mt-6 text-orange-600 font-semibold text-sm hover:underline transition-all duration-200">
             {zh ? '返回登入' : 'Back to Login'}
           </button>
         </motion.div>
@@ -90,12 +90,12 @@ export default function Login({ onAuth, lang = 'zh' }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-stone-50 to-purple-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-stone-50 to-orange-50 p-4">
       <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
         className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-sm">
 
         <div className="text-center mb-6">
-          <span className="text-5xl">🧮</span>
+          <img src="/mascot.webp" alt="Curlboo" className="w-20 h-20 object-cover rounded-2xl mx-auto shadow-md"/>
           <h1 className="text-2xl font-bold mt-2 text-gray-800">Maths Quests</h1>
           <p className="text-gray-400 text-sm">{titles[mode]}</p>
         </div>
@@ -105,7 +105,7 @@ export default function Login({ onAuth, lang = 'zh' }) {
             <input type="email" placeholder={zh ? '電郵地址' : 'Email'} value={email}
               onChange={e => setEmail(e.target.value)} required
               aria-label="Email address"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none text-sm" />
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none text-sm" />
           )}
 
           {(mode === 'login' || mode === 'signup' || mode === 'update') && (
@@ -116,13 +116,13 @@ export default function Login({ onAuth, lang = 'zh' }) {
               value={password}
               onChange={e => setPassword(e.target.value)} required minLength={6}
               aria-label="Password"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none text-sm" />
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none text-sm" />
           )}
 
           {mode === 'login' && (
             <div className="text-right">
               <button type="button" onClick={() => { setMode('forgot'); setError(''); }}
-                className="text-xs text-indigo-500 hover:underline transition-all duration-200">
+                className="text-xs text-orange-500 hover:underline transition-all duration-200">
                 {zh ? '忘記密碼？' : 'Forgot password?'}
               </button>
             </div>
@@ -139,7 +139,7 @@ export default function Login({ onAuth, lang = 'zh' }) {
           )}
 
           <button type="submit" disabled={loading}
-            className="w-full py-3 rounded-xl bg-indigo-500 text-white font-bold text-sm hover:bg-indigo-600 active:scale-95 transition-all duration-200 disabled:opacity-50">
+            className="w-full py-3 rounded-xl bg-orange-500 text-white font-bold text-sm hover:bg-orange-600 active:scale-95 transition-all duration-200 disabled:opacity-50">
             {loading ? <Loader2 size={16} className="animate-spin mx-auto"/> : (
               mode === 'login'  ? (zh ? '登入' : 'Log In') :
               mode === 'signup' ? (zh ? '建立帳戶' : 'Sign Up') :
@@ -153,7 +153,7 @@ export default function Login({ onAuth, lang = 'zh' }) {
           {mode === 'login' && (
             <p>{zh ? '沒有帳戶？' : 'No account?'}{' '}
               <button onClick={() => { setMode('signup'); setError(''); }}
-                className="text-indigo-600 font-semibold hover:underline transition-all duration-200">
+                className="text-orange-600 font-semibold hover:underline transition-all duration-200">
                 {zh ? '立即註冊' : 'Sign Up'}
               </button>
             </p>
@@ -161,7 +161,7 @@ export default function Login({ onAuth, lang = 'zh' }) {
           {(mode === 'signup' || mode === 'forgot') && (
             <p>
               <button onClick={() => { setMode('login'); setError(''); }}
-                className="text-indigo-600 font-semibold hover:underline transition-all duration-200">
+                className="text-orange-600 font-semibold hover:underline transition-all duration-200">
                 {zh ? '返回登入' : 'Back to Login'}
               </button>
             </p>
