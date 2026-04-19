@@ -25,6 +25,9 @@ import GradeGrid from './components/home/GradeGrid';
 import HistoryList from './components/home/HistoryList';
 import GuestBanner from './components/home/GuestBanner';
 import TrapInfoBox from './components/home/TrapInfoBox';
+import SplashScreen from './components/SplashScreen';
+import BottomTabBar from './components/ui/BottomTabBar';
+import CurlbooHero from './components/home/CurlbooHero';
 import SettingsView from './components/settings/SettingsView';
 import ScoreReport from './components/exam/ScoreReport';
 import ExamHeader from './components/exam/ExamHeader';
@@ -89,6 +92,9 @@ export default function App(){
   const L=(key,...args)=>t(lang,key,...args);
   const[gradeBest,setGradeBest]=useState(()=>{var b={};[1,2,3,4,5,6].forEach(g=>{var v=localStorage.getItem('grade_best_'+g);if(v)b[g]=+v});return b;});
   var isBirthday=(()=>{var bd=localStorage.getItem('student_birthday');if(!bd)return false;var b=new Date(bd),n=new Date();return b.getMonth()===n.getMonth()&&b.getDate()===n.getDate();})();
+  const[showSplash,setShowSplash]=useState(()=>!sessionStorage.getItem('mq_splash_shown'));
+  const[activeTab,setActiveTab]=useState('home');
+  var handleTab=tab=>{setActiveTab(tab);if(tab==='profile')setView('profile');else if(view!=='home')setView('home');};
 
   useEffect(()=>{var ts=TOPICS[grade];if(ts)setSelTopics(new Set(ts.map(t=>t.id)))},[grade]);
   useEffect(()=>{setHistory(loadHistory())},[]);
@@ -249,18 +255,21 @@ export default function App(){
     <Suspense fallback={null}><Login onAuth={{ signUp, signIn, skip: () => setSkippedLogin(true), isRecovery, resetPassword, updatePassword }} lang={lang} /></Suspense>
   );
 
+  /* ════════ SPLASH ════════ */
+  if(showSplash)return <SplashScreen onDone={()=>{sessionStorage.setItem('mq_splash_shown','1');setShowSplash(false);}}/>;
+
   /* ════════ PROFILE ════════ */
-  if(view==='profile')return <Suspense fallback={null}><Profile onBack={()=>setView('home')} lang={lang} studentName={studentName} setStudentName={setStudentName} streak={streak} user={user} signOut={async()=>{await signOut();setSkippedLogin(false);}} goToLogin={()=>setSkippedLogin(false)}/></Suspense>;
+  if(view==='profile')return(<><Suspense fallback={null}><Profile onBack={()=>{setView('home');setActiveTab('home');}} lang={lang} studentName={studentName} setStudentName={setStudentName} streak={streak} user={user} signOut={async()=>{await signOut();setSkippedLogin(false);}} goToLogin={()=>setSkippedLogin(false)}/></Suspense><BottomTabBar activeTab="profile" onTab={handleTab} lang={lang}/></>);
 
   /* ════════ VIEWS ════════ */
   if(view==='home')return(
-    <motion.div key="home" {...pageTransition}><PageShell>
-      <div className="flex justify-between items-center mb-1">
+    <><motion.div key="home" {...pageTransition}><PageShell>
+      <div className="flex justify-between items-center mb-3">
         <button onClick={()=>{const v=lang==='zh'?'en':'zh';setLang(v);localStorage.setItem('lang',v);track('lang_switch',{lang:v});}} aria-label={lang==='zh'?'Switch to English':'切換至中文'}
           className="p-2.5 min-w-[44px] min-h-[44px] rounded-xl bg-white/60 active:bg-white active:scale-[0.97] border border-stone-200 shadow-sm text-gray-500 transition-all duration-200 hover:shadow-md flex items-center justify-center">
           <Globe size={18}/>
         </button>
-        <button onClick={()=>setView('profile')} aria-label={lang==='zh'?'設定':'Settings'}
+        <button onClick={()=>{setView('profile');setActiveTab('profile');}} aria-label={lang==='zh'?'設定':'Settings'}
           className="p-2.5 min-w-[44px] min-h-[44px] rounded-xl bg-white/60 active:bg-white active:scale-[0.97] border border-stone-200 shadow-sm text-gray-500 transition-all duration-200 hover:shadow-md flex items-center justify-center">
           <Settings size={18}/>
         </button>
@@ -269,33 +278,19 @@ export default function App(){
           {soundOn?<Volume2 size={18}/>:<VolumeX size={18}/>}
         </button>
       </div>
-      <motion.div initial={{opacity:0,y:15}} animate={{opacity:1,y:0}} className="text-center mb-4 pt-4">
-        <img src={isBirthday?'/mascot-happy.webp':'/mascot.webp'} alt="Curlboo Bear mascot" className="w-48 h-48 object-cover rounded-3xl mx-auto mb-3 shadow-lg"/>
-        {isBirthday&&<motion.div initial={{scale:0}} animate={{scale:1}} transition={{type:'spring',stiffness:200}} className="inline-flex items-center gap-1.5 bg-pink-100 border border-pink-200 text-pink-600 font-bold text-sm px-3 py-1.5 rounded-full mb-2">🎂 {lang==='zh'?'生日快樂！':'Happy Birthday!'}</motion.div>}
-        <div className="flex items-center justify-center gap-3 mb-1">
-          {studentName?<p className="text-base font-bold text-indigo-600">{L('greeting',studentName)}</p>:null}
-          {streak>0&&<div className="flex items-center gap-1 bg-orange-100 border border-orange-200 px-2.5 py-1 rounded-full">
-            <motion.span animate={{scale:[1,1.15,1]}} transition={{duration:2,repeat:Infinity,ease:'easeInOut'}} className="text-lg inline-block">🔥</motion.span>
-            <span className="text-sm font-bold text-orange-500">{streak}</span>
-            <span className="text-xs text-orange-400 font-bold">{lang==='zh'?'日':'d'}</span>
-          </div>}
-        </div>
-        <h1 className="text-3xl font-black text-gray-800">{L('appTitle')}</h1>
-        <p className="text-xs text-gray-400 mt-1">{L('appSubtitle')}</p>
-        <div className="flex items-center justify-center gap-2 mt-1 flex-wrap">
-          <span className="text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full">{L('band1')}</span>
-          <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full flex items-center gap-0.5"><AlertTriangle size={10}/> {L('hasTrap')}</span>
-        </div>
-      </motion.div>
-      {!user&&<GuestBanner onSignUp={()=>setSkippedLogin(false)} lang={lang}/>}
-      <GradeGrid gradeBest={gradeBest} onSelect={g=>{setGrade(g);track('grade_selected',{grade:g});setView('settings')}} L={L}/>
-      <HistoryList history={history} onClear={()=>{clearHistory();setHistory([])}} L={L}/>
-      <TrapInfoBox L={L}/>
-      <p className="text-center text-xs text-gray-300 mt-6">
-        <button onClick={()=>setShowPrivacy(true)} className="underline hover:text-gray-400">{L('privacy')}</button>
-      </p>
+      {(activeTab==='home'||activeTab==='practice')&&(
+        <>
+          <CurlbooHero name={studentName} streak={streak} isBirthday={isBirthday} lang={lang}/>
+          {!user&&<GuestBanner onSignUp={()=>setSkippedLogin(false)} lang={lang}/>}
+          <GradeGrid gradeBest={gradeBest} onSelect={g=>{setGrade(g);track('grade_selected',{grade:g});setView('settings')}} L={L}/>
+        </>
+      )}
+      {activeTab==='history'&&(
+        <HistoryList history={history} onClear={()=>{clearHistory();setHistory([])}} L={L}/>
+      )}
       <AnimatePresence>{showPrivacy&&<Suspense fallback={null}><PrivacyPolicy onClose={()=>setShowPrivacy(false)}/></Suspense>}</AnimatePresence>
     </PageShell></motion.div>
+    <BottomTabBar activeTab={activeTab} onTab={handleTab} lang={lang}/></>
   );
 
   /* ════════ SETTINGS ════════ */

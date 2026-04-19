@@ -37,18 +37,18 @@ export default function SettingsView({grade,difficulty,setDifficulty,selTopics,t
           <h3 className="font-bold text-gray-700 flex items-center gap-1"><BookOpen size={16}/>{L('topicsTitle')}</h3>
           <button onClick={toggleAll} className="text-xs px-3 py-1.5 rounded-xl bg-indigo-100 text-indigo-600 font-bold active:scale-[0.97] transition-all duration-200">{selTopics.size===TOPICS[grade].length?L('deselectAll'):L('selectAll')}</button>
         </div>
-        <div className="space-y-1.5">
-          {TOPICS[grade].map(t=>(
+        <div className="grid grid-cols-2 gap-2">
+          {TOPICS[grade].map(t=>{
+            var sel=selTopics.has(t.id);
+            return(
             <button key={t.id} onClick={()=>toggleTopic(t.id)}
-              className={"w-full p-2.5 rounded-xl border-2 text-left transition-all duration-200 active:scale-[0.97] flex items-center gap-2 "+(selTopics.has(t.id)?GCL[co]+' border-current':'bg-gray-50 border-gray-200 text-gray-400')}>
-              <span className="text-lg">{t.ic}</span>
-              <div className="flex-1 min-w-0">
-                <span className="text-sm font-bold block truncate">{t.nm}</span>
-                <span className={"text-xs px-1.5 py-0.5 rounded-lg "+(CAT_COLORS[t.cat]||'bg-gray-100')}>{t.cat}</span>
-              </div>
-              <AnimatePresence>{selTopics.has(t.id)&&<motion.span initial={{scale:0}} animate={{scale:1}} exit={{scale:0}} transition={{duration:0.15}}><Check size={16}/></motion.span>}</AnimatePresence>
+              className={"relative p-2.5 rounded-xl border-2 text-left transition-all duration-200 active:scale-[0.97] "+(sel?GCL[co]+' border-current':'bg-gray-50 border-gray-200 text-gray-400')}>
+              <span className="text-xl block mb-0.5">{t.ic}</span>
+              <span className="text-xs font-bold block leading-tight line-clamp-2">{t.nm}</span>
+              <span className={"text-[10px] px-1 py-0.5 rounded mt-1 inline-block "+(CAT_COLORS[t.cat]||'bg-gray-100')}>{t.cat}</span>
+              {sel&&<AnimatePresence><motion.span initial={{scale:0}} animate={{scale:1}} exit={{scale:0}} transition={{duration:0.15}} className="absolute top-1.5 right-1.5"><Check size={11}/></motion.span></AnimatePresence>}
             </button>
-          ))}
+          )})}
         </div>
       </div>
 
