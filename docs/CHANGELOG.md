@@ -6,6 +6,30 @@ All notable changes to **Maths Quests** (數學特訓).
 
 ## [v1.3-beta] — 2026-04-20
 
+### feat: contexts.js enrichment — modern HK names, cultural venues, expanded classifiers
+
+**`names`** — Replaced with 20 modern HK primary school names (`梓軒`, `允行`, `凱晴`, `子穎`…); removed cliché `小明`/`小華`/`小芬`
+
+**`places`** — Switched to generic brand names (no endorsement risk); added HK cultural venues: `科學館`, `太空館`, `香港書展`, `動漫節`, `年宵市場`
+
+**`food`** — Updated to street-food-focused HK kids' list: `魚蛋`, `燒賣`, `腸粉`, `壽司`, `薄餅`, `漢堡包`; 士多啤梨 replaces 草莓 (Cantonese name)
+
+**`item`** — Added `平板電腦`, `實驗試管` (STEM items; other exotic STEM kept in grade files only)
+
+**`sport`** — Added `跆拳道`, `芭蕾舞`; excluded `合唱團` (not a sport)
+
+**`vehicle`** — Replaced `渡輪`→`天星小輪` (iconic HK); added `高鐵`; kept generic `巴士` + `輕鐵`; removed `機場快線`
+
+**`places_hk`** — Added `柴灣`, `東涌`
+
+**`prices_*`** — Re-tiered: cheap floor $2; mid adds $80; high starts at $120 (cleaner separation)
+
+**`classifiers`** — Expanded from 12→27 entries: added `燒賣/魚蛋`(粒), `手工紙/遊戲卡`(張), `蛋糕/壽司`(件), `玩具車/模型飛機`(架), `電腦`(部) etc.; excluded `健康飲食餐單` (inappropriate for maths problems)
+
+**`_pl()`** — Updated to school-specific contexts: `學校圖書館`, `學校禮堂`, `學校飯堂`, `社區公園`, `公眾泳池`
+
+---
+
 ### feat: config enrichment — Band 1 difficulty labels, exam ratios, question counts
 
 **`config.js` — Difficulty labels renamed (motivational / HK-exam-specific)**

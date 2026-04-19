@@ -1,47 +1,46 @@
 /**
  * contexts.js — HK-specific context pools for question generators
- * Expanded from the basic CTX in config.js.
- * Usage: import { CTX, nm, pl, fd, it, _nm2, _pl, _it } from './contexts.js'
- * (Drop-in replacement for the CTX helpers currently in config.js)
+ * Enriched with modern HK names, cultural venues, local food, and precise classifiers.
+ * Usage: import { CTX, nm, pl, fd, it, _nm2, _pl, _it, _price } from './contexts.js'
  */
 import { pk } from './core.js';
 
 export const CTX = {
-  /* ── Names (Cantonese, common HK primary school names) ── */
+  /* ── Names (Modern HK primary school names) ── */
   names: [
-    '小明','小華','小芬','志強','嘉欣','家俊','詠琪','浩然','子晴','俊熙',
-    '曉彤','柏熙','芷晴','振熙','欣桐','俊朗','穎思','家希','樂謙','悅澄',
+    '梓軒','柏宇','允行','卓楠','晉瑋','浩然','俊熙','樂謙','宇軒','智康',
+    '芷晴','凱晴','曉彤','凱琳','子穎','海晴','悅澄','心悠','鎧澄','穎思',
   ],
 
-  /* ── Places (HK-specific) ── */
+  /* ── Places (HK-specific, generic brands + cultural venues) ── */
   places: [
-    '百佳超市','惠康超市','7-Eleven','OK便利店','文具店','書店','玩具店',
-    '水果店','麵包店','餅店','茶餐廳','學校小賣部','街市','運動用品店',
-    '海洋公園','迪士尼樂園',
+    '超級市場','便利店','文具店','書報攤','茶餐廳','快餐店','酒樓','果欄',
+    '海洋公園','迪士尼樂園','科學館','太空館','香港書展','動漫節','年宵市場',
   ],
 
-  /* ── Food (HK everyday items) ── */
+  /* ── Food (HK everyday & local snacks) ── */
   food: [
-    '蘋果','橙','香蕉','芒果','草莓','西瓜','葡萄','桃',
-    '蛋撻','菠蘿包','雞蛋仔','煎堆','湯圓','叉燒包','老婆餅',
+    '蘋果','橙','香蕉','士多啤梨','車厘子','芒果',
+    '魚蛋','燒賣','雞蛋仔','菠蘿包','蛋撻','腸粉','壽司','薄餅','漢堡包',
   ],
 
-  /* ── Items (school stationery + everyday) ── */
+  /* ── Items (school stationery + STEM) ── */
   item: [
     '鉛筆','橡皮擦','尺子','練習簿','顏色筆','剪刀','膠水','筆袋',
     '直尺','量角器','圓規','螢光筆','文件夾','便條紙',
+    '平板電腦','實驗試管',
   ],
 
-  /* ── Sports (HK school sports) ── */
+  /* ── Sports & activities (HK school) ── */
   sport: [
     '足球','籃球','排球','乒乓球','羽毛球','游泳','跑步','跳繩',
-    '劍擊','壁球','手球','欖球','田徑','體操',
+    '劍擊','壁球','手球','欖球','田徑','體操','跆拳道','芭蕾舞',
   ],
 
   /* ── Transport (HK-specific) ── */
   vehicle: [
-    '巴士','小巴','的士','港鐵','渡輪','電車','校車','旅遊巴',
-    '輕鐵','纜車','機場快線',
+    '巴士','小巴','的士','港鐵','天星小輪','電車','校車','旅遊巴',
+    '輕鐵','纜車','高鐵',
   ],
 
   /* ── Schools (HK-style names) ── */
@@ -53,20 +52,25 @@ export const CTX = {
   /* ── HK landmarks & districts (for distance/map problems) ── */
   places_hk: [
     '尖沙咀','銅鑼灣','旺角','中環','觀塘','沙田','元朗','屯門',
-    '將軍澳','天水圍','大埔','北角',
+    '將軍澳','天水圍','大埔','北角','柴灣','東涌',
   ],
 
-  /* ── Currency (HK-specific amounts, realistic for story problems) ── */
-  prices_cheap: [3, 4, 5, 6, 7, 8, 10, 12, 15],     // stationery, snacks
-  prices_mid:   [20, 25, 30, 35, 40, 45, 50, 55, 60], // meals, books
-  prices_high:  [80, 100, 120, 150, 180, 200, 250],    // toys, sport items
+  /* ── Currency (realistic HK pricing tiers) ── */
+  prices_cheap: [2, 3, 4, 5, 6, 8, 10, 12, 15],      // snacks, basic stationery
+  prices_mid:   [20, 25, 30, 35, 40, 45, 50, 60, 80], // meals, books, standard items
+  prices_high:  [120, 150, 180, 200, 250, 300, 500],  // theme park tickets, electronics
 
   /* ── Units with Cantonese classifiers ── */
   classifiers: [
-    {n:'蘋果',u:'個'},{n:'鉛筆',u:'枝'},{n:'故事書',u:'本'},
-    {n:'糖果',u:'粒'},{n:'貼紙',u:'張'},{n:'雞蛋',u:'隻'},
-    {n:'曲奇餅',u:'塊'},{n:'練習簿',u:'本'},{n:'橙',u:'個'},
-    {n:'香蕉',u:'隻'},{n:'蛋撻',u:'個'},{n:'菠蘿包',u:'個'},
+    {n:'蘋果',u:'個'}, {n:'橙',u:'個'},    {n:'西瓜',u:'個'},
+    {n:'鉛筆',u:'枝'}, {n:'原子筆',u:'枝'},{n:'間尺',u:'把'},
+    {n:'圖書',u:'本'},  {n:'練習簿',u:'本'},{n:'雜誌',u:'本'},
+    {n:'波子',u:'粒'},  {n:'燒賣',u:'粒'},  {n:'魚蛋',u:'粒'},{n:'糖果',u:'粒'},
+    {n:'貼紙',u:'張'},  {n:'手工紙',u:'張'},{n:'遊戲卡',u:'張'},
+    {n:'雞蛋',u:'隻'},  {n:'香蕉',u:'隻'},  {n:'雞翼',u:'隻'},
+    {n:'曲奇餅',u:'塊'},{n:'蛋糕',u:'件'},  {n:'壽司',u:'件'},
+    {n:'蛋撻',u:'個'},  {n:'菠蘿包',u:'個'},
+    {n:'玩具車',u:'架'},{n:'模型飛機',u:'架'},{n:'電腦',u:'部'},
   ],
 };
 
@@ -84,8 +88,8 @@ export function _nm2() {
 
 export function _pl() {
   return pk([
-    '圖書館','超市','文具店','書店','玩具店','果園','農場',
-    '運動場','禮堂','飯堂','課室','公園','體育館','泳池',
+    '學校圖書館','公共圖書館','超級市場','文具店','玩具店','果園','農場',
+    '運動場','學校禮堂','學校飯堂','課室','社區公園','體育館','公眾泳池',
   ]);
 }
 
