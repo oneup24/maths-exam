@@ -27,7 +27,7 @@ export function buildExam(grade,topics,examType,difficulty){
       }catch{/* intentionally empty — skip broken generators */}
     });
   });
-  var types=['calc','fill','mc','short','work'].filter(t=>allGens[t].length>0);
+  var types=['mc','fill','calc','short','work'].filter(t=>allGens[t].length>0);
   if(!types.length)return[];
   var sumR=0;types.forEach(t=>{sumR+=SECT_RATIOS[t]||.1});
   var dist={};types.forEach(t=>{dist[t]=Math.max(1,Math.round(totalTarget*(SECT_RATIOS[t]||.1)/sumR))});
@@ -56,7 +56,8 @@ export function buildExam(grade,topics,examType,difficulty){
     if(!longest.length)break;generated[longest[0]].pop();count--;
   }
   var secs=[];
-  ['calc','fill','mc','short','work'].forEach(t=>{var qs=generated[t];if(!qs||!qs.length)return;var total=qs.reduce((s,q)=>s+(q.sc||2),0);secs.push({id:t,label:SECT_LBL[secs.length],nm:SECT_CONF[t].nm,nt:SECT_CONF[t].nt,total,qs})});
+  var defSc={mc:2,fill:2,calc:2,short:3,work:4};
+  ['mc','fill','calc','short','work'].forEach(t=>{var qs=generated[t];if(!qs||!qs.length)return;var total=qs.reduce((s,q)=>s+(q.sc||defSc[t]||2),0);secs.push({id:t,label:SECT_LBL[secs.length],nm:SECT_CONF[t].nm,nt:SECT_CONF[t].nt,total,qs})});
   /* persist question hashes for cross-exam dedup */
   try{var _sk='mq_seen_'+grade;var _prev=JSON.parse(sessionStorage.getItem(_sk)||'[]');var _new=secs.flatMap(s=>s.qs).map(q=>q.q+'|'+q.a);var _merged=[...new Set([..._prev,..._new])].slice(-200);sessionStorage.setItem(_sk,JSON.stringify(_merged));}catch{}
   return secs;
@@ -66,27 +67,77 @@ export function printExam(secs,grade,showAns,name,difficulty){
   var gt=secs.reduce((s,sec)=>s+sec.total,0);
   var esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br/>');
   var diffLabel=DIFF_INFO[difficulty||2].nm;
+  var defSc={mc:2,fill:2,calc:2,short:3,work:4};
+
   var b='';
   secs.forEach(sec=>{
-    b+='<div style="margin:14px 0 6px;border-bottom:2px solid #333;padding-bottom:3px"><b>'+sec.label+'. '+sec.nm+'（'+sec.total+'分，'+sec.nt+'）</b></div>';
+    b+=`<div style="margin:24px 0 10px;border-bottom:2px solid #000;padding-bottom:4px;font-size:15px;"><b>${sec.label}部：${sec.nm}</b> <span style="font-size:13px;color:#444;">（共 ${sec.total} 分，${sec.nt}）</span></div>`;
     sec.qs.forEach((q,i)=>{
-      b+='<div style="margin:6px 0;padding:4px 0;border-bottom:1px dashed #ddd"><b>'+(i+1)+'.</b> '+esc(q.q);
-      if(q.fig)b+='<div style="margin:4px 0;text-align:center">'+q.fig+'</div>';
-      if(q.isMC&&q.opts)b+='<div style="margin:3px 0 0 18px;display:flex;flex-wrap:wrap;gap:4px 24px">'+q.opts.map(o=>'<span>'+o.l+'. '+esc(o.v)+'</span>').join('')+'</div>';
-      if(sec.id==='work')b+='<div style="height:60px"></div>';
-      b+='</div>';
+      var sc=q.sc||defSc[sec.id]||2;
+      b+=`<div style="margin:12px 0;padding:6px 0;page-break-inside:avoid;">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;">
+              <div style="width:88%;font-size:14px;"><b>${i+1}.</b> ${esc(q.q)}</div>
+              <div style="width:12%;text-align:right;font-weight:bold;font-size:13px;">[ ${sc} 分 ]</div>
+            </div>`;
+      if(q.fig) b+=`<div style="margin:8px 0;text-align:center">${q.fig}</div>`;
+      if(sec.id==='mc'&&q.opts)
+        b+=`<div style="margin:8px 0 0 24px;display:flex;flex-wrap:wrap;gap:8px 32px;font-size:14px;">${q.opts.map(o=>`<span><span style="display:inline-block;width:13px;height:13px;border:1px solid #000;border-radius:50%;vertical-align:middle;margin-right:5px;"></span>${o.l}. ${esc(o.v)}</span>`).join('')}</div>`;
+      if(sec.id==='fill'||sec.id==='calc') b+=`<div style="height:22px"></div>`;
+      if(sec.id==='short') b+=`<div style="margin-top:14px;font-size:14px;padding-left:24px;">答：______________________________________</div>`;
+      if(sec.id==='work') b+=`<div style="height:180px;margin-top:10px;border-left:2px solid #e2e8f0;padding-left:10px;"></div>`;
+      b+=`</div>`;
     });
   });
+  b+=`<div style="text-align:center;margin-top:40px;font-weight:bold;font-size:16px;letter-spacing:4px;">— 全卷完 —</div>`;
+
   var ans='';
   if(showAns){
-    ans='<div style="page-break-before:always;border-top:3px double #333;padding-top:10px;margin-top:16px"><h2 style="text-align:center">參考答案</h2>';
+    ans=`<div style="page-break-before:always;border-top:4px double #000;padding-top:20px;margin-top:20px;">
+          <h2 style="text-align:center;margin-bottom:20px;">📘 導師評卷參考 (Marking Scheme)</h2>`;
     secs.forEach(sec=>{
-      ans+='<div style="margin:8px 0"><b>'+sec.label+'. '+sec.nm+'</b><div style="display:flex;flex-wrap:wrap;gap:2px 12px;margin-top:3px">';
-      sec.qs.forEach((q,i)=>{ans+='<span style="font-size:12px;width:46%"><b>'+(i+1)+'.</b> '+esc(q.a)+(q.trap?' <em style="color:#d97706;font-size:10px">[干擾: '+esc(q.trap)+']</em>':'')+'</span>'});
-      ans+='</div></div>';
+      ans+=`<div style="margin:16px 0;"><b style="font-size:15px;background:#eee;padding:4px 8px;border-radius:4px;">${sec.label}部：${sec.nm}</b><div style="margin-top:8px;">`;
+      sec.qs.forEach((q,i)=>{
+        ans+=`<div style="margin-bottom:12px;padding-bottom:8px;border-bottom:1px dashed #ccc;page-break-inside:avoid;">
+                <div style="font-size:14px;color:#1e3a8a;"><b>${i+1}. 答案：</b>${esc(q.a)}</div>`;
+        if(q.trap)
+          ans+=`<div style="font-size:13px;color:#b91c1c;margin-top:4px;background:#fee2e2;padding:4px 8px;border-radius:4px;display:inline-block;"><b>⚠️ 呈分試陷阱：</b>${esc(q.trap)}</div>`;
+        if(q.s&&q.s.length)
+          ans+=`<div style="font-size:13px;color:#334155;margin-top:6px;"><b>💡 導師拆解：</b><br/>${q.s.map(step=>`• ${esc(step)}`).join('<br/>')}</div>`;
+        ans+=`</div>`;
+      });
+      ans+=`</div></div>`;
     });
-    ans+='</div>';
+    ans+=`</div>`;
   }
-  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:15mm}body{font-family:"Microsoft JhengHei",sans-serif;font-size:13px;line-height:1.6}@media print{.np{display:none!important}}</style></head><body><div class="np" style="position:fixed;top:0;left:0;right:0;background:#4f46e5;padding:8px 16px;display:flex;justify-content:space-between;align-items:center;z-index:99"><span style="color:#fff;font-weight:bold">列印預覽</span><button onclick="window.print()" style="padding:6px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:bold;background:#fff">列印</button></div><div class="np" style="height:44px"></div><div style="text-align:center;border-bottom:3px double #333;padding-bottom:8px;margin-bottom:10px"><h1 style="font-size:18px;margin:0">'+GRADE_INFO[grade].nm+'數學科模擬試卷（'+diffLabel+'）</h1><p style="font-size:11px;color:#666;margin:4px 0">依據教育局《小學數學科學習內容》(2017)編製 · 含干擾項訓練</p><div style="display:flex;justify-content:space-between;margin-top:6px"><span>姓名：'+(name||'________')+'</span><span>分數：____/'+gt+'</span></div></div>'+b+ans+'</body></html>';
-  var w=window.open('','_blank','width=800,height=900');if(w){w.document.write(html);w.document.close();}
+
+  var html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>${GRADE_INFO[grade].nm}數學模擬試卷</title>
+  <style>
+    @page{size:A4;margin:15mm}
+    body{font-family:"DFKai-SB","BiauKai","MingLiU","PMingLiU","Microsoft JhengHei",serif;font-size:14px;line-height:1.6;color:#000;}
+    table.ht{width:100%;border-collapse:collapse;margin:15px 0;}
+    table.ht td{border:1px solid #000;padding:8px 12px;font-size:14px;}
+    @media print{.np{display:none!important}}
+  </style></head><body>
+  <div class="np" style="position:fixed;top:0;left:0;right:0;background:#4f46e5;padding:8px 16px;display:flex;justify-content:space-between;align-items:center;z-index:99;box-shadow:0 2px 4px rgba(0,0,0,.2);">
+    <span style="color:#fff;font-weight:bold;font-family:sans-serif;">列印預覽 (HK Exam Format)</span>
+    <button onclick="window.print()" style="padding:6px 20px;border-radius:6px;border:none;cursor:pointer;font-weight:bold;background:#fff;color:#4f46e5;">列印試卷</button>
+  </div>
+  <div class="np" style="height:50px"></div>
+  <div style="text-align:center;margin-bottom:10px;">
+    <h1 style="font-size:22px;margin:0;letter-spacing:2px;">${GRADE_INFO[grade].nm}數學科模擬考試（${diffLabel}）</h1>
+    <p style="font-size:12px;color:#555;margin:6px 0;">依據香港教育局《小學數學科學習內容》(2017) 核心課程編製</p>
+  </div>
+  <table class="ht">
+    <tr>
+      <td width="35%">姓名：${name||'_________________'}</td>
+      <td width="20%">班別：_______</td>
+      <td width="25%">日期：_____________</td>
+      <td width="20%" style="font-weight:bold;">成績：<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; / ${gt} 分</td>
+    </tr>
+  </table>
+  ${b}${ans}
+  </body></html>`;
+
+  var w=window.open('','_blank','width=820,height=950');if(w){w.document.write(html);w.document.close();}
 }

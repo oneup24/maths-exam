@@ -6,6 +6,28 @@ All notable changes to **Maths Quests** (數學特訓).
 
 ## [v1.3-beta] — 2026-04-20
 
+### fix+feat: exam.js — HK exam layout, marking scheme, 3 bug fixes
+
+**Bug fixes:**
+- `buildExam`: type order corrected to `mc→fill→calc→short→work` in both the filter and section-build loops (was `calc→fill→mc→short→work`, conflicting with `SECT_RATIOS`)
+- `buildExam`: section total now uses type-specific default scores `{mc:2,fill:2,calc:2,short:3,work:4}` (was `||2` for all types, understating `short`/`work` totals)
+- `printExam`: MC option rendering now uses `sec.id==='mc'` check instead of fragile `q.isMC` flag
+
+**`printExam` — authentic HK exam layout:**
+- Header: proper `<table>` with 姓名/班別/日期/成績 columns (replaces inline flex)
+- Section headers: "甲部：選擇題" format with separate mark count span
+- Per-question: flex row with question text + `[ X 分 ]` right-aligned
+- MC options: `○` bubble circles before A/B/C
+- Answer spaces: 22px for fill/calc; `答：___` line for short; 180px + left border for work (was 60px, no guide)
+- Font stack: added DFKai-SB, BiauKai, MingLiU, PMingLiU for HK school authenticity
+- Footer: "— 全卷完 —" closing line
+
+**`printExam` — marking scheme upgraded to teacher's guide:**
+- Title changed to "📘 導師評卷參考 (Marking Scheme)"
+- Per-question div with answer in blue, trap warning in red box (`⚠️ 呈分試陷阱`), solution steps as bullet points (`💡 導師拆解`)
+
+---
+
 ### feat: core.js — smart answer checker + 3 new exam figures
 
 **`chkAns` improvements (tolerant HK-exam grading):**
