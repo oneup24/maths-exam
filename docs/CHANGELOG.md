@@ -4,6 +4,38 @@ All notable changes to **Maths Quests** (數學特訓).
 
 ---
 
+## [v1.3-beta] — 2026-04-20
+
+### feat: config enrichment — Band 1 difficulty labels, exam ratios, question counts
+
+**`config.js` — Difficulty labels renamed (motivational / HK-exam-specific)**
+- `基礎` → `基礎鞏固` (desc: 掌握基本概念與運算)
+- `標準` → `呈分實戰` (desc: 包含陷阱及多步應用題)
+- `挑戰` → `奧數拔尖` (desc: 逆向思維、Band 1 名校 Killer 題)
+
+**`config.js` — Exam section ratios rebalanced to match real HK paper weighting**
+- `work` (列式計算題) raised from 20% → **30%** (highest weighting, reflects HK 呈分試)
+- `calc` lowered from 28% → 20%; `short` from 22% → 15%; `mc` from 12% → 15%; `fill` from 18% → 20%
+- Ratios still sum to 1.0
+
+**`config.js` — Section instruction text upgraded to exam-realistic language**
+- `work`: "必須列出計算步驟，並寫上文字解說及單位。每題4分。"
+- `short`: "依題意作答，部分題目需附以單位。每題3分。"
+- All sections now have explicit per-question mark values
+
+**`config.js` — Exam question targets updated for exam stamina training**
+- `practice`: 12 → 10 (quick daily drill)
+- `test`: 15 → 20 (unit test)
+- `exam`: 24 → 35 (full-length 呈分試 simulation, ~45-50 min)
+
+**`config.js` — P2 topic label bug fix**
+- `2N5` was mislabelled `加減法(三)`; corrected to `分數的初步認識` (matches grade2.js generators)
+
+**`contexts.js` — Places pool expanded**
+- Added `海洋公園`, `迪士尼樂園` to HK-specific places
+
+---
+
 ## [v1.3-beta] — 2026-04-19
 
 ### feat: Phase 3A hardening — Vitest suite, password reset, Sentry

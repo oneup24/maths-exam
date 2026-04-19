@@ -5,7 +5,7 @@
  */
 
 import { ri, pk, shuffle } from '../core.js';
-import { nm, pl, fd, it, CTX } from '../config.js';
+import { nm, pl, fd, CTX } from '../config.js';
 
 export const grade1 = {
 '1N1':[ // 20以內的數 (Numbers up to 20)
@@ -55,7 +55,7 @@ export const grade1 = {
   ()=>{var a=ri(30,50),b=ri(20,40),give=ri(5,15);var dColor=pk(['紅色的','藍色的','綠色的']);return{d:2,tp:'work',q:'哥哥有 '+a+' 張印花，弟弟有 '+b+' 張'+dColor+'印花。哥哥給了弟弟 '+give+' 張後，哥哥現在有印花多少張？',a:String(a-give),trap:'弟弟的印花數量和顏色',s:['🔍 題目只問哥哥現在的數量，弟弟原本的數量和顏色是干擾資訊。','哥哥現在：'+a+' − '+give+' = '+(a-give)],sc:2}},
   // d:3 - Multi-step & Logical
   ()=>{var total=ri(30,50),diff=ri(4,10);if((total-diff)%2!==0)total++;var small=(total-diff)/2,big=small+diff;return{d:3,tp:'work',q:'紅波和白波共有 '+total+' 個。已知紅波比白波多 '+diff+' 個。紅波有多少個？',a:String(big),s:['這是一道「和差問題」。','方法：(總數 + 相差) ÷ 2 = 較大的數','紅波數量：('+total+' + '+diff+') ÷ 2 = '+big],sc:3}},
-  ()=>{var a=ri(50,80),b=ri(20,40),c=ri(10,20);return{d:3,tp:'calc',q:'有三個數，最大的是 '+a+'，最小的是 '+c+'。把它們三個加起來是 100。中間的那個數是多少？',a:String(100-a-c),s:['三個數的總和是 100。','中間的數 = 100 − 最大數 − 最小數 = 100 − '+a+' − '+c+' = '+(100-a-c)],sc:2}}
+  ()=>{var a=ri(50,80),c=ri(10,20);return{d:3,tp:'calc',q:'有三個數，最大的是 '+a+'，最小的是 '+c+'。把它們三個加起來是 100。中間的那個數是多少？',a:String(100-a-c),s:['三個數的總和是 100。','中間的數 = 100 − 最大數 − 最小數 = 100 − '+a+' − '+c+' = '+(100-a-c)],sc:2}}
 ],
 
 '1M':[ // 長度和距離、貨幣、時間 (Length, Distance, Money, Time)
