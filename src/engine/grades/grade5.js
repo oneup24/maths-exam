@@ -205,7 +205,7 @@ export const grade5={
   /* d:3 — reverse */
   ()=>{var l=ri(5,10),w=ri(3,7);var vol=l*w*ri(3,6);var h=vol/(l*w);return{d:3,tp:'work',q:'長方體體積'+vol+'cm³，長'+l+'cm闊'+w+'cm。高多少cm？',a:String(h),s:[vol+'÷'+l+'÷'+w+'='+h],sc:2}},
   // 呈分試Killer題：排水法 Water Displacement (d:3)
-  ()=>{var l=ri(10,20),w=ri(10,15),rise=ri(2,5);var dWater=ri(6,10);return{d:3,tp:'work',q:'一個長 '+l+' cm、闊 '+w+' cm 的長方體玻璃水箱內，裝有 '+dWater+' cm 深的水。把一塊不規則的石頭完全沉入水中後，水位上升了 '+rise+' cm。這塊石頭的體積是多少 cm³？',a:String(l*w*rise),trap:'原本的水深（'+dWater+' cm）',s:['🔍 陷阱！求石頭體積，只需要看「上升了的水的體積」，原本的水深是多餘資訊。','石頭體積 = 水箱長 × 水箱闊 × 上升的水位','體積 = '+l+' × '+w+' × '+rise+' = '+(l*w*rise)+' cm³'],sc:3}},
+  ()=>{var l=ri(10,20),w=ri(10,15),rise=ri(2,5);var dWater=ri(6,10);return{d:3,tp:'work',fig:FIG.waterTank(l,w,dWater+rise,rise),q:'一個長 '+l+' cm、闊 '+w+' cm 的長方體玻璃水箱內，裝有 '+dWater+' cm 深的水。把一塊不規則的石頭完全沉入水中後，水位上升了 '+rise+' cm。這塊石頭的體積是多少 cm³？',a:String(l*w*rise),trap:'原本的水深（'+dWater+' cm）',s:['🔍 陷阱！求石頭體積，只需要看「上升了的水的體積」，原本的水深是多餘資訊。','石頭體積 = 水箱長 × 水箱闊 × 上升的水位','體積 = '+l+' × '+w+' × '+rise+' = '+(l*w*rise)+' cm³'],sc:3}},
   /* _addQ Phase 2 — reverse: find height + surface area (line 925) */
   ()=>{
     var l=ri(5,12),w=ri(3,8),h=ri(3,7),vol=l*w*h;

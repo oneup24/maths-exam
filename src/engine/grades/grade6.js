@@ -163,7 +163,7 @@ export const grade6={
       a:String(dims[miss]),s:[labels[miss]+'='+vol+'÷'+k1+'÷'+k2+'='+dims[miss]],sc:2}},
   // 排水：物體體積=水位升高體積 (d:2)
   ()=>{const l=ri(10,25),w=ri(5,12),rise=ri(1,5);const vol=l*w*rise;
-    return{d:2,tp:'work',q:'長方形魚缸底長'+l+'cm、闊'+w+'cm。放入一塊石頭後，水位升高'+rise+'cm。石頭體積是多少cm³？',
+    return{d:2,tp:'work',fig:FIG.waterTank(l,w,rise*4,rise),q:'長方形魚缸底長'+l+'cm、闊'+w+'cm。放入一塊石頭後，水位升高'+rise+'cm。石頭體積是多少cm³？',
       a:String(vol),s:['石頭體積=底面積×升高高度='+l+'×'+w+'×'+rise+'='+vol+' cm³'],sc:2}},
   // 倒水求水深（含干擾） (d:3)
   ()=>{const l1=ri(10,20),w1=ri(5,10),h1=ri(8,15);const v1=l1*w1*h1;
@@ -174,7 +174,7 @@ export const grade6={
 ],
 '6M3':[
   ()=>{var r=ri(5,15);return{d:1,tp:'short',q:'半徑'+r+'cm，求圓周。(π=3.14)',fig:FIG.circ(r,'r'),a:(2*3.14*r).toFixed(2),s:['2×3.14×'+r],sc:2}},
-  ()=>{var r=ri(4,10);var semi=3.14*r+2*r;var dArea=(3.14*r*r/2).toFixed(2);return{d:3,tp:'work',q:'半圓半徑'+r+'cm，面積約'+dArea+'cm²。求半圓周界。(π=3.14)',a:semi.toFixed(2),trap:'面積',s:['🔍 面積是干擾','弧長: '+(3.14*r).toFixed(2),'直徑: '+2*r,'周界: '+semi.toFixed(2)],sc:3}}
+  ()=>{var r=ri(4,10);var semi=3.14*r+2*r;var dArea=(3.14*r*r/2).toFixed(2);return{d:3,tp:'work',fig:FIG.semiCirc(r),q:'半圓半徑'+r+'cm，面積約'+dArea+'cm²。求半圓周界。(π=3.14)',a:semi.toFixed(2),trap:'面積',s:['🔍 面積是干擾','弧長: '+(3.14*r).toFixed(2),'直徑: '+2*r,'周界: '+semi.toFixed(2)],sc:3}}
 ],
 '6M4':[
   ()=>{var s=pk([40,50,60,80]),t=ri(2,8);return{d:1,tp:'short',q:'車速'+s+'km/h行'+t+'小時，距離？',a:String(s*t),s:[s+'×'+t+'='+s*t],sc:2}},
