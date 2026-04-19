@@ -68,16 +68,16 @@ src/
     animations.js      — Shared Framer Motion variants (pageTransition, fadeInUp, stagger)
 
   engine/                — Modular extraction of engine.js (Phases 1–9 complete)
-    core.js              — Utilities (ri, pk, gcd, lcm, fOf, fS, shuffle), chkAns, FIG SVG helpers
+    core.js              — Utilities (ri, pk, gcd, lcm, fOf, fS, shuffle), chkAns, FIG SVG helpers; FIG.rect(w,h,hide?) supports '?' label for unknown dimension
     config.js            — TOPICS, GRADE_INFO, DIFF_INFO, EXAM_TARGETS, SECT_*, CTX pools, helpers
     history.js           — saveHistory, loadHistory, clearHistory (localStorage)
     grade1.js            — P1 generators (6 topics, 25 functions)
     grades/
-      grade2.js          — P2 generators (8 topics, 32 functions)
+      grade2.js          — P2 generators (9 topics, 37 functions) — 2N4 added
       grade3.js          — P3 generators (10 topics, 41 functions)
       grade4.js          — P4 generators (13 topics, 82 functions)
       grade5.js          — P5 generators (11 topics, 56 functions)
-      grade6.js          — P6 generators (14 topics, 63 functions)
+      grade6.js          — P6 generators (14 topics, 63 functions) — 6D34→6D3
 
   hooks/
     useAuth.js         — Supabase auth: session, signUp, signIn, signOut; PostHog identify/reset on auth change

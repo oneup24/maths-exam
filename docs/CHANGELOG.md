@@ -4,6 +4,35 @@ All notable changes to **Maths Quests** (數學特訓).
 
 ---
 
+## [v1.3-beta] — 2026-04-19
+
+### fix: D6 generator bugs — diagram leak, proportions, negatives, cross-session dedup
+
+**Bug #1/#3 — Diagram leaks answer (parent-visible, critical)**
+- `FIG.rect(w,h)` extended with optional `hide` param (`'w'|'h'`): shows `?` for the unknown dimension instead of the value
+- 3 generators fixed in `grade4.js` (4M1: find-side-from-perimeter, find-area-from-perimeter; 4M2: find-side-from-area) — diagram now consistent with question
+
+**Bug #4 — Answer equals a given value**
+- Same 3 generators: `do-while` guard ensures answer `h` ≠ given `w` or `peri`
+
+**Bug #5 — Unrealistic shape proportions**
+- All 8 `FIG.rect` generators in 4M1/4M2: max 2.5:1 aspect ratio enforced
+- Zero-difference guard added to 4M1 compare-shapes generator (`s1 ≠ s2`)
+
+**Bug #6 — Negative/zero answers**
+- `grade2.js` 2M rope problem: `part` capped to 110, `do-while` ensures positive remainder
+
+**Bug #7 — Duplicate questions across sessions**
+- `exam.js buildExam()` pre-seeds `gSeen` from `sessionStorage` (keyed per grade)
+- Persists new question hashes after each exam; capped at 200 entries to bound storage
+
+### feat: curriculum alignment — add 2N4 四位數, fix 6D34→6D3
+- Added `2N4` (四位數, 4-digit numbers) to P2: 5 generators covering reading/writing by place value, thousand-digit identification, comparison, ordering, word problem
+- P2 now has 9 topics (was 8); `config.js` TOPICS updated
+- Renamed topic key `6D34` → `6D3` in both `config.js` and `grade6.js` (was conflating EDB units 6D3 圓形圖 and 6D4 統計的應用)
+
+---
+
 ## [v1.3-beta] — 2026-04-18
 
 ### feat: full EDB curriculum audit — 10 new topics, ~60 new generators (all grades)
