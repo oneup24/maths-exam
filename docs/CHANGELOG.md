@@ -6,6 +6,20 @@ All notable changes to **Maths Quests** (數學特訓).
 
 ## [v1.3-beta] — 2026-04-20
 
+### fix: gradeRules.js — P4 decimal places, P6 negative flag, note text
+
+**`GRADE_RULES` — two constraint corrections (teacher advisory):**
+- **P4** `maxDecimalPlaces: 2 → 4` — 4N7 covers 十分位至萬分位; constraint was too restrictive and silently dropped valid 4-d.p. generators
+- **P6** `allowNegative: true → false` — EDB principle: final answers are always non-negative; negative intermediate working is generator-internal and already correct
+
+**`GRADE_RULES` — all grade `note` strings updated** to cleaner bilingual curriculum descriptions matching EDB topic codes
+
+**Skipped (conflicts):**
+- P2 `allowFraction: false` — conflicts with 2N5 (分數的初步認識) curriculum audit; `allowFraction` is also not enforced by `validateQuestion` (fraction strings bypass numeric checks)
+- P3 `allowDecimal: false` — would silently kill all 3N6 generators (`allowDecimal` IS enforced); 3N6 was deliberately added in Phase 2 EDB audit
+
+---
+
 ### fix+feat: exam.js — HK exam layout, marking scheme, 3 bug fixes
 
 **Bug fixes:**
