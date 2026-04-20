@@ -16,7 +16,7 @@ export const GRADE_RULES = {
     maxMultiplier:   null,
     maxDivisor:      null,
     maxAddend:       100,
-    note: 'P1: 20以內加減 (1N2), 100以內數 (1N3/1N4)',
+    note: 'P1: 100以內數、加減法、序數、錢幣、簡單圖形',
   },
   2: {
     maxNumber:       9999,      // P2: 三位數 + 四位數 (2N1/2N4)
@@ -28,7 +28,7 @@ export const GRADE_RULES = {
     maxMultiplier:   9,
     maxDivisor:      9,
     maxAddend:       999,
-    note: 'P2: 三位數加減, 乘法表1-9, 基本除法, 簡單分數',
+    note: 'P2: 四位數加減、乘法表1-9、基本除法、簡單分數(半/三分一/四分一)',
   },
   3: {
     maxNumber:       99999,     // P3: 大數到100,000 (3N1)
@@ -41,20 +41,20 @@ export const GRADE_RULES = {
     maxMultiplier:   99,
     maxDivisor:      9,
     maxAddend:       99999,
-    note: 'P3: 大數到十萬, 乘除, 分數, 小數(一位)',
+    note: 'P3: 十萬以內大數、多位乘除、單位分數、小數(一位小數)',
   },
   4: {
     maxNumber:       9999999,   // P4: large numbers in context
     allowNegative:   false,
-    allowDecimal:    true,      // 4N78: decimals to 2 d.p.
-    maxDecimalPlaces: 2,
+    allowDecimal:    true,      // 4N7: decimals to 4 d.p. (十分位至萬分位)
+    maxDecimalPlaces: 4,
     allowFraction:   true,      // 4N6: proper/improper, mixed numbers
     allowMultiply:   true,      // 4N1: 4-digit × 2-digit
     allowDivide:     true,      // 4N2: 4-digit ÷ 2-digit
     maxMultiplier:   99,
     maxDivisor:      99,
     maxAddend:       9999999,
-    note: 'P4: 大數, 小數(兩位), 分數, 長乘短除, 周界面積',
+    note: 'P4: 大數, 小數(十分至萬分位), 真假分數帶分數, 長乘短除, 周界面積',
   },
   5: {
     maxNumber:       999999999, // P5: 億位 (5N1)
@@ -67,11 +67,11 @@ export const GRADE_RULES = {
     maxMultiplier:   999,
     maxDivisor:      99,
     maxAddend:       999999999,
-    note: 'P5: 億以下大數, 異分母分數四則, 小數乘除, 代數',
+    note: 'P5: 億以下大數、異分母分數四則、小數乘除移位、代數方程、面積體積',
   },
   6: {
     maxNumber:       null,      // P6: no hard max; decimals and percentages
-    allowNegative:   true,      // 6A1 equations may involve negative intermediate steps
+    allowNegative:   false,     // EDB: P6 answers are non-negative; negative intermediate steps are internal only
     allowDecimal:    true,
     maxDecimalPlaces: 3,
     allowFraction:   true,      // 6N1/6N2: fraction↔decimal conversion
@@ -80,7 +80,7 @@ export const GRADE_RULES = {
     allowDivide:     true,
     maxMultiplier:   null,
     maxDivisor:      null,
-    note: 'P6: 小數除法, 分數小數互換, 百分數, 方程, 圓形面積, 速率',
+    note: 'P6: 小數除法、分數小數百分數互換、方程、圓形面積周界、速率、統計圖',
   },
 };
 
