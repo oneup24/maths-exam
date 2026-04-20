@@ -83,5 +83,14 @@ export const grade1 = {
 ]
 };
 
-// Topics: 1N1, 1N2, 1N3, 1N4, 1M, 1S
-// Export: grade1 (object with 6 topic keys)
+// Map config sub-topic IDs to the shared generator pools
+grade1['1M1']=grade1['1M'];
+grade1['1M2']=grade1['1M'];
+grade1['1M3']=grade1['1M'];
+grade1['1M4']=grade1['1M'];
+grade1['1S1']=grade1['1S'];
+grade1['1S2']=grade1['1S'];
+grade1['1S3']=grade1['1S'];
+
+// Topics: 1N1, 1N2, 1N3, 1N4, 1M→1M1-4, 1S→1S1-3
+// Export: grade1 (object with 13 topic keys)
