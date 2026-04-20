@@ -218,26 +218,27 @@ export const grade5={
   }
 ],
 '5S1':[
-  ()=>{var r=ri(4,15);return{d:1,tp:'fill',q:'圓的半徑'+r+'cm，直徑____cm，周界約____cm（π=3.14）',a:r*2+','+(2*3.14*r).toFixed(2),s:['d=2r, C=2πr'],sc:2}},
-  ()=>{var r=ri(3,8);var sq=r*2;var dRL=ri(30,60);return{d:3,tp:'work',q:'圓內接在邊長'+sq+'cm正方形中。旁邊有'+dRL+'cm繩子。圓面積與正方形面積相差多少？(π=3.14)',a:(sq*sq-3.14*r*r).toFixed(2),trap:'繩子長度',s:['🔍 繩子無關','正方: '+sq*sq,'圓: '+(3.14*r*r).toFixed(2),'差: '+(sq*sq-3.14*r*r).toFixed(2)],sc:3}},
+  ()=>{var r=ri(4,15);return{d:1,tp:'fill',fig:FIG.circ(r,'r'),q:'圓的半徑'+r+'cm，直徑____cm，周界約____cm（π=3.14）',a:r*2+','+(2*3.14*r).toFixed(2),s:['d=2r, C=2πr'],sc:2}},
+  ()=>{var r=ri(3,8);var sq=r*2;var dRL=ri(30,60);return{d:3,tp:'work',fig:FIG.circ(r,'r'),q:'圓內接在邊長'+sq+'cm正方形中。旁邊有'+dRL+'cm繩子。圓面積與正方形面積相差多少？(π=3.14)',a:(sq*sq-3.14*r*r).toFixed(2),trap:'繩子長度',s:['🔍 繩子無關','正方: '+sq*sq,'圓: '+(3.14*r*r).toFixed(2),'差: '+(sq*sq-3.14*r*r).toFixed(2)],sc:3}},
   /* _addQ Strategy 2 — reverse: find rectangle width from area (line 538) */
   ()=>{
     var w=ri(5,15),h=ri(3,12),area=w*h;
-    return{d:3,tp:'work',
+    return{d:3,tp:'work',fig:FIG.rect(w,h,'h'),
       q:'長方形面積是'+area+'cm²，長'+w+'cm。闊是多少cm？',
       a:String(h),s:['闊 = '+area+' ÷ '+w+' = '+h+' cm'],sc:3};
   },
   // 圓的各部分 (d:1)
   ()=>{const part=pk([{n:'半徑',d:'從圓心到圓周的線段'},{n:'直徑',d:'通過圓心的最長弦'},{n:'圓心',d:'圓內距圓周等距的點'}]);
-    return{d:1,tp:'mc',q:part.d+'叫做？',isMC:true,
+    const mode=part.n==='半徑'?'r':part.n==='直徑'?'d':null;
+    return{d:1,tp:'mc',fig:mode?FIG.circ(6,mode):FIG.circ(6,'r'),q:part.d+'叫做？',isMC:true,
       opts:[{l:'A',v:'半徑',c:part.n==='半徑'},{l:'B',v:'直徑',c:part.n==='直徑'},{l:'C',v:'圓心',c:part.n==='圓心'}],
       a:part.n==='半徑'?'A':part.n==='直徑'?'B':'C',s:[part.n+': '+part.d],sc:1}},
   // 直徑=2×半徑 (d:1)
   ()=>{const r=ri(3,12);const type=ri(0,1);
-    if(type===0)return{d:1,tp:'calc',q:'半徑'+r+'cm，直徑 = ____cm',a:String(r*2),s:['直徑=2×半徑='+r*2],sc:1};
-    return{d:1,tp:'calc',q:'直徑'+r*2+'cm，半徑 = ____cm',a:String(r),s:['半徑=直徑÷2='+r],sc:1}},
+    if(type===0)return{d:1,tp:'calc',fig:FIG.circ(r,'r'),q:'半徑'+r+'cm，直徑 = ____cm',a:String(r*2),s:['直徑=2×半徑='+r*2],sc:1};
+    return{d:1,tp:'calc',fig:FIG.circ(r,'d'),q:'直徑'+r*2+'cm，半徑 = ____cm',a:String(r),s:['半徑=直徑÷2='+r],sc:1}},
   // 正方形內接圓：直徑=邊長 (d:3)
-  ()=>{var sq=ri(10,20);return{d:3,tp:'mc',q:'在一個邊長為 '+sq+' cm 的正方形內，畫一個最大的圓形。這個圓形的直徑是多少？',isMC:true,opts:[{l:'A',v:String(sq/2)+' cm',c:false},{l:'B',v:String(sq)+' cm',c:true},{l:'C',v:String(sq*2)+' cm',c:false}],a:'B',s:['在正方形內畫最大的圓，圓的直徑剛好等於正方形的邊長。'],sc:2}}
+  ()=>{var sq=ri(10,20);var r=sq/2;return{d:3,tp:'mc',fig:FIG.circ(r,'r'),q:'在一個邊長為 '+sq+' cm 的正方形內，畫一個最大的圓形。這個圓形的直徑是多少？',isMC:true,opts:[{l:'A',v:String(sq/2)+' cm',c:false},{l:'B',v:String(sq)+' cm',c:true},{l:'C',v:String(sq*2)+' cm',c:false}],a:'B',s:['在正方形內畫最大的圓，圓的直徑剛好等於正方形的邊長。'],sc:2}}
 ],
 
 /* ═══════════ 5S2 立體圖形(二) ═══════════ */
