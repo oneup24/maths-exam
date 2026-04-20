@@ -150,7 +150,7 @@ export const grade3={
 
 '3S':[
   ()=>({d:2,tp:'mc',q:'以下哪個不一定是平行四邊形？',isMC:true,opts:[{l:'A',v:'正方形',c:false},{l:'B',v:'長方形',c:false},{l:'C',v:'梯形',c:true}],a:'C',s:['梯形只有一組平行邊'],sc:2}),
-  ()=>{var n=ri(3,6);return{d:2,tp:'calc',q:n+'個不同大小的平行四邊形的內角總和是多少度？',a:String(n*360),s:['每個360°, '+n+'×360='+n*360],sc:2}},
+  ()=>{var n=ri(3,6);return{d:2,tp:'calc',fig:FIG.para(8,5),q:n+'個不同大小的平行四邊形的內角總和是多少度？',a:String(n*360),s:['每個360°, '+n+'×360='+n*360],sc:2}},
   ()=>({d:3,tp:'mc',q:'一個三角形三條邊長分別是3cm、4cm和8cm，這三角形存在嗎？',isMC:true,opts:[{l:'A',v:'存在',c:false},{l:'B',v:'不存在',c:true}],a:'B',s:['3+4=7 < 8，不符合三角不等式'],sc:3}),
   // 正方形 ⊂ 平行四邊形 relationship
   ()=>({d:1,tp:'mc',q:'以下哪一句句子是正確的？',isMC:true,opts:[{l:'A',v:'所有長方形都是正方形',c:false},{l:'B',v:'所有正方形都是平行四邊形',c:true},{l:'C',v:'所有梯形都是平行四邊形',c:false}],a:'B',s:['正方形具有兩組對邊平行的特性，因此它是特殊的平行四邊形。'],sc:2}),

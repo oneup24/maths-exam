@@ -369,12 +369,12 @@ export const grade4={
 ],
 '4S1':[
   ()=>({d:1,tp:'mc',q:'所有正方形都是菱形，對嗎？',isMC:true,opts:[{l:'A',v:'正確',c:true},{l:'B',v:'不正確',c:false}],a:'A',s:['正方形四邊等長→菱形'],sc:2}),
-  ()=>{var n=ri(4,7);return{d:2,tp:'calc',q:n+'個平行四邊形，內角總和多少度？',a:String(n*360),s:[n+'×360='+n*360],sc:2}},
+  ()=>{var n=ri(4,7);return{d:2,tp:'calc',q:n+'個平行四邊形，內角總和多少度？',fig:FIG.para(8,5),a:String(n*360),s:[n+'×360='+n*360],sc:2}},
   ()=>({d:3,tp:'mc',q:'以下哪種四邊形的對角線互相垂直？',isMC:true,opts:[{l:'A',v:'長方形',c:false},{l:'B',v:'菱形',c:true},{l:'C',v:'梯形',c:false}],a:'B',s:['菱形的對角線互相垂直平分'],sc:2}),
   /* _addQ Strategy 7 — cross-topic (line 745) */
   ()=>{
     var w=ri(5,15),h=ri(3,10),peri=(w+h)*2;
-    return{d:3,tp:'work',
+    return{d:3,tp:'work',fig:FIG.rect(w,h,'h'),
       q:'長方形周界'+peri+'cm，長'+w+'cm。求闊和面積。（用逗號分隔）',
       a:h+','+(w*h),
       s:['闊 = '+peri+'÷2 − '+w+' = '+h+' cm',
@@ -410,7 +410,7 @@ export const grade4={
     a:'B',s:['正三角形、正方形、正六邊形可密鋪；正五邊形和圓形不可'],sc:2}),
   // 三角形面積（由長方形得） (d:3)
   ()=>{const w=ri(6,12),h=ri(4,8);const area=w*h;
-    return{d:3,tp:'work',q:'把長'+w+'cm、闊'+h+'cm的長方形沿對角線分成兩個三角形，每個三角形面積是多少cm²？',
+    return{d:3,tp:'work',fig:FIG.rect(w,h),q:'把長'+w+'cm、闊'+h+'cm的長方形沿對角線分成兩個三角形，每個三角形面積是多少cm²？',
       a:String(area/2),s:['長方形面積='+w+'×'+h+'='+area,'每個三角形='+area+'÷2='+area/2],sc:2}}
 ],
 
